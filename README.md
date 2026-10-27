@@ -24,9 +24,9 @@ Tutti i componenti del pacchetto sono organizzati con una numerazione sequenzial
 
 ### 1. Barra Rotazionale & Dual Swing Timer (`15 - Rotational Bar`)
 Posizionata visivamente a centro schermo subito sopra la barra della rabbia (278x7px):
-- **Doppio Swing Timer Speculare**:
-  - **Mezza Barra Sinistra (MH)**: Avanzamento dello swing per la Mano Primaria.
-  - **Mezza Barra Destra (OH)**: Avanzamento dello swing per la Mano Secondaria.
+- **Doppio Swing Timer Speculare con Timing Numerico Live**:
+  - **Mezza Barra Sinistra (MH)**: Avanzamento dello swing per la Mano Primaria con etichetta `MH` e countdown numerico al decimo di secondo (es. `1.8s` in combattimento, velocità arma da fermo).
+  - **Mezza Barra Destra (OH)**: Avanzamento dello swing per la Mano Secondaria con countdown numerico al decimo di secondo (es. `1.2s` in combattimento, velocità arma da fermo) ed etichetta `OH`.
 - **Rilevamento Heroic Strike / Cleave Queued**:
   - Non appena Heroic Strike o Cleave viene accodato, l'intera barra si illumina istantaneamente con un **Pixel Glow dorato** e compare la dicitura centrale `[HS QUEUED]`.
   - Fornisce la certezza visiva che il colpo successivo eliminerà i glancing blow sulla mano primaria e applicherà all'arma secondaria il cap di hit speciale (8%) invece della penalità 27% del dual wield!

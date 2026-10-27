@@ -31,6 +31,19 @@ def run_tests():
     assert hsq["id"] == "Rotational Bar - HS Queued"
     assert hsq["width"] == 278 and hsq["height"] == 7
 
+    # Verify swing timing subregions and triggers
+    mh_subtexts = [sub.get("text_text") for sub in mh.get("subRegions", [])]
+    assert "MH" in mh_subtexts, "Manca etichetta MH in subRegions"
+    assert "%c" in mh_subtexts, "Manca timing %c in MH subRegions"
+    assert mh["triggers"][1]["trigger"]["custom_type"] == "status", "MH trigger custom_type != status"
+    assert mh["triggers"][1]["trigger"].get("customTextUpdate") == "update", "MH trigger customTextUpdate != update"
+
+    oh_subtexts = [sub.get("text_text") for sub in oh.get("subRegions", [])]
+    assert "OH" in oh_subtexts, "Manca etichetta OH in subRegions"
+    assert "%c" in oh_subtexts, "Manca timing %c in OH subRegions"
+    assert oh["triggers"][1]["trigger"]["custom_type"] == "status", "OH trigger custom_type != status"
+    assert oh["triggers"][1]["trigger"].get("customTextUpdate") == "update", "OH trigger customTextUpdate != update"
+
     # Verify swing lua logic
     assert "SWING_DAMAGE" in SHARED_SWING_TIMER_LUA, "Manca evento SWING_DAMAGE in swing timer"
     assert "IsCurrentSpell" in SHARED_SWING_TIMER_LUA, "Manca IsCurrentSpell in swing timer"

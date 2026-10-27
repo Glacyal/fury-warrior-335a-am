@@ -52,3 +52,4 @@ def libdeflate_encode_for_print(data: bytes) -> str:
         cache_bitlen -= 6
     
     return ''.join(buffer)
+

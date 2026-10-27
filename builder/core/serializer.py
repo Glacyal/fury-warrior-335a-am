@@ -80,3 +80,4 @@ def serialize_value(v) -> str:
 def ace_serialize(data) -> str:
     """Restituisce la rappresentazione serializzata completa con header Ace3 '^1' e terminatore '^^'."""
     return f"^1{serialize_value(data)}^^"
+

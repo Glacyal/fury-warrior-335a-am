@@ -159,3 +159,4 @@ def build_stats_auras() -> list[dict]:
             },
         },
     ]
+

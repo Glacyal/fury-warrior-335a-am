@@ -94,3 +94,4 @@ def build_alerts_auras() -> list[dict]:
             },
         },
     ]
+

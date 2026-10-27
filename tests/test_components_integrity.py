@@ -15,8 +15,8 @@ def run_tests():
     expected_children = [
         "01 - Procs",
         "02 - Battle Shout",
-        "03 - Berserker Stance",
-        "04 - Rampage",
+        "03 - Commanding Shout",
+        "04 - Berserker Stance",
         "05 - Trinket 1",
         "06 - Trinket 2",
         "07 - Cloak",
@@ -63,3 +63,4 @@ def run_tests():
 
 if __name__ == "__main__":
     run_tests()
+

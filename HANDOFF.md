@@ -38,8 +38,8 @@ fury-warrior-335a-am/
 │   │   └── helpers.py               # Generatori di subtext e glow helper
 │   └── components/                  # Moduli dedicati ai singoli componenti dell'HUD
 │       ├── rotational.py            # 15 - Rotational Bar (Dual Swing Timer e HS Queued glow)
-│       ├── procs.py                 # 01 - Procs (gruppo dinamico superiore)
-│       ├── buffs.py                 # 02 - Battle Shout, 03 - Berserker Stance, 04 - Rampage
+│       ├── procs.py                 # 01 - Procs (gruppo dinamico con Victory Rush, Bloodsurge, T10, DBW, ecc.)
+│       ├── buffs.py                 # 02 - Battle Shout, 03 - Commanding Shout, 04 - Berserker Stance (con filtri overlap raid)
 │       ├── utility.py               # 05-13 - Utility Row (Monili, Mantello, CD maggiori, Stivali)
 │       ├── bars.py                  # 14 - Rage Bar & 16 - Castbar
 │       ├── alerts.py                # 17 - Alerts (Bloodsurge & Execute Phase)
@@ -81,3 +81,4 @@ Come concordato e specificato nella configurazione `.gitignore`:
 - I file markdown presenti in `docs/*.md` contengono la memoria persistente e l'architettura tecnica per gli assistenti AI e gli sviluppatori.
 - **Questi file sono esclusi dal repository Git** e non compaiono nei commit.
 - Il simulatore web `docs/index.html` fa eccezione ed è incluso nel versionamento Git per consentire il funzionamento della live demo su GitHub Pages.
+

@@ -317,3 +317,4 @@ def build_rotational_auras() -> list[dict]:
             },
         },
     ]
+

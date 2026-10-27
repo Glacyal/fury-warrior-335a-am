@@ -39,19 +39,21 @@ Barra orizzontale di precisione (278x14px a y = -20) con lettura numerica (%p) e
 
 ### 3. Gruppo Dinamico Procs (`01 - Procs`)
 Barra orizzontale superiore (y = 52) con riposizionamento automatico:
-1. **Bloodsurge**: Slam istantaneo con pixel glow dorato e conto alla rovescia di 5 secondi.
-2. **Tier 10 4P (Siegebreaker)**: Tracciamento delle 2 cariche di Slam e -1s su Bloodthirst.
-3. **Tier 10 2P**: +16% Attack Power per 10s da tick di Deep Wounds.
-4. **Flurry**: +25% attack speed (3 cariche) dopo un critico in mischia.
-5. **Wrecking Crew / Enrage**: +10% danno fisico per 12s da critico.
-6. **Deathbringer's Will (DBW)**: Monitoraggio dei proc Taunka (+600 Str), Vrykul (+600 Agi), Iron Dwarf (+600 ArP/Haste).
-7. **Berserking**: Proc +400 AP da incanto armi.
-8. **Execute Usable**: Icona attiva con bordo luminoso quando il boss scende sotto il 20% di salute.
+1. **Victory Rush**: Proc *Victorious* (Spell 34428 / Buff 32216) con conto alla rovescia di 20 secondi e pixel glow verde.
+2. **Bloodsurge**: Slam istantaneo con pixel glow dorato e conto alla rovescia di 5 secondi.
+3. **Tier 10 4P (Siegebreaker)**: Tracciamento delle 2 cariche di Slam e -1s su Bloodthirst.
+4. **Tier 10 2P**: +16% Attack Power per 10s da tick di Deep Wounds.
+5. **Flurry**: +25% attack speed (3 cariche) dopo un critico in mischia.
+6. **Wrecking Crew / Enrage**: +10% danno fisico per 12s da critico.
+7. **Deathbringer's Will (DBW)**: Monitoraggio dei proc Taunka (+1200 AP), Vrykul (+9.6% Crit), Iron Dwarf (+42.8% ArP).
+8. **Berserking**: Proc +400 AP da incanto armi.
+9. **Execute Usable**: Icona attiva con bordo luminoso quando il boss scende sotto il 20% di salute.
 
-### 4. Zero Clutter & Buff di Classe
-- **02 - Battle Shout**: Nascosto in combattimento se attivo con più di 30 secondi; mostra il timer in scadenza e un avviso pulsante in rosso se assente (con fallback intelligente a Commanding Shout).
-- **03 - Berserker Stance**: Allerta immediata se durante il combattimento il guerriero si trova fuori dalla Berserker Stance.
-- **04 - Rampage**: Verifica la presenza del buff raid +5% critico fisico, segnalando eventuali assenze in combattimento.
+### 4. Zero Clutter & Intelligenza Overlap di Raid
+- **02 - Battle Shout**: Nascosto in combattimento se attivo con più di 30 secondi; mostra il timer in scadenza e allerta se assente. **Filtro Overlap**: Viene soppresso automaticamente se è attivo *Blessing of Might* o *Greater Blessing of Might* del Paladino (buff equivalente/superiore).
+- **03 - Commanding Shout**: Diventa la shout di riferimento se Battle Shout è coperto dal Paladino. Viene soppresso automaticamente se è attivo il buff *Blood Pact* dell'Imp del Warlock.
+- **04 - Berserker Stance**: Allerta immediata ad alta visibilità se durante il combattimento il guerriero si trova fuori dalla Berserker Stance.
+- *(Nota su Rampage)*: Rimosso dall'HUD per eliminare il disordine visivo, essendo in 3.3.5a un'aura passiva permanente al critico fisico.
 
 ### 5. Riga Utility Adattiva (`05` - `13`, da 3 a 9 Icone)
 La fila inferiore a y = -45 si adatta e si ricentra automaticamente:
@@ -103,3 +105,4 @@ python scripts/sync_docs.py
 # 3. Esegui la suite di test paralleli ad alte prestazioni
 python tests/run_parallel_tests.py
 ```
+

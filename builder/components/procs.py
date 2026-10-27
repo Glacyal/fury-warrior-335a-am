@@ -5,22 +5,23 @@ Gestisce la barra orizzontale dinamica superiore dei proc di combattimento (y = 
 - Crescita orizzontale centrata (space = 6px, icone 34x34px).
 - Include i seguenti proc e debuff attivi:
   1. Bloodsurge (Slam istantaneo con Pixel Glow e timer 5s)
-  2. Tier 10 4P (Siegebreaker: 2 cariche e -1s CD su Bloodthirst)
-  3. Tier 10 2P (+16% Attack Power per 10s da Deep Wounds)
-  4. Flurry (+25% Attack Speed per 3 colpi dopo un critico)
-  5. Wrecking Crew / Enrage (+10% danno fisico per 12s)
-  6. Deathbringer's Will (DBW: Taunka / Vrykul / Iron Dwarf)
-  7. Berserking (+400 Attack Power da incanto arma)
-  8. Execute Usable (Target <= 20% HP con bordo luminoso)
+  2. Victory Rush (Proc Victorious con countdown durata 20s e glow)
+  3. Tier 10 4P (Siegebreaker: 2 cariche e -1s CD su Bloodthirst)
+  4. Tier 10 2P (+16% Attack Power per 10s da Deep Wounds)
+  5. Flurry (+25% Attack Speed per 3 colpi dopo un critico)
+  6. Wrecking Crew / Enrage (+10% danno fisico per 12s)
+  7. Deathbringer's Will (DBW: Taunka / Vrykul / Iron Dwarf)
+  8. Berserking (+400 Attack Power da incanto arma)
+  9. Execute Usable (Target <= 20% HP con bordo luminoso)
 """
 from builder.core.helpers import make_subtext, make_glow_action
 
 
 def build_procs_auras() -> list[dict]:
     """
-    Costruisce e restituisce le 9 aure del gruppo dinamico Procs:
+    Costruisce e restituisce le 10 aure del gruppo dinamico Procs:
     - 01 - Procs (Dynamic Group)
-    - Bloodsurge, Tier 10 4P, Tier 10 2P, Flurry, Wrecking Crew, DBW, Berserking, Execute Usable.
+    - Bloodsurge, Victory Rush, Tier 10 4P, Tier 10 2P, Flurry, Wrecking Crew, DBW, Berserking, Execute Usable.
     """
     return [
         {
@@ -36,6 +37,7 @@ def build_procs_auras() -> list[dict]:
             "yOffset": 52,
             "controlledChildren": [
                 "Bloodsurge",
+                "Victory Rush",
                 "Tier 10 4P",
                 "Tier 10 2P",
                 "Flurry",
@@ -83,7 +85,43 @@ def build_procs_auras() -> list[dict]:
                 "activeTriggerMode": -10,
             },
         },
-        # 2. Tier 10 4P (Siegebreaker - 70846)
+        # 2. Victory Rush (Proc Victorious - 32216 / durata 20s)
+        {
+            "id": "Victory Rush",
+            "uid": "FWHUD_PROC_VICTORY_RUSH",
+            "parent": "01 - Procs",
+            "regionType": "icon",
+            "internalVersion": 52,
+            "width": 34,
+            "height": 34,
+            "displayIcon": "Interface\\Icons\\Ability_Warrior_VictoryRush",
+            "auto": True,
+            "color": [1, 1, 1, 1],
+            "cooldown": True,
+            "cooldownSwipe": True,
+            "actions": {
+                "start": make_glow_action(),
+                "finish": {"do_glow": True, "glow_action": "hide"},
+            },
+            "subRegions": [
+                make_subtext("%p", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=12, y_offset=0),
+            ],
+            "triggers": {
+                1: {
+                    "trigger": {
+                        "type": "aura2",
+                        "unit": "player",
+                        "auranames": ["Victorious", "Victory Rush", "32216", "34428"],
+                        "useName": True,
+                        "debuffType": "HELPFUL",
+                        "matchesShowOn": "showOnActive",
+                    },
+                    "untrigger": {}
+                },
+                "activeTriggerMode": -10,
+            },
+        },
+        # 3. Tier 10 4P (Siegebreaker - 70846)
         {
             "id": "Tier 10 4P",
             "uid": "FWHUD_PROC_T10_4P",
@@ -115,7 +153,7 @@ def build_procs_auras() -> list[dict]:
                 "activeTriggerMode": -10,
             },
         },
-        # 3. Tier 10 2P (+16% Attack Power - 70845)
+        # 4. Tier 10 2P (+16% Attack Power - 70845)
         {
             "id": "Tier 10 2P",
             "uid": "FWHUD_PROC_T10_2P",
@@ -147,7 +185,7 @@ def build_procs_auras() -> list[dict]:
                 "activeTriggerMode": -10,
             },
         },
-        # 4. Flurry (+25% Attack Speed - 16280)
+        # 5. Flurry (+25% Attack Speed - 16280)
         {
             "id": "Flurry",
             "uid": "FWHUD_PROC_FLURRY",
@@ -180,7 +218,7 @@ def build_procs_auras() -> list[dict]:
                 "activeTriggerMode": -10,
             },
         },
-        # 5. Wrecking Crew / Enrage (+10% danno - 57519 / 57516)
+        # 6. Wrecking Crew / Enrage (+10% danno - 57519 / 57516)
         {
             "id": "Wrecking Crew",
             "uid": "FWHUD_PROC_WRECKING_CREW",
@@ -212,7 +250,7 @@ def build_procs_auras() -> list[dict]:
                 "activeTriggerMode": -10,
             },
         },
-        # 6. Deathbringer's Will (DBW Proc: Taunka / Vrykul / Iron Dwarf)
+        # 7. Deathbringer's Will (DBW Proc: Taunka / Vrykul / Iron Dwarf)
         {
             "id": "Deathbringer's Will",
             "uid": "FWHUD_PROC_DBW",
@@ -221,7 +259,7 @@ def build_procs_auras() -> list[dict]:
             "internalVersion": 52,
             "width": 34,
             "height": 34,
-            "displayIcon": "Interface\\Icons\\INV_Jewelry_Necklace_36",
+            "displayIcon": "Interface\\Icons\\INV_Misc_Ornament_02",
             "auto": True,
             "color": [1, 1, 1, 1],
             "cooldown": True,
@@ -251,7 +289,7 @@ def build_procs_auras() -> list[dict]:
                 "activeTriggerMode": -10,
             },
         },
-        # 7. Berserking (+400 Attack Power - 59620)
+        # 8. Berserking (+400 Attack Power - 59620)
         {
             "id": "Berserking",
             "uid": "FWHUD_PROC_BERSERKING",
@@ -284,7 +322,7 @@ def build_procs_auras() -> list[dict]:
                 "activeTriggerMode": -10,
             },
         },
-        # 8. Execute Usable (Target <= 20% HP)
+        # 9. Execute Usable (Target <= 20% HP)
         {
             "id": "Execute Usable",
             "uid": "FWHUD_PROC_EXECUTE",

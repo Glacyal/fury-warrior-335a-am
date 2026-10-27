@@ -28,3 +28,4 @@ if count > 0:
     print(f"docs/index.html updated successfully! String length: {len(wa_str)}")
 else:
     print("Warning: textarea id='hiddenWaString' not found in docs/index.html")
+

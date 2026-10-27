@@ -3,8 +3,8 @@ Modulo Componente: 05 - Trinkets & 06-13 - Utility Row (Warrior Fury)
 ======================================================================
 Gestisce la riga orizzontale di utilità a y = -45 con riposizionamento dinamico
 centrato naturale (da 3 a 9 icone) in base all'equipaggiamento e alle abilità:
-1. 05 - Trinket 1 (Slot 13: ICD 45s/90s/105s o On-Use, Pixel Glow su proc)
-2. 06 - Trinket 2 (Slot 14: ICD 45s/90s/105s o On-Use, Pixel Glow su proc)
+1. 05 - Trinket 1 (Slot 13: Deathbringer's Will o altro monile con ICD 45s/90s/105s o On-Use, Glow su proc)
+2. 06 - Trinket 2 (Slot 14: Sharpened Twilight Scale o altro monile con ICD 45s/90s/105s o On-Use, Glow su proc)
 3. 07 - Cloak (Slot 15: Swordguard Embroidery +400 AP / Paracadute / Flexweave)
 4. 08 - Death Wish (Spell ID 12292, durata attiva 30s + cooldown 2m/3m)
 5. 09 - Gloves (Slot 10: Acceleratori Ipersonici Ingegneria +340 Haste per 12s, 60s CD)
@@ -124,44 +124,16 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
             if link then itemID = tonumber(link:match("item:(%d+)")) end
         end
 
+        -- Slot 13 & 14 (Trinkets): sempre visibili per default se item presente o in configurazione standard
         if s == 13 or s == 14 then
             local eq = (itemID ~= nil and itemID > 0)
+            if not itemID then eq = true end -- fallback di visualizzazione sicura
             cache.isEquipped = eq
             return eq
         end
 
         if not itemID or itemID == 0 then
-            cache.isEquipped = false
-            return false
-        end
-
-        local itemLink = GetInventoryItemLink("player", s)
-        local enchantID = nil
-        if itemLink then
-            enchantID = tonumber(itemLink:match("item:%d+:(%d+)"))
-        end
-
-        if s == 10 then
-            if enchantID == 3604 or enchantID == 3834 then cache.isEquipped = true return true end
-            cache.isEquipped = true
-            return true
-        end
-
-        if s == 8 then
-            if enchantID and _G.FWHUD_BootsEnchantIDs and _G.FWHUD_BootsEnchantIDs[enchantID] then
-                cache.isEquipped = true
-                return true
-            end
-            cache.isEquipped = true
-            return true
-        end
-
-        if s == 15 then
-            if enchantID and _G.FWHUD_CloakEnchantIDs and _G.FWHUD_CloakEnchantIDs[enchantID] then
-                cache.isEquipped = true
-                return true
-            end
-            cache.isEquipped = true
+            cache.isEquipped = true -- fallback sicuro per non nascondere icone chiave
             return true
         end
 
@@ -304,7 +276,8 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
             end
         end
 
-        return finish("READY", 0, 0, nil)
+        local defSlotIcon = (slot == 13 and "Interface\\Icons\\INV_Misc_Ornament_02") or (slot == 14 and "Interface\\Icons\\INV_Misc_RubySanctum1") or nil
+        return finish("READY", 0, 0, defSlotIcon)
     end
 
     local lastRowUpdate = 0
@@ -318,22 +291,17 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         local group = groupObj and (groupObj.region or (groupObj.GetPoint and groupObj))
         if not group then return end
 
-        local hasT1 = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(13)
-        local hasT2 = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(14)
-        local hasCloak = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(15)
-        local hasGloves = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(10)
-        local hasBoots = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(8)
-
-        local activeOrder = {}
-        if hasT1 then table.insert(activeOrder, "05 - Trinket 1") end
-        if hasT2 then table.insert(activeOrder, "06 - Trinket 2") end
-        if hasCloak then table.insert(activeOrder, "07 - Cloak") end
-        table.insert(activeOrder, "08 - Death Wish")
-        if hasGloves then table.insert(activeOrder, "09 - Gloves") end
-        table.insert(activeOrder, "10 - Recklessness")
-        table.insert(activeOrder, "11 - Shattering Throw")
-        table.insert(activeOrder, "12 - Enraged Regeneration")
-        if hasBoots then table.insert(activeOrder, "13 - Boots") end
+        local activeOrder = {
+            "05 - Trinket 1",
+            "06 - Trinket 2",
+            "07 - Cloak",
+            "08 - Death Wish",
+            "09 - Gloves",
+            "10 - Recklessness",
+            "11 - Shattering Throw",
+            "12 - Enraged Regeneration",
+            "13 - Boots",
+        }
 
         local N = #activeOrder
         local step = 38
@@ -461,10 +429,10 @@ def build_utility_auras() -> list[dict]:
             },
         }
 
-    # 05 - Trinket 1 (Slot 13)
-    auras.append(make_slot_aura("05 - Trinket 1", "FWHUD_UTIL_TRINKET1", 13, "Interface\\Icons\\INV_Jewelry_TrinketPVP_02"))
-    # 06 - Trinket 2 (Slot 14)
-    auras.append(make_slot_aura("06 - Trinket 2", "FWHUD_UTIL_TRINKET2", 14, "Interface\\Icons\\INV_Jewelry_Necklace_36"))
+    # 05 - Trinket 1 (Slot 13: Deathbringer's Will icon)
+    auras.append(make_slot_aura("05 - Trinket 1", "FWHUD_UTIL_TRINKET1", 13, "Interface\\Icons\\INV_Misc_Ornament_02"))
+    # 06 - Trinket 2 (Slot 14: Sharpened Twilight Scale icon)
+    auras.append(make_slot_aura("06 - Trinket 2", "FWHUD_UTIL_TRINKET2", 14, "Interface\\Icons\\INV_Misc_RubySanctum1"))
     # 07 - Cloak (Slot 15)
     auras.append(make_slot_aura("07 - Cloak", "FWHUD_UTIL_CLOAK", 15, "Interface\\Icons\\INV_Misc_Cape_19"))
 

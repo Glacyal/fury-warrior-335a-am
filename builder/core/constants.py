@@ -28,3 +28,4 @@ COLOR_RAGE_BG = [0.10, 0.04, 0.04, 0.85]     # Sfondo scuro barra rabbia
 COLOR_GOLD_BLOODSURGE = [1.0, 0.84, 0.0, 1.0] # Oro per proc Bloodsurge e glow
 COLOR_CASTBAR = [0.0, 0.77, 1.0, 1.0]         # Azzurro classico castbar
 COLOR_CASTBAR_BG = [0.05, 0.08, 0.12, 0.8]   # Sfondo castbar
+

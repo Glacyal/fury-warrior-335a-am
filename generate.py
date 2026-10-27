@@ -10,3 +10,4 @@ if __name__ == "__main__":
     with open(output_path, "w", encoding="utf-8") as f:
         f.write(wa_string)
     print(f"Generated !WA:1! String successfully! Length: {len(wa_string)}")
+

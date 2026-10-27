@@ -129,3 +129,4 @@ def build_bars_auras() -> list[dict]:
             ],
         },
     ]
+

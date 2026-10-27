@@ -22,8 +22,8 @@ def build_wa_tree() -> dict:
     """
     Costruisce e restituisce l'albero gerarchico completo per WeakAuras 4.0.0 (internalVersion 52).
     Assembla modularmente gli 8 componenti:
-    1. 01 - Procs (Dynamic Group)
-    2. 02 - Battle Shout, 03 - Berserker Stance, 04 - Rampage
+    1. 01 - Procs (Dynamic Group con Bloodsurge, Victory Rush, T10, Flurry, Wrecking Crew, DBW, Berserking, Execute)
+    2. 02 - Battle Shout, 03 - Commanding Shout, 04 - Berserker Stance
     3. 05-13 - Utility Row (Trinket 1, Trinket 2, Cloak, Death Wish, Gloves, Recklessness, Shattering Throw, Enraged Regen, Boots)
     4. 14 - Rage Bar, 16 - Castbar
     5. 15 - Rotational Bar (Dual Swing Timer & Heroic Strike Queued)
@@ -51,8 +51,8 @@ def build_wa_tree() -> dict:
             "controlledChildren": [
                 "01 - Procs",
                 "02 - Battle Shout",
-                "03 - Berserker Stance",
-                "04 - Rampage",
+                "03 - Commanding Shout",
+                "04 - Berserker Stance",
                 "05 - Trinket 1",
                 "06 - Trinket 2",
                 "07 - Cloak",

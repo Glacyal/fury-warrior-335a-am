@@ -21,3 +21,4 @@ def generate_wa_string(data_table: dict) -> str:
     compressed = comp_obj.compress(serialized.encode('latin1')) + comp_obj.flush()
     encoded = libdeflate_encode_for_print(compressed)
     return f"!WA:1!{encoded}"
+

@@ -10,15 +10,15 @@ def run_tests():
     assert len(auras) == 3, f"Expected 3 auras in stats panel, got {len(auras)}"
 
     grp = auras[0]
-    assert grp["id"] == "18 - Stats Panel"
+    assert grp["id"] == "18 - Stats Panel warDPS"
     assert grp["regionType"] == "group"
 
     bg = auras[1]
-    assert bg["id"] == "Stats Panel - Background"
+    assert bg["id"] == "Stats Panel - Background warDPS"
     assert bg["width"] == 88 and bg["height"] == 48
 
     text_aura = auras[2]
-    assert text_aura["id"] == "Stats Panel - Text"
+    assert text_aura["id"] == "Stats Panel - Text warDPS"
     assert text_aura["displayText"] == "%c"
     lua_code = text_aura.get("customText", "")
 

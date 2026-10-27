@@ -22,7 +22,7 @@ Visualizza e interagisci con l'HUD direttamente dal browser senza installare nul
 
 Tutti i componenti del pacchetto sono organizzati con una numerazione sequenziale rigorosa da **01** a **19**:
 
-### 1. Gruppo Dinamico Procs Rotazionali (`01 - Procs`)
+### 1. Gruppo Dinamico Procs Rotazionali (`01 - Procs warDPS`)
 Barra orizzontale superiore (y = 52) con riposizionamento dinamico centrato, riservata **esclusivamente ai proc di combattimento attivi**:
 1. **Bloodsurge**: Slam istantaneo con pixel glow dorato e conto alla rovescia di 5 secondi.
 2. **Victory Rush**: Proc *Victorious* (Spell 34428 / Buff 32216) con conto alla rovescia di 20 secondi e pixel glow verde.
@@ -39,21 +39,21 @@ Barra orizzontale superiore (y = 52) con riposizionamento dinamico centrato, ris
 ### 3. Riga Utility Adattiva (`05` - `13`, da 3 a 9 Icone a y = -45)
 Fila orizzontale inferiore a y = -45 con riposizionamento e ricentratura automatica (espansione e contrazione dinamica identica a fire-mage-335a-am):
 - **05 - Trinket 1 warDPS & 06 - Trinket 2 warDPS**: Riconoscimento automatico slot 13 & 14 (con suffisso dedicato `warDPS` per prevenire sovrascritture o duplicati `2` in caso di convivenza con la suite Fire Mage). Catalogo integrato di **tutti i monili da mischia 3.3.5a** (Deathbringer's Will, Sharpened Twilight Scale, Death's Choice/Verdict, Whispering Fanged Skull, Herkuml War Token, Needle-Encrusted Scorpion, Mjolnir Runestone, Comet's Trail, Darkmoon Card: Greatness, Grim Toll, Mirror of Truth, Wrathstone, Mark of Supremacy, ecc.) con tracciamento durata attiva, Pixel Glow e conto alla rovescia ICD.
-- **07 - Cloak**: Attivo con incanti da mischia (Swordguard Embroidery +400 AP o paracadute/flexweave).
-- **08 - Tier Set (T7 - T10)**: Rilevamento automatico dell'armatura Tier equipaggiata (>= 2 o >= 4 pezzi) e tracciamento proc:
+- **07 - Cloak warDPS**: Attivo con incanti da mischia (Swordguard Embroidery +400 AP o paracadute/flexweave).
+- **08 - Tier Set warDPS (T7 - T10)**: Rilevamento automatico dell'armatura Tier equipaggiata (>= 2 o >= 4 pezzi) e tracciamento proc:
   - **Tier 10 (Ymirjar Lord)**: 4P Siegebreaker (2 cariche e -0.5s GCD su Slam) e 2P Advantage (+16% AP per 10s da Deep Wounds).
   - **Tier 8 (Siegebreaker)**: 4P (+20% Attack Speed per 5s) e 2P (+150 Crit per 5s).
   - **Tier 7 (Dreadnaught)**: 4P (+610 AP per 10s da critico).
   - **Tier 9 (Hellscream/Wrynn)**: Bonus passivi di stance e critico.
-- **09 - Enchants (Armi & Anello)**: Monitoraggio in tempo reale degli incanti arma ed anello:
+- **09 - Enchants warDPS (Armi & Anello)**: Monitoraggio in tempo reale degli incanti arma ed anello:
   - **Berserking MH & OH**: Rilevamento singolo o doppio stack (**x2 con +800 AP complessivi**) con timer e Pixel Glow.
   - **Executioner**: +120 Armor Penetration per 15s.
   - **Mongoose**: +120 Agilità e 2% Haste per 15s.
   - **Ashen Band of Endless Might**: Proc anello +480 AP per 10s (60s ICD).
-- **10 - Gloves**: Acceleratori Ipersonici Ingegneria (+340 Haste per 12s, 60s CD).
+- **10 - Gloves warDPS**: Acceleratori Ipersonici Ingegneria (+340 Haste per 12s, 60s CD).
 - **11 - Death Wish**: Durata attiva 30s (+20% danno) e cooldown.
 - **12 - Recklessness**: Tracciamento delle 3 cariche di critico garantito e cooldown.
-- **13 - Boots**: Stivali a nitro (Nitro Boosts) o incanti velocità con stato pronto e ricarica.
+- **13 - Boots warDPS**: Stivali a nitro (Nitro Boosts) o incanti velocità con stato pronto e ricarica.
 
 ### 4. Barra della Rabbia Dinamica (`14 - Rage Bar`)
 Barra orizzontale di precisione (278x14px a y = -20) con lettura numerica (%p) e cambio cromatico a 3 stadi:
@@ -70,15 +70,15 @@ Posizionata visivamente a centro schermo subito sopra la barra della rabbia (278
   - Non appena Heroic Strike o Cleave viene accodato, l'intera barra si illumina istantaneamente con un **Pixel Glow dorato** e compare la dicitura centrale `[HS QUEUED]`.
   - Fornisce la certezza visiva che il colpo successivo eliminerà i glancing blow sulla mano primaria e applicherà all'arma secondaria il cap di hit speciale (8%) invece della penalità 27% del dual wield!
 
-### 6. Castbar Centrale (`16 - Castbar`)
+### 6. Castbar Centrale (`16 - Castbar warDPS`)
 Barra sincronizzata (278x20px a y = 8) per lanci di Slam non-proc e cannellature, con icona incantesimo a sinistra, nome al centro e tempo a destra.
 
-### 7. Avvisi Testuali ad Alta Visibilità (`17 - Alerts`)
+### 7. Avvisi Testuali ad Alta Visibilità (`17 - Alerts warDPS`)
 Avvisi a caratteri cubitali a centro schermo (y = 105):
 - `BLOODSURGE! / SLAM READY!` in giallo/arancione quando Bloodsurge si attiva.
 - `EXECUTE PHASE (< 20%)!` in rosso fuoco quando il target scende sotto il 20% di salute.
 
-### 8. Pannello Statistiche in Tempo Reale (`18 - Stats Panel`)
+### 8. Pannello Statistiche in Tempo Reale (`18 - Stats Panel warDPS`)
 Pannello compatto (88x48px a x = -190, y = -45) con aggiornamento throttled a 10 Hz:
 - **AP**: Attack power totale con buff e moltiplicatori.
 - **Crit**: Critico in mischia con debuff Heart of the Crusader / Master Poisoner (+3%) sul bersaglio.

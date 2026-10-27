@@ -18,7 +18,7 @@ def build_alerts_auras() -> list[dict]:
     """
     return [
         {
-            "id": "17 - Alerts",
+            "id": "17 - Alerts warDPS",
             "uid": "FWHUD_ALERTS_GRP",
             "parent": "Class Warrior (Fury)",
             "regionType": "group",
@@ -34,7 +34,7 @@ def build_alerts_auras() -> list[dict]:
         {
             "id": "Alert - Bloodsurge",
             "uid": "FWHUD_ALERT_BLOODSURGE",
-            "parent": "17 - Alerts",
+            "parent": "17 - Alerts warDPS",
             "regionType": "text",
             "internalVersion": 52,
             "displayText": "|cFFFF2200BLOODSURGE!|r\\n|cFFFFFF00SLAM READY!|r",
@@ -65,7 +65,7 @@ def build_alerts_auras() -> list[dict]:
         {
             "id": "Alert - Execute Phase",
             "uid": "FWHUD_ALERT_EXECUTE",
-            "parent": "17 - Alerts",
+            "parent": "17 - Alerts warDPS",
             "regionType": "text",
             "internalVersion": 52,
             "displayText": "|cFFFF0000EXECUTE PHASE (< 20%)!|r",

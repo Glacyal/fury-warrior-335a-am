@@ -88,7 +88,7 @@ def build_stats_auras() -> list[dict]:
 
     return [
         {
-            "id": "18 - Stats Panel",
+            "id": "18 - Stats Panel warDPS",
             "uid": "FWHUD_STATS_GRP",
             "parent": "Class Warrior (Fury)",
             "regionType": "group",
@@ -96,15 +96,15 @@ def build_stats_auras() -> list[dict]:
             "xOffset": -190,
             "yOffset": -45,
             "controlledChildren": [
-                "Stats Panel - Background",
-                "Stats Panel - Text",
+                "Stats Panel - Background warDPS",
+                "Stats Panel - Text warDPS",
             ],
         },
         # Background Frame (88x48px)
         {
-            "id": "Stats Panel - Background",
+            "id": "Stats Panel - Background warDPS",
             "uid": "FWHUD_STATS_BG",
-            "parent": "18 - Stats Panel",
+            "parent": "18 - Stats Panel warDPS",
             "regionType": "texture",
             "internalVersion": 52,
             "width": 88,
@@ -133,9 +133,9 @@ def build_stats_auras() -> list[dict]:
         },
         # Testo Dinamico a 4 Righe (Aggiornamento reattivo %c)
         {
-            "id": "Stats Panel - Text",
+            "id": "Stats Panel - Text warDPS",
             "uid": "FWHUD_STATS_TEXT",
-            "parent": "18 - Stats Panel",
+            "parent": "18 - Stats Panel warDPS",
             "regionType": "text",
             "internalVersion": 52,
             "fontSize": 9,

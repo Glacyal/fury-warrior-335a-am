@@ -697,13 +697,13 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         local activeOrder = {}
         if hasT1 then table.insert(activeOrder, "05 - Trinket 1 warDPS") end
         if hasT2 then table.insert(activeOrder, "06 - Trinket 2 warDPS") end
-        if hasCloak then table.insert(activeOrder, "07 - Cloak") end
-        if hasTier then table.insert(activeOrder, "08 - Tier Set") end
-        if hasEnchants then table.insert(activeOrder, "09 - Enchants") end
-        if hasGloves then table.insert(activeOrder, "10 - Gloves") end
+        if hasCloak then table.insert(activeOrder, "07 - Cloak warDPS") end
+        if hasTier then table.insert(activeOrder, "08 - Tier Set warDPS") end
+        if hasEnchants then table.insert(activeOrder, "09 - Enchants warDPS") end
+        if hasGloves then table.insert(activeOrder, "10 - Gloves warDPS") end
         table.insert(activeOrder, "11 - Death Wish")
         table.insert(activeOrder, "12 - Recklessness")
-        if hasBoots then table.insert(activeOrder, "13 - Boots") end
+        if hasBoots then table.insert(activeOrder, "13 - Boots warDPS") end
 
         local N = #activeOrder
         local step = 38
@@ -1091,13 +1091,13 @@ def build_utility_auras() -> list[dict]:
     Costruisce e restituisce le 9 aure della riga utility adattiva centrata a y = -45:
     - 05 - Trinket 1 warDPS (Icon, Slot 13)
     - 06 - Trinket 2 warDPS (Icon, Slot 14)
-    - 07 - Cloak (Icon, Slot 15)
-    - 08 - Tier Set (Icon, T10/T8/T7 Proc & ICD)
-    - 09 - Enchants (Icon, Berserking MH/OH x1/x2, Executioner, Mongoose, Ashen Band)
-    - 10 - Gloves (Icon, Slot 10)
+    - 07 - Cloak warDPS (Icon, Slot 15)
+    - 08 - Tier Set warDPS (Icon, T10/T8/T7 Proc & ICD)
+    - 09 - Enchants warDPS (Icon, Berserking MH/OH x1/x2, Executioner, Mongoose, Ashen Band)
+    - 10 - Gloves warDPS (Icon, Slot 10)
     - 11 - Death Wish (Icon, Spell 12292)
     - 12 - Recklessness (Icon, Spell 1719)
-    - 13 - Boots (Icon, Slot 8)
+    - 13 - Boots warDPS (Icon, Slot 8)
     """
     events_list = "PLAYER_EQUIPMENT_CHANGED,UNIT_INVENTORY_CHANGED,PLAYER_ENTERING_WORLD,ZONE_CHANGED_NEW_AREA,UNIT_AURA,SPELL_UPDATE_COOLDOWN,ACTIONBAR_UPDATE_COOLDOWN,BAG_UPDATE_COOLDOWN,COMBAT_LOG_EVENT_UNFILTERED,FWHUD_ROW_UPDATE"
 
@@ -1188,9 +1188,9 @@ def build_utility_auras() -> list[dict]:
             ],
         },
 
-        # 07 - Cloak (Slot 15)
+        # 07 - Cloak warDPS (Slot 15)
         {
-            "id": "07 - Cloak",
+            "id": "07 - Cloak warDPS",
             "uid": "FWHUD_UTIL_CLOAK",
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",
@@ -1231,9 +1231,9 @@ def build_utility_auras() -> list[dict]:
             ],
         },
 
-        # 08 - Tier Set (T10/T8/T7 Proc & ICD)
+        # 08 - Tier Set warDPS (T10/T8/T7 Proc & ICD)
         {
-            "id": "08 - Tier Set",
+            "id": "08 - Tier Set warDPS",
             "uid": "FWHUD_UTIL_TIERSET",
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",
@@ -1274,9 +1274,9 @@ def build_utility_auras() -> list[dict]:
             ],
         },
 
-        # 09 - Enchants (Berserking MH/OH x1/x2, Executioner, Mongoose, Ashen Band)
+        # 09 - Enchants warDPS (Berserking MH/OH x1/x2, Executioner, Mongoose, Ashen Band)
         {
-            "id": "09 - Enchants",
+            "id": "09 - Enchants warDPS",
             "uid": "FWHUD_UTIL_ENCHANTS",
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",
@@ -1317,9 +1317,9 @@ def build_utility_auras() -> list[dict]:
             ],
         },
 
-        # 10 - Gloves (Slot 10)
+        # 10 - Gloves warDPS (Slot 10)
         {
-            "id": "10 - Gloves",
+            "id": "10 - Gloves warDPS",
             "uid": "FWHUD_UTIL_GLOVES",
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",
@@ -1450,9 +1450,9 @@ end"""
             ],
         },
 
-        # 13 - Boots (Slot 8)
+        # 13 - Boots warDPS (Slot 8)
         {
-            "id": "13 - Boots",
+            "id": "13 - Boots warDPS",
             "uid": "FWHUD_UTIL_BOOTS",
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",

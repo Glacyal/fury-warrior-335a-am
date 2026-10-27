@@ -18,12 +18,12 @@ from builder.core.helpers import make_subtext, make_glow_action
 def build_procs_auras() -> list[dict]:
     """
     Costruisce e restituisce le 6 aure del gruppo dinamico Procs:
-    - 01 - Procs (Dynamic Group)
+    - 01 - Procs warDPS (Dynamic Group)
     - Bloodsurge, Victory Rush, Flurry, Wrecking Crew, Execute Usable.
     """
     return [
         {
-            "id": "01 - Procs",
+            "id": "01 - Procs warDPS",
             "uid": "FWHUD_PROCS_DG",
             "parent": "Class Warrior (Fury)",
             "regionType": "dynamicgroup",
@@ -45,7 +45,7 @@ def build_procs_auras() -> list[dict]:
         {
             "id": "Bloodsurge",
             "uid": "FWHUD_PROC_BLOODSURGE",
-            "parent": "01 - Procs",
+            "parent": "01 - Procs warDPS",
             "regionType": "icon",
             "internalVersion": 52,
             "width": 34,
@@ -83,7 +83,7 @@ def build_procs_auras() -> list[dict]:
         {
             "id": "Victory Rush",
             "uid": "FWHUD_PROC_VICTORY_RUSH",
-            "parent": "01 - Procs",
+            "parent": "01 - Procs warDPS",
             "regionType": "icon",
             "internalVersion": 52,
             "width": 34,
@@ -119,7 +119,7 @@ def build_procs_auras() -> list[dict]:
         {
             "id": "Flurry",
             "uid": "FWHUD_PROC_FLURRY",
-            "parent": "01 - Procs",
+            "parent": "01 - Procs warDPS",
             "regionType": "icon",
             "internalVersion": 52,
             "width": 34,
@@ -152,7 +152,7 @@ def build_procs_auras() -> list[dict]:
         {
             "id": "Wrecking Crew",
             "uid": "FWHUD_PROC_WRECKING_CREW",
-            "parent": "01 - Procs",
+            "parent": "01 - Procs warDPS",
             "regionType": "icon",
             "internalVersion": 52,
             "width": 34,
@@ -184,7 +184,7 @@ def build_procs_auras() -> list[dict]:
         {
             "id": "Execute Usable",
             "uid": "FWHUD_PROC_EXECUTE",
-            "parent": "01 - Procs",
+            "parent": "01 - Procs warDPS",
             "regionType": "icon",
             "internalVersion": 52,
             "width": 34,

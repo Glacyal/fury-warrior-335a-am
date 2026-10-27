@@ -13,24 +13,24 @@ def run_tests():
     assert root["internalVersion"] == 52, f"Invalid internalVersion: {root.get('internalVersion')}"
 
     expected_children = [
-        "01 - Procs",
+        "01 - Procs warDPS",
         "02 - Battle Shout",
         "03 - Commanding Shout",
         "04 - Berserker Stance",
         "05 - Trinket 1 warDPS",
         "06 - Trinket 2 warDPS",
-        "07 - Cloak",
-        "08 - Tier Set",
-        "09 - Enchants",
-        "10 - Gloves",
+        "07 - Cloak warDPS",
+        "08 - Tier Set warDPS",
+        "09 - Enchants warDPS",
+        "10 - Gloves warDPS",
         "11 - Death Wish",
         "12 - Recklessness",
-        "13 - Boots",
+        "13 - Boots warDPS",
         "14 - Rage Bar",
         "15 - Rotational Bar",
-        "16 - Castbar",
-        "17 - Alerts",
-        "18 - Stats Panel",
+        "16 - Castbar warDPS",
+        "17 - Alerts warDPS",
+        "18 - Stats Panel warDPS",
         "19 - Sunder Armor Tracker",
     ]
 

@@ -96,7 +96,7 @@ def build_bars_auras() -> list[dict]:
         # 16 - CASTBAR
         # =====================================================================
         {
-            "id": "16 - Castbar",
+            "id": "16 - Castbar warDPS",
             "uid": "FWHUD_CASTBAR",
             "parent": "Class Warrior (Fury)",
             "regionType": "aurabar",

@@ -62,14 +62,15 @@ Barra orizzontale di precisione (278x14px a y = -20) con lettura numerica (%p) e
 - **25 - 44 Rage**: Rosso sangue pieno (capacità di lanciare Bloodthirst/Whirlwind).
 - **>= 45 Rage**: Transizione istantanea ad **Ambra/Oro** per indicare il via libera allo scarico sicuro con Heroic Strike/Cleave!
 
-### 5. Barra Rotazionale & Dual Swing Timer (`15 - Rotational Bar`)
+### 5. Barra Rotazionale & Dual Swing Timer (15 - Rotational Bar)
 Posizionata visivamente a centro schermo subito sopra la barra della rabbia (278x7px):
 - **Doppio Swing Timer Speculare con Timing Numerico Live**:
-  - **Mezza Barra Sinistra (MH)**: Avanzamento dello swing per la Mano Primaria con etichetta `MH` e countdown numerico al decimo di secondo (es. `1.8s` in combattimento, velocità arma da fermo).
-  - **Mezza Barra Destra (OH)**: Avanzamento dello swing per la Mano Secondaria con countdown numerico al decimo di secondo (es. `1.2s` in combattimento, velocità arma da fermo) ed etichetta `OH`.
-- **Rilevamento Heroic Strike / Cleave Queued**:
-  - Non appena Heroic Strike o Cleave viene accodato, l'intera barra si illumina istantaneamente con un **Pixel Glow dorato** e compare la dicitura centrale `[HS QUEUED]`.
-  - Fornisce la certezza visiva che il colpo successivo eliminerà i glancing blow sulla mano primaria e applicherà all'arma secondaria il cap di hit speciale (8%) invece della penalità 27% del dual wield!
+  - **Mezza Barra Sinistra (MH)**: Avanzamento dello swing per la Mano Primaria con etichetta MH e countdown numerico al decimo di secondo (es. 1.8s durante l'animazione di swing, velocità arma da fermo).
+  - **Mezza Barra Destra (OH)**: Avanzamento dello swing per la Mano Secondaria con countdown numerico al decimo di secondo (es. 1.2s durante l'animazione di swing, velocità arma da fermo) ed etichetta OH.
+- **Rilevamento ed Evidenziazione Differenziata HS vs Cleave Queued**:
+  - Quando **Heroic Strike** è in coda: La barra si illumina con bordo e bagliore dorato e mostra la scritta centrale |cFFFFD700[HS QUEUED]|r.
+  - Quando **Cleave** è in coda: La barra si illumina con bordo e bagliore verde smeraldo e mostra la scritta centrale |cFF00FF00[CLEAVE QUEUED]|r.
+  - Consente di distinguere istantaneamente la coda per single target rispetto all'AoE, garantendo che il colpo elimini i glancing blow sulla mano primaria e rimuova la penalità del 27% miss sull'arma secondaria!
 
 ### 6. Castbar Centrale (`16 - Castbar warDPS`)
 Barra sincronizzata (278x20px a y = 8) per lanci di Slam non-proc e cannellature, con icona incantesimo a sinistra, nome al centro e tempo a destra.

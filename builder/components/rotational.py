@@ -65,10 +65,14 @@ SHARED_SWING_TIMER_LUA = r"""_G.FWHUD_GetSwing = function()
             elseif ev == "SPELL_DAMAGE" or ev == "SPELL_MISSED" then
                 local sId = select(9, ...)
                 local sName = select(10, ...)
-                if sId == 47450 or sId == 47520 or sName == "Heroic Strike" or sName == "Cleave" then
+                if sId == 47450 or sName == "Heroic Strike" or sName == "Colpo Eroico" then
                     sw.mhStart = now
                     sw.mhDur = mhSpeed
                     sw.hsQueued = false
+                elseif sId == 47520 or sName == "Cleave" or sName == "Fendente" then
+                    sw.mhStart = now
+                    sw.mhDur = mhSpeed
+                    sw.cleaveQueued = false
                 end
             elseif ev == "SPELL_EXTRA_ATTACKS" then
                 sw.mhStart = now
@@ -99,8 +103,10 @@ SHARED_SWING_TIMER_LUA = r"""_G.FWHUD_GetSwing = function()
         end)
     end
 
-    local isHS = IsCurrentSpell and (IsCurrentSpell(47450) or IsCurrentSpell(47520) or IsCurrentSpell("Heroic Strike") or IsCurrentSpell("Cleave"))
+    local isHS = IsCurrentSpell and (IsCurrentSpell(47450) or IsCurrentSpell("Heroic Strike") or IsCurrentSpell("Colpo Eroico"))
+    local isCleave = IsCurrentSpell and (IsCurrentSpell(47520) or IsCurrentSpell("Cleave") or IsCurrentSpell("Fendente"))
     sw.hsQueued = (isHS == true or isHS == 1)
+    sw.cleaveQueued = (isCleave == true or isCleave == 1)
 
     return sw
 end"""
@@ -188,6 +194,20 @@ def build_rotational_auras() -> list[dict]:
             "backgroundColor": [0.12, 0.06, 0.04, 0.6],
             "texture": TEXTURE_STATUSBAR,
             "inverse": False,
+            "customTextUpdate": "update",
+            "customText": """function()
+                if _G.FWHUD_GetSwing then _G.FWHUD_GetSwing() end
+                local now = GetTime()
+                local sw = _G.FWHUD_Swing
+                if sw and sw.mhStart and sw.mhStart > 0 then
+                    local rem = (sw.mhStart + (sw.mhDur or 3.0)) - now
+                    if rem > 0 then
+                        return string.format("%.1fs", rem)
+                    end
+                end
+                local spd = select(1, UnitAttackSpeed("player")) or 3.0
+                return string.format("%.1fs", spd)
+            end""",
             "actions": {
                 "init": {
                     "do_custom": True,
@@ -205,10 +225,6 @@ def build_rotational_auras() -> list[dict]:
                         "custom": "function() return true end",
                         "customDuration": """function()
                             if _G.FWHUD_GetSwing then _G.FWHUD_GetSwing() end
-                            if WeakAuras and WeakAuras.GetSwingTimerInfo then
-                                local d, e = WeakAuras.GetSwingTimerInfo("main")
-                                if e and e > GetTime() then return d, e end
-                            end
                             local sw = _G.FWHUD_Swing
                             local now = GetTime()
                             local start = sw and sw.mhStart or 0
@@ -222,12 +238,6 @@ def build_rotational_auras() -> list[dict]:
                         "customText": """function()
                             if _G.FWHUD_GetSwing then _G.FWHUD_GetSwing() end
                             local now = GetTime()
-                            if WeakAuras and WeakAuras.GetSwingTimerInfo then
-                                local d, e = WeakAuras.GetSwingTimerInfo("main")
-                                if e and e > now then
-                                    return string.format("%.1fs", e - now)
-                                end
-                            end
                             local sw = _G.FWHUD_Swing
                             if sw and sw.mhStart and sw.mhStart > 0 then
                                 local rem = (sw.mhStart + (sw.mhDur or 3.0)) - now
@@ -266,6 +276,24 @@ def build_rotational_auras() -> list[dict]:
             "backgroundColor": [0.12, 0.06, 0.04, 0.6],
             "texture": TEXTURE_STATUSBAR,
             "inverse": False,
+            "customTextUpdate": "update",
+            "customText": """function()
+                if _G.FWHUD_GetSwing then _G.FWHUD_GetSwing() end
+                local now = GetTime()
+                local sw = _G.FWHUD_Swing
+                if sw and sw.ohStart and sw.ohStart > 0 then
+                    local rem = (sw.ohStart + (sw.ohDur or 3.0)) - now
+                    if rem > 0 then
+                        return string.format("%.1fs", rem)
+                    end
+                end
+                local _, spd = UnitAttackSpeed("player")
+                spd = spd or 0
+                if spd > 0 then
+                    return string.format("%.1fs", spd)
+                end
+                return "-"
+            end""",
             "actions": {
                 "init": {
                     "do_custom": True,
@@ -283,10 +311,6 @@ def build_rotational_auras() -> list[dict]:
                         "custom": "function() return true end",
                         "customDuration": """function()
                             if _G.FWHUD_GetSwing then _G.FWHUD_GetSwing() end
-                            if WeakAuras and WeakAuras.GetSwingTimerInfo then
-                                local d, e = WeakAuras.GetSwingTimerInfo("off")
-                                if e and e > GetTime() then return d, e end
-                            end
                             local sw = _G.FWHUD_Swing
                             local now = GetTime()
                             local start = sw and sw.ohStart or 0
@@ -300,12 +324,6 @@ def build_rotational_auras() -> list[dict]:
                         "customText": """function()
                             if _G.FWHUD_GetSwing then _G.FWHUD_GetSwing() end
                             local now = GetTime()
-                            if WeakAuras and WeakAuras.GetSwingTimerInfo then
-                                local d, e = WeakAuras.GetSwingTimerInfo("off")
-                                if e and e > now then
-                                    return string.format("%.1fs", e - now)
-                                end
-                            end
                             local sw = _G.FWHUD_Swing
                             if sw and sw.ohStart and sw.ohStart > 0 then
                                 local rem = (sw.ohStart + (sw.ohDur or 3.0)) - now
@@ -333,7 +351,7 @@ def build_rotational_auras() -> list[dict]:
                 make_subtext("OH", justify="RIGHT", anchor_point="INNER_RIGHT", font_size=9, y_offset=0, extra_props={"text_xOffset": -3, "text_color": [1.0, 0.65, 0.2, 1.0]}),
             ],
         },
-        # HS Queued Indicator (Border / Glow / Text overlay quando Heroic Strike o Cleave è accodato)
+        # HS Queued Indicator (Border / Glow / Dynamic Text overlay [HS QUEUED] vs [CLEAVE QUEUED])
         {
             "id": "Rotational Bar - HS Queued",
             "uid": "FWHUD_ROTCENTER_HSQ",
@@ -346,12 +364,23 @@ def build_rotational_auras() -> list[dict]:
             "yOffset": 0,
             "texture": TEXTURE_STATUSBAR,
             "color": [1.0, 0.84, 0.0, 0.35],
+            "customTextUpdate": "update",
+            "customText": """function()
+                local isHS = IsCurrentSpell and (IsCurrentSpell(47450) or IsCurrentSpell("Heroic Strike") or IsCurrentSpell("Colpo Eroico"))
+                local isCleave = IsCurrentSpell and (IsCurrentSpell(47520) or IsCurrentSpell("Cleave") or IsCurrentSpell("Fendente"))
+                if isHS then
+                    return "|cFFFFD700[HS QUEUED]|r"
+                elseif isCleave then
+                    return "|cFF00FF00[CLEAVE QUEUED]|r"
+                end
+                return ""
+            end""",
             "actions": {
                 "start": make_glow_action(),
                 "finish": {"do_glow": True, "glow_action": "hide"},
             },
             "subRegions": [
-                make_subtext("|cFFFFD700[HS QUEUED]|r", justify="CENTER", anchor_point="CENTER", font_size=10, y_offset=0),
+                make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=10, y_offset=0),
             ],
             "triggers": {
                 1: {
@@ -361,13 +390,16 @@ def build_rotational_auras() -> list[dict]:
                         "check": "event",
                         "events": "CURRENT_SPELL_CAST_CHANGED,ACTIONBAR_UPDATE_STATE,START_AUTOREPEAT_SPELL,STOP_AUTOREPEAT_SPELL,UNIT_SPELLCAST_SUCCEEDED,PLAYER_ENTERING_WORLD",
                         "custom": """function()
-                            return IsCurrentSpell and (IsCurrentSpell(47450) or IsCurrentSpell(47520) or IsCurrentSpell("Heroic Strike") or IsCurrentSpell("Cleave"))
+                            local isHS = IsCurrentSpell and (IsCurrentSpell(47450) or IsCurrentSpell("Heroic Strike") or IsCurrentSpell("Colpo Eroico"))
+                            local isCleave = IsCurrentSpell and (IsCurrentSpell(47520) or IsCurrentSpell("Cleave") or IsCurrentSpell("Fendente"))
+                            return (isHS == true or isHS == 1 or isCleave == true or isCleave == 1)
                         end""",
                     },
                     "untrigger": {
                         "custom": """function()
-                            local isHS = IsCurrentSpell and (IsCurrentSpell(47450) or IsCurrentSpell(47520) or IsCurrentSpell("Heroic Strike") or IsCurrentSpell("Cleave"))
-                            return not isHS
+                            local isHS = IsCurrentSpell and (IsCurrentSpell(47450) or IsCurrentSpell("Heroic Strike") or IsCurrentSpell("Colpo Eroico"))
+                            local isCleave = IsCurrentSpell and (IsCurrentSpell(47520) or IsCurrentSpell("Cleave") or IsCurrentSpell("Fendente"))
+                            return not (isHS or isCleave)
                         end""",
                     }
                 },

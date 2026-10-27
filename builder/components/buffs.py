@@ -1,7 +1,7 @@
 """
 Modulo Componente: 02 - Battle Shout, 03 - Commanding Shout, 04 - Berserker Stance
 ===================================================================================
-Gestisce i buff di classe e la stance con intelligenza raid (x = -190, -220, -160 a y = 0):
+Gestisce i buff di classe e la stance con intelligenza raid (x = -190, -222, -158 a y = 0):
 1. 02 - Battle Shout:
    - Zero Clutter: nascosto se attivo con > 30s.
    - Mostra timer se <= 30s.
@@ -105,6 +105,8 @@ def build_buffs_auras() -> list[dict]:
     - 03 - Commanding Shout
     - 04 - Berserker Stance
     """
+    buff_events = "UNIT_AURA,PLAYER_REGEN_DISABLED,PLAYER_REGEN_ENABLED,PLAYER_ENTERING_WORLD"
+
     return [
         # =====================================================================
         # 02 - BATTLE SHOUT (Gruppo Madre a x = -190, y = 0)
@@ -129,15 +131,15 @@ def build_buffs_auras() -> list[dict]:
             "parent": "02 - Battle Shout",
             "regionType": "icon",
             "internalVersion": 52,
-            "width": 32,
-            "height": 32,
+            "width": 28,
+            "height": 28,
             "displayIcon": "Interface\\Icons\\Ability_Warrior_BattleShout",
             "auto": True,
             "color": [1, 1, 1, 1],
             "cooldown": True,
             "cooldownSwipe": True,
             "subRegions": [
-                make_subtext("%p", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=12, y_offset=0),
+                make_subtext("%p", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=11, y_offset=0),
             ],
             "triggers": {
                 1: {
@@ -164,8 +166,8 @@ def build_buffs_auras() -> list[dict]:
             "parent": "02 - Battle Shout",
             "regionType": "icon",
             "internalVersion": 52,
-            "width": 32,
-            "height": 32,
+            "width": 28,
+            "height": 28,
             "displayIcon": "Interface\\Icons\\Ability_Warrior_BattleShout",
             "auto": False,
             "color": [1, 0.2, 0.2, 0.9],
@@ -178,39 +180,33 @@ def build_buffs_auras() -> list[dict]:
                 1: {
                     "trigger": {
                         "type": "custom",
-                        "custom_type": "stateupdate",
+                        "custom_type": "status",
                         "check": "event",
-                        "events": "UNIT_AURA:player PLAYER_REGEN_DISABLED PLAYER_REGEN_ENABLED",
-                        "custom": """function(allstates, event, ...)
+                        "events": buff_events,
+                        "custom": """function(event, ...)
                             local inCombat = UnitAffectingCombat("player")
-                            if not inCombat then
-                                allstates[""] = { show = false, changed = true }
-                                return true
-                            end
-
+                            if not inCombat then return false end
                             local c = _G.FWHUD_BuffCache or (_G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs())
-                            -- Se ha Blessing of Might o ha Battle Shout, NON mostrare missing
-                            if (c and c.hasBoM) or (c and c.hasBattleShout) then
-                                allstates[""] = { show = false, changed = true }
-                            else
-                                allstates[""] = {
-                                    show = true,
-                                    changed = true,
-                                    progressType = "static",
-                                    icon = "Interface\\\\Icons\\\\Ability_Warrior_BattleShout",
-                                }
-                            end
+                            if (c and c.hasBoM) or (c and c.hasBattleShout) then return false end
                             return true
                         end""",
                     },
-                    "untrigger": {}
+                    "untrigger": {
+                        "custom": """function(event, ...)
+                            local inCombat = UnitAffectingCombat("player")
+                            if not inCombat then return true end
+                            local c = _G.FWHUD_BuffCache or (_G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs())
+                            if (c and c.hasBoM) or (c and c.hasBattleShout) then return true end
+                            return false
+                        end"""
+                    }
                 },
                 "activeTriggerMode": -10,
             },
         },
 
         # =====================================================================
-        # 03 - COMMANDING SHOUT (Gruppo Madre a x = -220, y = 0)
+        # 03 - COMMANDING SHOUT (Gruppo Madre a x = -222, y = 0)
         # =====================================================================
         {
             "id": "03 - Commanding Shout",
@@ -218,7 +214,7 @@ def build_buffs_auras() -> list[dict]:
             "parent": "Class Warrior (Fury)",
             "regionType": "group",
             "internalVersion": 52,
-            "xOffset": -220,
+            "xOffset": -222,
             "yOffset": 0,
             "controlledChildren": [
                 "03 - Commanding Shout - Active",
@@ -232,15 +228,15 @@ def build_buffs_auras() -> list[dict]:
             "parent": "03 - Commanding Shout",
             "regionType": "icon",
             "internalVersion": 52,
-            "width": 32,
-            "height": 32,
+            "width": 28,
+            "height": 28,
             "displayIcon": "Interface\\Icons\\Ability_Warrior_RallyingCry",
             "auto": True,
             "color": [1, 1, 1, 1],
             "cooldown": True,
             "cooldownSwipe": True,
             "subRegions": [
-                make_subtext("%p", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=12, y_offset=0),
+                make_subtext("%p", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=11, y_offset=0),
             ],
             "triggers": {
                 1: {
@@ -267,8 +263,8 @@ def build_buffs_auras() -> list[dict]:
             "parent": "03 - Commanding Shout",
             "regionType": "icon",
             "internalVersion": 52,
-            "width": 32,
-            "height": 32,
+            "width": 28,
+            "height": 28,
             "displayIcon": "Interface\\Icons\\Ability_Warrior_RallyingCry",
             "auto": False,
             "color": [1, 0.4, 0.1, 0.9],
@@ -281,39 +277,33 @@ def build_buffs_auras() -> list[dict]:
                 1: {
                     "trigger": {
                         "type": "custom",
-                        "custom_type": "stateupdate",
+                        "custom_type": "status",
                         "check": "event",
-                        "events": "UNIT_AURA:player PLAYER_REGEN_DISABLED PLAYER_REGEN_ENABLED",
-                        "custom": """function(allstates, event, ...)
+                        "events": buff_events,
+                        "custom": """function(event, ...)
                             local inCombat = UnitAffectingCombat("player")
-                            if not inCombat then
-                                allstates[""] = { show = false, changed = true }
-                                return true
-                            end
-
+                            if not inCombat then return false end
                             local c = _G.FWHUD_BuffCache or (_G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs())
-                            -- Se ha già Commanding Shout o ha Blood Pact, oppure NON ha BoM (nel qual caso serve Battle Shout), non mostrare missing
-                            if (c and c.hasCommandingShout) or (c and c.hasBloodPact) or (c and not c.hasBoM) then
-                                allstates[""] = { show = false, changed = true }
-                            else
-                                allstates[""] = {
-                                    show = true,
-                                    changed = true,
-                                    progressType = "static",
-                                    icon = "Interface\\\\Icons\\\\Ability_Warrior_RallyingCry",
-                                }
-                            end
+                            if (c and c.hasCommandingShout) or (c and c.hasBloodPact) or (c and not c.hasBoM) then return false end
                             return true
                         end""",
                     },
-                    "untrigger": {}
+                    "untrigger": {
+                        "custom": """function(event, ...)
+                            local inCombat = UnitAffectingCombat("player")
+                            if not inCombat then return true end
+                            local c = _G.FWHUD_BuffCache or (_G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs())
+                            if (c and c.hasCommandingShout) or (c and c.hasBloodPact) or (c and not c.hasBoM) then return true end
+                            return false
+                        end"""
+                    }
                 },
                 "activeTriggerMode": -10,
             },
         },
 
         # =====================================================================
-        # 04 - BERSERKER STANCE (x = -160, y = 0)
+        # 04 - BERSERKER STANCE (x = -158, y = 0)
         # =====================================================================
         {
             "id": "04 - Berserker Stance",
@@ -321,7 +311,7 @@ def build_buffs_auras() -> list[dict]:
             "parent": "Class Warrior (Fury)",
             "regionType": "group",
             "internalVersion": 52,
-            "xOffset": -160,
+            "xOffset": -158,
             "yOffset": 0,
             "controlledChildren": [
                 "04 - Berserker Stance - OutOfStance",
@@ -333,8 +323,8 @@ def build_buffs_auras() -> list[dict]:
             "parent": "04 - Berserker Stance",
             "regionType": "icon",
             "internalVersion": 52,
-            "width": 32,
-            "height": 32,
+            "width": 28,
+            "height": 28,
             "displayIcon": "Interface\\Icons\\Ability_Racial_Avatar",
             "auto": False,
             "color": [1, 0.2, 0.1, 1],
@@ -346,27 +336,22 @@ def build_buffs_auras() -> list[dict]:
                 1: {
                     "trigger": {
                         "type": "custom",
-                        "custom_type": "stateupdate",
+                        "custom_type": "status",
                         "check": "event",
-                        "events": "UPDATE_SHAPESHIFT_FORM PLAYER_REGEN_DISABLED PLAYER_REGEN_ENABLED",
-                        "custom": """function(allstates, event, ...)
+                        "events": "UPDATE_SHAPESHIFT_FORM,PLAYER_REGEN_DISABLED,PLAYER_REGEN_ENABLED,PLAYER_ENTERING_WORLD",
+                        "custom": """function(event, ...)
                             local inCombat = UnitAffectingCombat("player")
                             local form = GetShapeshiftForm()
-                            -- Form 3 = Berserker Stance
-                            if inCombat and form ~= 3 then
-                                allstates[""] = {
-                                    show = true,
-                                    changed = true,
-                                    progressType = "static",
-                                    icon = "Interface\\\\Icons\\\\Ability_Racial_Avatar",
-                                }
-                            else
-                                allstates[""] = { show = false, changed = true }
-                            end
-                            return true
+                            return inCombat and (form ~= 3)
                         end""",
                     },
-                    "untrigger": {}
+                    "untrigger": {
+                        "custom": """function(event, ...)
+                            local inCombat = UnitAffectingCombat("player")
+                            local form = GetShapeshiftForm()
+                            return (not inCombat) or (form == 3)
+                        end"""
+                    }
                 },
                 "activeTriggerMode": -10,
             },

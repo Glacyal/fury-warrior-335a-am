@@ -849,9 +849,10 @@ end"""
 # =============================================================================
 def make_slot_custom_text(slot: int) -> str:
     """Testo descrittivo del monile/mantello/guanti/scarpe (%c), con pixel glow su proc attivo e riposizionamento dinamico."""
+    bootstrap = f"""    _G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
+    if not _G.FWHUD_CoreInitDone then _G.FWHUD_InitCore() end""" if slot == 13 else """    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end"""
     return f"""function()
-    _G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
-    if not _G.FWHUD_CoreInitDone then _G.FWHUD_InitCore() end
+{bootstrap}
     if _G.FWHUD_UpdateUtilityRowPositions then
         _G.FWHUD_UpdateUtilityRowPositions()
     end
@@ -910,9 +911,10 @@ end"""
 
 def make_slot_trigger_custom(slot: int) -> str:
     """Trigger custom per verificare se lo slot è equipaggiato."""
+    bootstrap = f"""    _G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
+    if not _G.FWHUD_CoreInitDone then _G.FWHUD_InitCore() end""" if slot == 13 else """    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end"""
     return f"""function(event, ...)
-    _G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
-    if not _G.FWHUD_CoreInitDone then _G.FWHUD_InitCore() end
+{bootstrap}
     if not _G.FWHUD_CheckSlotEquipped then return false end
     return _G.FWHUD_CheckSlotEquipped({slot})
 end"""
@@ -928,9 +930,8 @@ end"""
 
 def make_tierset_custom_text() -> str:
     """Testo descrittivo del Tier Set (%c) con cariche/durata e pixel glow su proc."""
-    return f"""function()
-    _G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
-    if not _G.FWHUD_CoreInitDone then _G.FWHUD_InitCore() end
+    return """function()
+    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if _G.FWHUD_UpdateUtilityRowPositions then
         _G.FWHUD_UpdateUtilityRowPositions()
     end
@@ -940,7 +941,7 @@ def make_tierset_custom_text() -> str:
     local glowKey = "FWHUD_TIER_GLOW"
     if state == "ACTIVE" then
         if LCG and aura_env and aura_env.region then
-            LCG.PixelGlow_Start(aura_env.region, {{1, 0.85, 0.1, 1}}, 8, 0.25, 10, 2, 0, 0, false, glowKey)
+            LCG.PixelGlow_Start(aura_env.region, {1, 0.85, 0.1, 1}, 8, 0.25, 10, 2, 0, 0, false, glowKey)
         end
         if count and count > 1 then
             return string.format("|cFFFFFF00x%d %.1fs|r", count, rem)
@@ -985,9 +986,8 @@ end"""
 
 def make_tierset_trigger_custom() -> str:
     """Trigger custom per verificare se almeno un pezzo Tier Set è attivo."""
-    return f"""function(event, ...)
-    _G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
-    if not _G.FWHUD_CoreInitDone then _G.FWHUD_InitCore() end
+    return """function(event, ...)
+    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if not _G.FWHUD_CheckTierSetEquipped then return false end
     return _G.FWHUD_CheckTierSetEquipped()
 end"""
@@ -1002,9 +1002,8 @@ end"""
 
 def make_enchants_custom_text() -> str:
     """Testo descrittivo incanti arma/anello (%c) con cariche (x2 per Berserking MH+OH) e pixel glow."""
-    return f"""function()
-    _G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
-    if not _G.FWHUD_CoreInitDone then _G.FWHUD_InitCore() end
+    return """function()
+    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if _G.FWHUD_UpdateUtilityRowPositions then
         _G.FWHUD_UpdateUtilityRowPositions()
     end
@@ -1014,7 +1013,7 @@ def make_enchants_custom_text() -> str:
     local glowKey = "FWHUD_ENCHANT_GLOW"
     if state == "ACTIVE" then
         if LCG and aura_env and aura_env.region then
-            LCG.PixelGlow_Start(aura_env.region, {{1, 0.85, 0.1, 1}}, 8, 0.25, 10, 2, 0, 0, false, glowKey)
+            LCG.PixelGlow_Start(aura_env.region, {1, 0.85, 0.1, 1}, 8, 0.25, 10, 2, 0, 0, false, glowKey)
         end
         if count and count > 1 then
             return string.format("|cFFFFFF00x%d %.1fs|r", count, rem)
@@ -1053,9 +1052,8 @@ end"""
 
 
 def make_enchants_trigger_custom() -> str:
-    return f"""function(event, ...)
-    _G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
-    if not _G.FWHUD_CoreInitDone then _G.FWHUD_InitCore() end
+    return """function(event, ...)
+    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if not _G.FWHUD_CheckEnchantsEquipped then return false end
     return _G.FWHUD_CheckEnchantsEquipped()
 end"""
@@ -1071,8 +1069,7 @@ end"""
 def make_warrior_spell_custom_text(spell_id: int, buff_id: int, glow_key: str) -> str:
     """Testo descrittivo del cooldown guerriero (%c), con pixel glow su proc attivo e timer cooldown."""
     return f"""function()
-    _G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
-    if not _G.FWHUD_CoreInitDone then _G.FWHUD_InitCore() end
+    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if _G.FWHUD_UpdateUtilityRowPositions then
         _G.FWHUD_UpdateUtilityRowPositions()
     end
@@ -1132,9 +1129,8 @@ end"""
 
 
 def make_warrior_spell_trigger_custom(spell_id: int) -> str:
-    return f"""function(event, ...)
-    _G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
-    if not _G.FWHUD_CoreInitDone then _G.FWHUD_InitCore() end
+    return """function(event, ...)
+    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     return true
 end"""
 
@@ -1174,7 +1170,6 @@ def build_utility_auras() -> list[dict]:
             "inverse": False,
             "customTextUpdate": "update",
             "customText": make_slot_custom_text(13),
-            "init_completed": SHARED_WARRIOR_CORE_BOOTSTRAP_LUA,
             "triggers": {
                 1: {
                     "trigger": {
@@ -1217,7 +1212,6 @@ def build_utility_auras() -> list[dict]:
             "inverse": False,
             "customTextUpdate": "update",
             "customText": make_slot_custom_text(14),
-            "init_completed": SHARED_WARRIOR_CORE_BOOTSTRAP_LUA,
             "triggers": {
                 1: {
                     "trigger": {
@@ -1260,7 +1254,6 @@ def build_utility_auras() -> list[dict]:
             "inverse": False,
             "customTextUpdate": "update",
             "customText": make_slot_custom_text(15),
-            "init_completed": SHARED_WARRIOR_CORE_BOOTSTRAP_LUA,
             "triggers": {
                 1: {
                     "trigger": {
@@ -1303,7 +1296,6 @@ def build_utility_auras() -> list[dict]:
             "inverse": False,
             "customTextUpdate": "update",
             "customText": make_tierset_custom_text(),
-            "init_completed": SHARED_WARRIOR_CORE_BOOTSTRAP_LUA,
             "triggers": {
                 1: {
                     "trigger": {
@@ -1346,7 +1338,6 @@ def build_utility_auras() -> list[dict]:
             "inverse": False,
             "customTextUpdate": "update",
             "customText": make_enchants_custom_text(),
-            "init_completed": SHARED_WARRIOR_CORE_BOOTSTRAP_LUA,
             "triggers": {
                 1: {
                     "trigger": {
@@ -1389,7 +1380,6 @@ def build_utility_auras() -> list[dict]:
             "inverse": False,
             "customTextUpdate": "update",
             "customText": make_slot_custom_text(10),
-            "init_completed": SHARED_WARRIOR_CORE_BOOTSTRAP_LUA,
             "triggers": {
                 1: {
                     "trigger": {
@@ -1432,7 +1422,6 @@ def build_utility_auras() -> list[dict]:
             "inverse": False,
             "customTextUpdate": "update",
             "customText": make_warrior_spell_custom_text(12292, 12292, "FWHUD_DW_GLOW"),
-            "init_completed": SHARED_WARRIOR_CORE_BOOTSTRAP_LUA,
             "triggers": {
                 1: {
                     "trigger": {
@@ -1477,7 +1466,6 @@ end"""
             "inverse": False,
             "customTextUpdate": "update",
             "customText": make_warrior_spell_custom_text(1719, 1719, "FWHUD_RECK_GLOW"),
-            "init_completed": SHARED_WARRIOR_CORE_BOOTSTRAP_LUA,
             "triggers": {
                 1: {
                     "trigger": {
@@ -1522,7 +1510,6 @@ end"""
             "inverse": False,
             "customTextUpdate": "update",
             "customText": make_slot_custom_text(8),
-            "init_completed": SHARED_WARRIOR_CORE_BOOTSTRAP_LUA,
             "triggers": {
                 1: {
                     "trigger": {

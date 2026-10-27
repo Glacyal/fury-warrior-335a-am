@@ -258,7 +258,7 @@ def build_rotational_auras() -> list[dict]:
             },
             "subRegions": [
                 make_subtext("MH", justify="LEFT", anchor_point="INNER_LEFT", font_size=9, y_offset=0, extra_props={"text_xOffset": 3, "text_color": [1.0, 0.75, 0.2, 1.0]}),
-                make_subtext("%c", justify="LEFT", anchor_point="INNER_LEFT", font_size=9, y_offset=0, extra_props={"text_xOffset": 24, "text_color": [1.0, 1.0, 1.0, 1.0]}),
+                make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=9, y_offset=0, extra_props={"text_color": [1.0, 1.0, 1.0, 1.0]}),
             ],
         },
         # OH Swing (Mezza barra destra: 137x5px a x = +70.5) con etichetta OH e timing %c
@@ -347,7 +347,7 @@ def build_rotational_auras() -> list[dict]:
                 "activeTriggerMode": -10,
             },
             "subRegions": [
-                make_subtext("%c", justify="RIGHT", anchor_point="INNER_RIGHT", font_size=9, y_offset=0, extra_props={"text_xOffset": -24, "text_color": [1.0, 1.0, 1.0, 1.0]}),
+                make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=9, y_offset=0, extra_props={"text_color": [1.0, 1.0, 1.0, 1.0]}),
                 make_subtext("OH", justify="RIGHT", anchor_point="INNER_RIGHT", font_size=9, y_offset=0, extra_props={"text_xOffset": -3, "text_color": [1.0, 0.65, 0.2, 1.0]}),
             ],
         },

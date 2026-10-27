@@ -65,8 +65,8 @@ Barra orizzontale di precisione (278x14px a y = -20) con lettura numerica (%p) e
 ### 5. Barra Rotazionale & Dual Swing Timer (15 - Rotational Bar)
 Posizionata visivamente a centro schermo subito sopra la barra della rabbia (278x7px):
 - **Doppio Swing Timer Speculare con Timing Numerico Live**:
-  - **Mezza Barra Sinistra (MH)**: Avanzamento dello swing per la Mano Primaria con etichetta MH e countdown numerico al decimo di secondo (es. 1.8s durante l'animazione di swing, velocità arma da fermo).
-  - **Mezza Barra Destra (OH)**: Avanzamento dello swing per la Mano Secondaria con countdown numerico al decimo di secondo (es. 1.2s durante l'animazione di swing, velocità arma da fermo) ed etichetta OH.
+  - **Mezza Barra Sinistra (MH)**: Avanzamento dello swing per la Mano Primaria con etichetta MH a sinistra e countdown numerico centrato nella barretta (es. 1.8s durante l'animazione di swing, velocità arma da fermo).
+  - **Mezza Barra Destra (OH)**: Avanzamento dello swing per la Mano Secondaria con countdown numerico centrato nella barretta (es. 1.2s durante l'animazione di swing, velocità arma da fermo) ed etichetta OH a destra.
 - **Rilevamento ed Evidenziazione Differenziata HS vs Cleave Queued**:
   - Quando **Heroic Strike** è in coda: La barra si illumina con bordo e bagliore dorato e mostra la scritta centrale |cFFFFD700[HS QUEUED]|r.
   - Quando **Cleave** è in coda: La barra si illumina con bordo e bagliore verde smeraldo e mostra la scritta centrale |cFF00FF00[CLEAVE QUEUED]|r.

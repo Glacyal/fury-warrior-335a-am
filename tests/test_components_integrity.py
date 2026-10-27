@@ -20,22 +20,24 @@ def run_tests():
         "05 - Trinket 1",
         "06 - Trinket 2",
         "07 - Cloak",
-        "08 - Death Wish",
-        "09 - Gloves",
-        "10 - Recklessness",
-        "11 - Shattering Throw",
-        "12 - Enraged Regeneration",
-        "13 - Boots",
-        "14 - Rage Bar",
-        "15 - Rotational Bar",
-        "16 - Castbar",
-        "17 - Alerts",
-        "18 - Stats Panel",
-        "19 - Sunder Armor Tracker",
+        "08 - Tier Set",
+        "09 - Enchants",
+        "10 - Gloves",
+        "11 - Death Wish",
+        "12 - Recklessness",
+        "13 - Shattering Throw",
+        "14 - Enraged Regeneration",
+        "15 - Boots",
+        "16 - Rage Bar",
+        "17 - Rotational Bar",
+        "18 - Castbar",
+        "19 - Alerts",
+        "20 - Stats Panel",
+        "21 - Sunder Armor Tracker",
     ]
 
     ctrl = root["controlledChildren"]
-    assert len(ctrl) == 19, f"Expected 19 controlled children, got {len(ctrl)}"
+    assert len(ctrl) == 21, f"Expected 21 controlled children, got {len(ctrl)}"
     for exp in expected_children:
         assert exp in ctrl, f"Missing child in root controlledChildren: {exp}"
 
@@ -69,9 +71,8 @@ def run_tests():
     assert root_load.get("talent", {}).get("single") == 64, "Root load talent != 64 (Rampage)"
     assert root_load.get("talent", {}).get("multi", {}).get(64) is True, "Root load talent multi[64] is not True"
 
-    print(f"[OK] Validati {len(tree['c'])} nodi e 19 moduli di primo livello.")
+    print(f"[OK] Validati {len(tree['c'])} nodi e 21 moduli di primo livello.")
     print("[PASS] test_components_integrity.py superato con successo!")
 
 if __name__ == "__main__":
     run_tests()
-

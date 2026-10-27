@@ -10,7 +10,7 @@ def run_tests():
     assert len(auras) == 3, f"Expected 3 auras in stats panel, got {len(auras)}"
 
     grp = auras[0]
-    assert grp["id"] == "18 - Stats Panel"
+    assert grp["id"] == "20 - Stats Panel"
     assert grp["regionType"] == "group"
 
     bg = auras[1]

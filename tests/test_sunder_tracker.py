@@ -10,7 +10,7 @@ def run_tests():
     assert len(auras) == 1, f"Expected 1 aura in sunder tracker, got {len(auras)}"
 
     sunder = auras[0]
-    assert sunder["id"] == "19 - Sunder Armor Tracker"
+    assert sunder["id"] == "21 - Sunder Armor Tracker"
     assert sunder["xOffset"] == 169
     assert sunder["yOffset"] == 45
     assert sunder["width"] == 32

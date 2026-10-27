@@ -10,7 +10,7 @@ def run_tests():
     assert len(auras) == 5, f"Expected 5 auras in rotational bar, got {len(auras)}"
 
     grp = auras[0]
-    assert grp["id"] == "15 - Rotational Bar"
+    assert grp["id"] == "17 - Rotational Bar"
     assert grp["regionType"] == "group"
     assert len(grp["controlledChildren"]) == 4
 

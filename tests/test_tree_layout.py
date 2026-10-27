@@ -15,35 +15,35 @@ def run_tests():
 
     c_map = {item["id"]: item for item in tree["c"]}
 
-    # Check 14 - Rage Bar
-    rage_bar = c_map.get("14 - Rage Bar")
-    assert rage_bar is not None, "Missing 14 - Rage Bar"
+    # Check 16 - Rage Bar
+    rage_bar = c_map.get("16 - Rage Bar")
+    assert rage_bar is not None, "Missing 16 - Rage Bar"
     assert rage_bar["width"] == 278, f"Invalid Rage Bar width: {rage_bar.get('width')}"
     assert rage_bar["height"] == 14, f"Invalid Rage Bar height: {rage_bar.get('height')}"
     assert rage_bar["yOffset"] == -20, f"Invalid Rage Bar yOffset: {rage_bar.get('yOffset')}"
 
-    # Check 16 - Castbar
-    castbar = c_map.get("16 - Castbar")
-    assert castbar is not None, "Missing 16 - Castbar"
+    # Check 18 - Castbar
+    castbar = c_map.get("18 - Castbar")
+    assert castbar is not None, "Missing 18 - Castbar"
     assert castbar["width"] == 278, f"Invalid Castbar width: {castbar.get('width')}"
     assert castbar["height"] == 20, f"Invalid Castbar height: {castbar.get('height')}"
     assert castbar["yOffset"] == 8, f"Invalid Castbar yOffset: {castbar.get('yOffset')}"
 
-    # Check 15 - Rotational Bar Background
+    # Check 17 - Rotational Bar Background
     rot_bg = c_map.get("Rotational Bar - Background")
     assert rot_bg is not None, "Missing Rotational Bar - Background"
     assert rot_bg["width"] == 278, f"Invalid Rotational Bar Background width: {rot_bg.get('width')}"
     assert rot_bg["height"] == 7, f"Invalid Rotational Bar Background height: {rot_bg.get('height')}"
 
-    # Check 18 - Stats Panel Background
+    # Check 20 - Stats Panel Background
     stats_bg = c_map.get("Stats Panel - Background")
     assert stats_bg is not None, "Missing Stats Panel - Background"
     assert stats_bg["width"] == 88, f"Invalid Stats Panel Background width: {stats_bg.get('width')}"
     assert stats_bg["height"] == 48, f"Invalid Stats Panel Background height: {stats_bg.get('height')}"
 
-    # Check 19 - Sunder Armor Tracker
-    sunder = c_map.get("19 - Sunder Armor Tracker")
-    assert sunder is not None, "Missing 19 - Sunder Armor Tracker"
+    # Check 21 - Sunder Armor Tracker
+    sunder = c_map.get("21 - Sunder Armor Tracker")
+    assert sunder is not None, "Missing 21 - Sunder Armor Tracker"
     assert sunder["xOffset"] == 169, f"Invalid Sunder Tracker xOffset: {sunder.get('xOffset')}"
     assert sunder["yOffset"] == 45, f"Invalid Sunder Tracker yOffset: {sunder.get('yOffset')}"
 
@@ -52,4 +52,3 @@ def run_tests():
 
 if __name__ == "__main__":
     run_tests()
-

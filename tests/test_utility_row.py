@@ -7,18 +7,20 @@ def run_tests():
     from builder.components.utility import build_utility_auras, SHARED_WARRIOR_CORE_BOOTSTRAP_LUA
 
     auras = build_utility_auras()
-    assert len(auras) == 9, f"Expected 9 utility auras, got {len(auras)}"
+    assert len(auras) == 11, f"Expected 11 utility auras, got {len(auras)}"
 
     expected_ids = [
         "05 - Trinket 1",
         "06 - Trinket 2",
         "07 - Cloak",
-        "08 - Death Wish",
-        "09 - Gloves",
-        "10 - Recklessness",
-        "11 - Shattering Throw",
-        "12 - Enraged Regeneration",
-        "13 - Boots",
+        "08 - Tier Set",
+        "09 - Enchants",
+        "10 - Gloves",
+        "11 - Death Wish",
+        "12 - Recklessness",
+        "13 - Shattering Throw",
+        "14 - Enraged Regeneration",
+        "15 - Boots",
     ]
 
     for i, a in enumerate(auras):
@@ -27,14 +29,29 @@ def run_tests():
         assert a["height"] == 28, f"Invalid height for {a['id']}"
         assert a["yOffset"] == -45, f"Invalid yOffset for {a['id']}"
 
-    # Verify trinket DB in Lua bootstrap
+    # Verify physical trinket catalog in Lua bootstrap
     assert "50362" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Deathbringer's Will nel DB dei monili"
     assert "54569" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Sharpened Twilight Scale nel DB dei monili"
+    assert "47115" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Death's Choice nel DB dei monili"
+    assert "50342" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Whispering Fanged Skull nel DB dei monili"
+    assert "50355" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Herkuml War Token nel DB dei monili"
+    assert "50198" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Needle-Encrusted Scorpion nel DB dei monili"
+    assert "45931" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Mjolnir Runestone nel DB dei monili"
+    assert "44253" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Darkmoon Card: Greatness nel DB dei monili"
+    assert "40256" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Grim Toll nel DB dei monili"
+    assert "40684" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Mirror of Truth nel DB dei monili"
+
+    # Verify Tier Sets and Enchants detection in Lua bootstrap
+    assert "FWHUD_T10_Pieces" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca tabella pezzi Tier 10"
+    assert "FWHUD_T8_Pieces" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca tabella pezzi Tier 8"
+    assert "FWHUD_T7_Pieces" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca tabella pezzi Tier 7"
+    assert "FWHUD_T9_Pieces" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca tabella pezzi Tier 9"
+    assert "FWHUD_CheckTierSet" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione FWHUD_CheckTierSet"
+    assert "FWHUD_CheckEnchants" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione FWHUD_CheckEnchants"
     assert "FWHUD_UpdateUtilityRowPositions" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione di riposizionamento dinamico"
 
-    print("[OK] Tutti i 9 elementi della riga utility adattiva verificati con successo.")
+    print("[OK] Tutti gli 11 elementi della riga utility e il catalogo Tier Sets/Trinkets verificati con successo.")
     print("[PASS] test_utility_row.py superato con successo!")
 
 if __name__ == "__main__":
     run_tests()
-

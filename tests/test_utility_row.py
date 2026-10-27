@@ -10,8 +10,8 @@ def run_tests():
     assert len(auras) == 9, f"Expected 9 utility auras, got {len(auras)}"
 
     expected_ids = [
-        "05 - Trinket 1",
-        "06 - Trinket 2",
+        "05 - Trinket 1 warDPS",
+        "06 - Trinket 2 warDPS",
         "07 - Cloak",
         "08 - Tier Set",
         "09 - Enchants",

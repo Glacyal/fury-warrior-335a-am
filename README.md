@@ -38,7 +38,7 @@ Barra orizzontale superiore (y = 52) con riposizionamento dinamico centrato, ris
 
 ### 3. Riga Utility Adattiva (`05` - `13`, da 3 a 9 Icone a y = -45)
 Fila orizzontale inferiore a y = -45 con riposizionamento e ricentratura automatica (espansione e contrazione dinamica identica a fire-mage-335a-am):
-- **05 - Trinket 1 & 06 - Trinket 2**: Riconoscimento automatico slot 13 & 14. Catalogo integrato di **tutti i monili da mischia 3.3.5a** (Deathbringer's Will, Sharpened Twilight Scale, Death's Choice/Verdict, Whispering Fanged Skull, Herkuml War Token, Needle-Encrusted Scorpion, Mjolnir Runestone, Comet's Trail, Darkmoon Card: Greatness, Grim Toll, Mirror of Truth, Wrathstone, Mark of Supremacy, ecc.) con tracciamento durata attiva, Pixel Glow e conto alla rovescia ICD.
+- **05 - Trinket 1 warDPS & 06 - Trinket 2 warDPS**: Riconoscimento automatico slot 13 & 14 (con suffisso dedicato `warDPS` per prevenire sovrascritture o duplicati `2` in caso di convivenza con la suite Fire Mage). Catalogo integrato di **tutti i monili da mischia 3.3.5a** (Deathbringer's Will, Sharpened Twilight Scale, Death's Choice/Verdict, Whispering Fanged Skull, Herkuml War Token, Needle-Encrusted Scorpion, Mjolnir Runestone, Comet's Trail, Darkmoon Card: Greatness, Grim Toll, Mirror of Truth, Wrathstone, Mark of Supremacy, ecc.) con tracciamento durata attiva, Pixel Glow e conto alla rovescia ICD.
 - **07 - Cloak**: Attivo con incanti da mischia (Swordguard Embroidery +400 AP o paracadute/flexweave).
 - **08 - Tier Set (T7 - T10)**: Rilevamento automatico dell'armatura Tier equipaggiata (>= 2 o >= 4 pezzi) e tracciamento proc:
   - **Tier 10 (Ymirjar Lord)**: 4P Siegebreaker (2 cariche e -0.5s GCD su Slam) e 2P Advantage (+16% AP per 10s da Deep Wounds).

@@ -3,8 +3,8 @@ Modulo Componente: 05-13 - Utility Row (Warrior Fury)
 =====================================================
 Gestisce la riga orizzontale di utilità a y = -45 con riposizionamento dinamico
 centrato naturale (da 3 a 9 icone) in base all'equipaggiamento e alle abilità:
-1. 05 - Trinket 1 (Slot 13: DBW, STS, Death's Choice o altro monile, ICD o On-Use, Pixel Glow su proc)
-2. 06 - Trinket 2 (Slot 14: STS, DBW, Whispering Fanged Skull o altro monile, ICD/On-Use, Pixel Glow)
+1. 05 - Trinket 1 warDPS (Slot 13: DBW, STS, Death's Choice o altro monile, ICD o On-Use, Pixel Glow su proc)
+2. 06 - Trinket 2 warDPS (Slot 14: STS, DBW, Whispering Fanged Skull o altro monile, ICD/On-Use, Pixel Glow)
 3. 07 - Cloak (Slot 15: Swordguard Embroidery +400 AP / Paracadute / Flexweave)
 4. 08 - Tier Set (Slot Set: T10 Siegebreaker/Advantage, T8 Crit/Haste, T7 AP, T9 Passive)
 5. 09 - Enchants (Slot 16/17: Berserking MH/OH x1/x2 +800 AP, Executioner, Mongoose, Ashen Band)
@@ -695,8 +695,8 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         local hasBoots = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(8)
 
         local activeOrder = {}
-        if hasT1 then table.insert(activeOrder, "05 - Trinket 1") end
-        if hasT2 then table.insert(activeOrder, "06 - Trinket 2") end
+        if hasT1 then table.insert(activeOrder, "05 - Trinket 1 warDPS") end
+        if hasT2 then table.insert(activeOrder, "06 - Trinket 2 warDPS") end
         if hasCloak then table.insert(activeOrder, "07 - Cloak") end
         if hasTier then table.insert(activeOrder, "08 - Tier Set") end
         if hasEnchants then table.insert(activeOrder, "09 - Enchants") end
@@ -1088,9 +1088,9 @@ end"""
 
 def build_utility_auras() -> list[dict]:
     """
-    Costruisce e restituisce le 11 aure della riga utility adattiva centrata a y = -45:
-    - 05 - Trinket 1 (Icon, Slot 13)
-    - 06 - Trinket 2 (Icon, Slot 14)
+    Costruisce e restituisce le 9 aure della riga utility adattiva centrata a y = -45:
+    - 05 - Trinket 1 warDPS (Icon, Slot 13)
+    - 06 - Trinket 2 warDPS (Icon, Slot 14)
     - 07 - Cloak (Icon, Slot 15)
     - 08 - Tier Set (Icon, T10/T8/T7 Proc & ICD)
     - 09 - Enchants (Icon, Berserking MH/OH x1/x2, Executioner, Mongoose, Ashen Band)
@@ -1102,9 +1102,9 @@ def build_utility_auras() -> list[dict]:
     events_list = "PLAYER_EQUIPMENT_CHANGED,UNIT_INVENTORY_CHANGED,PLAYER_ENTERING_WORLD,ZONE_CHANGED_NEW_AREA,UNIT_AURA,SPELL_UPDATE_COOLDOWN,ACTIONBAR_UPDATE_COOLDOWN,BAG_UPDATE_COOLDOWN,COMBAT_LOG_EVENT_UNFILTERED,FWHUD_ROW_UPDATE"
 
     return [
-        # 05 - Trinket 1 (Slot 13)
+        # 05 - Trinket 1 warDPS (Slot 13)
         {
-            "id": "05 - Trinket 1",
+            "id": "05 - Trinket 1 warDPS",
             "uid": "FWHUD_UTIL_TRINKET1",
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",
@@ -1145,9 +1145,9 @@ def build_utility_auras() -> list[dict]:
             ],
         },
 
-        # 06 - Trinket 2 (Slot 14)
+        # 06 - Trinket 2 warDPS (Slot 14)
         {
-            "id": "06 - Trinket 2",
+            "id": "06 - Trinket 2 warDPS",
             "uid": "FWHUD_UTIL_TRINKET2",
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",

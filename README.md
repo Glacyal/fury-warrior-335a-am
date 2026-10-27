@@ -53,7 +53,7 @@ Barra orizzontale superiore (y = 52) con riposizionamento automatico:
 - **02 - Battle Shout**: Nascosto in combattimento se attivo con più di 30 secondi; mostra il timer in scadenza e allerta se assente. **Filtro Overlap**: Viene soppresso automaticamente se è attivo *Blessing of Might* o *Greater Blessing of Might* del Paladino (buff equivalente/superiore).
 - **03 - Commanding Shout**: Diventa la shout di riferimento se Battle Shout è coperto dal Paladino. Viene soppresso automaticamente se è attivo il buff *Blood Pact* dell'Imp del Warlock.
 - **04 - Berserker Stance**: Allerta immediata ad alta visibilità se durante il combattimento il guerriero si trova fuori dalla Berserker Stance.
-- *(Nota su Rampage)*: Rimosso dall'HUD per eliminare il disordine visivo, essendo in 3.3.5a un'aura passiva permanente al critico fisico.
+- **Caricamento Specifico su [Rampage]**: Il talento passivo *Rampage* (Tab 2, Posizione 24 -> ID WeakAuras 64) è utilizzato come condizione di caricamento esclusiva dell'intero pacchetto: la suite si carica solo se il guerriero è specializzato Fury con Rampage attivo, e non occupa spazio visivo superfluo a schermo.
 
 ### 5. Riga Utility Adattiva (`05` - `13`, da 3 a 9 Icone)
 La fila inferiore a y = -45 si adatta e si ricentra automaticamente:

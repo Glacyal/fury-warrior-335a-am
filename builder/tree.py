@@ -84,7 +84,7 @@ def build_wa_tree() -> dict:
     data["c"].extend(build_stats_auras())
     data["c"].extend(build_sunder_auras())
 
-    # Applicazione uniforme delle condizioni di caricamento (Warrior + Titan's Grip)
+    # Applicazione uniforme delle condizioni di caricamento (Warrior + Rampage)
     for item in data["c"]:
         item["load"] = copy.deepcopy(FURY_WARRIOR_LOAD)
 

@@ -53,10 +53,21 @@ def run_tests():
         assert uid.startswith("FWHUD_"), f"UID {uid} does not start with 'FWHUD_'"
         assert item.get("internalVersion") == 52, f"Item {cid} internalVersion != 52"
 
-        # Check load conditions
+        # Check load conditions (Warrior Class + Rampage Talent ID 64)
         load = item.get("load", {})
         assert load.get("use_class") is True, f"Item {cid} load use_class is not True"
         assert load.get("class", {}).get("single") == "WARRIOR", f"Item {cid} load class != WARRIOR"
+        assert load.get("use_talent") is True, f"Item {cid} load use_talent is not True"
+        assert load.get("talent", {}).get("single") == 64, f"Item {cid} load talent != 64 (Rampage)"
+        assert load.get("talent", {}).get("multi", {}).get(64) is True, f"Item {cid} load talent multi[64] is not True"
+
+    # Check root load conditions
+    root_load = root.get("load", {})
+    assert root_load.get("use_class") is True, "Root load use_class is not True"
+    assert root_load.get("class", {}).get("single") == "WARRIOR", "Root load class != WARRIOR"
+    assert root_load.get("use_talent") is True, "Root load use_talent is not True"
+    assert root_load.get("talent", {}).get("single") == 64, "Root load talent != 64 (Rampage)"
+    assert root_load.get("talent", {}).get("multi", {}).get(64) is True, "Root load talent multi[64] is not True"
 
     print(f"[OK] Validati {len(tree['c'])} nodi e 19 moduli di primo livello.")
     print("[PASS] test_components_integrity.py superato con successo!")

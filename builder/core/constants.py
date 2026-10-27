@@ -6,12 +6,12 @@ e le impostazioni grafiche condivise (font, texture, colori).
 """
 
 # Condizioni di Caricamento (Load Conditions):
-# Classe Guerriero (Class: WARRIOR) e talento Titan's Grip / Bloodsurge (Talent ID: 84 - Ramo Furia)
+# Classe Guerriero (Class: WARRIOR) e talento Rampage (Talent ID: 64 - Ramo Furia, Tab 2 Talento 24)
 FURY_WARRIOR_LOAD = {
     "use_class": True,
     "class": {"single": "WARRIOR", "multi": {"WARRIOR": True}},
     "use_talent": True,
-    "talent": {"single": 84, "multi": {84: True}},
+    "talent": {"single": 64, "multi": {64: True}},
     "use_vehicle": False,
 }
 

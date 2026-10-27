@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Temporary / OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.bak
+*.swp
+*~
+
+# IDE / Editor directories
+.vscode/
+.idea/
+
+# Agent scratch / internal artifacts
+.system_generated/
+scratch/
+.agents/
+.agent/
+_agents/
+_agent/
+GEMINI.md
+AGENTS.md
+*OLD.txt
+
+# DOCS - Contesto, memoria, tasks, architetture (esclusi dal controllo versione git)
+docs/*.md

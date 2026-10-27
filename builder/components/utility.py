@@ -6,7 +6,7 @@ centrato naturale (da 3 a 9 icone) in base all'equipaggiamento e alle abilità:
 1. 05 - Trinket 1 warDPS (Slot 13: DBW, STS, Death's Choice o altro monile, ICD o On-Use, Pixel Glow su proc)
 2. 06 - Trinket 2 warDPS (Slot 14: STS, DBW, Whispering Fanged Skull o altro monile, ICD/On-Use, Pixel Glow)
 3. 07 - Cloak (Slot 15: Swordguard Embroidery +400 AP / Paracadute / Flexweave)
-4. 08 - Tier Set (Slot Set: T10 Siegebreaker/Advantage, T8 Crit/Haste, T7 AP, T9 Passive)
+4. 08 - Tier Set warDPS (T10 Siegebreaker/Advantage, T8 Haste, T7 Spirits of the Lost, T9 e combinazioni 2P+2P)
 5. 09 - Enchants (Slot 16/17: Berserking MH/OH x1/x2 +800 AP, Executioner, Mongoose, Ashen Band)
 6. 10 - Gloves (Slot 10: Acceleratori Ipersonici Ingegneria +340 Haste per 12s, 60s CD)
 7. 11 - Death Wish (Spell ID 12292, durata attiva 30s + cooldown)
@@ -447,13 +447,17 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         local now = GetTime()
         local cache = _G.FWHUD_TierEquipCache
         if cache and (now - cache.time < 0.25) then return cache.hasSet end
-        if not cache then cache = { time = 0, hasSet = false, setType = nil, count = 0 }; _G.FWHUD_TierEquipCache = cache end
+        if not cache then cache = { time = 0, hasSet = false, t10 = 0, t8 = 0, t7 = 0, t9 = 0 }; _G.FWHUD_TierEquipCache = cache end
         cache.time = now
 
         local slots = { 1, 3, 5, 7, 10 }
         local t10, t8, t7, t9 = 0, 0, 0, 0
         for _, s in ipairs(slots) do
-            local id = GetInventoryItemID("player", s)
+            local id = GetInventoryItemID and GetInventoryItemID("player", s)
+            if not id then
+                local link = GetInventoryItemLink("player", s)
+                if link then id = tonumber(link:match("item:(%d+)")) end
+            end
             if id then
                 if _G.FWHUD_T10_Pieces[id] then t10 = t10 + 1
                 elseif _G.FWHUD_T8_Pieces[id] then t8 = t8 + 1
@@ -462,26 +466,35 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                 end
             end
         end
-        if t10 >= 2 then
-            cache.hasSet = true; cache.setType = "T10"; cache.count = t10
-        elseif t8 >= 2 then
-            cache.hasSet = true; cache.setType = "T8"; cache.count = t8
-        elseif t7 >= 4 then
-            cache.hasSet = true; cache.setType = "T7"; cache.count = t7
-        elseif t9 >= 2 then
-            cache.hasSet = true; cache.setType = "T9"; cache.count = t9
+        cache.t10 = t10
+        cache.t8 = t8
+        cache.t7 = t7
+        cache.t9 = t9
+
+        if t10 >= 2 or t8 >= 2 or t7 >= 2 or t9 >= 2 or t7 >= 4 then
+            cache.hasSet = true
         else
             local buffs = _G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs()
             if buffs then
-                if buffs.bySpellId[70845] or buffs.bySpellId[70844] or buffs.bySpellId[70846] or buffs.bySpellId[70848] then
-                    cache.hasSet = true; cache.setType = "T10"; cache.count = 4; return true
-                elseif buffs.bySpellId[64937] or buffs.bySpellId[64942] then
-                    cache.hasSet = true; cache.setType = "T8"; cache.count = 4; return true
-                elseif buffs.bySpellId[60578] then
-                    cache.hasSet = true; cache.setType = "T7"; cache.count = 4; return true
+                if buffs.bySpellId[70845] or buffs.bySpellId[70844] or buffs.bySpellId[70846] or buffs.bySpellId[70848]
+                   or buffs.bySpellId[64937] or buffs.bySpellId[64938] or buffs.bySpellId[64942]
+                   or buffs.bySpellId[60176] then
+                    cache.hasSet = true
+                else
+                    for _, b in ipairs(buffs.list or {}) do
+                        if b.name and (b.name:find("Spirits of the Lost") or b.name:find("Spiriti dei Perduti")
+                                       or b.name:find("Bleed Cost Reduction")
+                                       or b.name:find("Siegebreaker") or b.name:find("Spezzassedio")
+                                       or b.name:find("Advantage") or b.name:find("Vantaggio")) then
+                            cache.hasSet = true
+                            break
+                        end
+                    end
                 end
             end
-            cache.hasSet = false; cache.setType = nil; cache.count = 0
+            if not cache.hasSet then
+                cache.hasSet = false
+            end
         end
         return cache.hasSet
     end
@@ -492,59 +505,99 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
             return "NONE", 0, 0, 0, "Interface\\Icons\\Ability_Warrior_Siegebreaker"
         end
         local now = GetTime()
-        local cache = _G.FWHUD_TierEquipCache
-        local setType = cache and cache.setType or "T10"
+        local cache = _G.FWHUD_TierEquipCache or {}
+        local t10 = cache.t10 or 0
+        local t8 = cache.t8 or 0
+        local t7 = cache.t7 or 0
+        local t9 = cache.t9 or 0
+
         local buffs = _G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs()
         local bList = buffs and buffs.list or {}
 
-        if setType == "T10" then
-            local defIcon = "Interface\\Icons\\Ability_Warrior_Siegebreaker"
-            for _, b in ipairs(bList) do
-                if b.spellId == 70846 or b.spellId == 70848 or (b.name and (b.name:find("Siegebreaker") or b.name:find("Spezzassedio"))) then
-                    local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 10
-                    local dur = (b.duration and b.duration > 0) and b.duration or 10
-                    return "ACTIVE", rem, dur, b.count or 2, b.icon or defIcon, "T10-4P"
-                end
+        -- Scansione dei buff attivi dei tier set (T10-4P, T10-2P, T7-4P, T8-2P)
+        local aT10_4P, aT10_2P, aT7_4P, aT8_2P = nil, nil, nil, nil
+
+        for _, b in ipairs(bList) do
+            local sId = b.spellId
+            local name = b.name or ""
+
+            -- T10 4P: Siegebreaker (Spell 70846, 70848) - 2 cariche, -0.5s GCD
+            if sId == 70846 or sId == 70848 or name:find("Siegebreaker") or name:find("Spezzassedio") then
+                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 10
+                local dur = (b.duration and b.duration > 0) and b.duration or 10
+                aT10_4P = { rem = rem, dur = dur, count = b.count or 2, icon = b.icon or "Interface\\Icons\\Ability_Warrior_Siegebreaker", label = "T10-4P" }
+
+            -- T7 4P: Spirits of the Lost (Spell 60176) - Riduce il costo in rabbia della prossima abilità di 5
+            elseif sId == 60176 or name:find("Spirits of the Lost") or name:find("Spiriti dei Perduti") or name:find("Bleed Cost Reduction") then
+                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 10
+                local dur = (b.duration and b.duration > 0) and b.duration or 10
+                aT7_4P = { rem = rem, dur = dur, count = b.count or 1, icon = b.icon or "Interface\\Icons\\Ability_Warrior_BloodNova", label = "T7-4P" }
+
+            -- T10 2P: Advantage (Spell 70845, 70844) - +16% AP per 10s
+            elseif sId == 70845 or sId == 70844 or name:find("Advantage") or name:find("Vantaggio") then
+                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 10
+                local dur = (b.duration and b.duration > 0) and b.duration or 10
+                aT10_2P = { rem = rem, dur = dur, count = 1, icon = b.icon or "Interface\\Icons\\Ability_Warrior_Riposte", label = "T10-2P" }
+
+            -- T8 2P: Haste Proc (Spell 64937, 64938, 64942) - +150 Haste per 5s
+            elseif sId == 64937 or sId == 64938 or sId == 64942 or name:find("T8 2P") then
+                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 5
+                local dur = (b.duration and b.duration > 0) and b.duration or 5
+                aT8_2P = { rem = rem, dur = dur, count = 1, icon = b.icon or "Interface\\Icons\\Spell_Nature_BloodLust", label = "T8-2P" }
             end
-            for _, b in ipairs(bList) do
-                if b.spellId == 70845 or b.spellId == 70844 or (b.name and (b.name:find("Advantage") or b.name:find("Vantaggio") or b.name:find("T10 2P"))) then
-                    local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 10
-                    local dur = (b.duration and b.duration > 0) and b.duration or 10
-                    return "ACTIVE", rem, dur, 1, b.icon or "Interface\\Icons\\Ability_Warrior_Riposte", "T10-2P"
-                end
-            end
-            return "READY", 0, 0, 0, defIcon, "T10"
-        elseif setType == "T8" then
-            local defIcon = "Interface\\Icons\\Spell_Nature_BloodLust"
-            for _, b in ipairs(bList) do
-                if b.spellId == 64942 or (b.name and (b.name:find("T8 4P") or b.name:find("Siegebreaker"))) then
-                    local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 5
-                    local dur = (b.duration and b.duration > 0) and b.duration or 5
-                    return "ACTIVE", rem, dur, 1, b.icon or defIcon, "T8-4P"
-                end
-            end
-            for _, b in ipairs(bList) do
-                if b.spellId == 64937 or (b.name and (b.name:find("T8 2P"))) then
-                    local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 5
-                    local dur = (b.duration and b.duration > 0) and b.duration or 5
-                    return "ACTIVE", rem, dur, 1, b.icon or "Interface\\Icons\\Ability_CriticalStrike", "T8-2P"
-                end
-            end
-            return "READY", 0, 0, 0, defIcon, "T8"
-        elseif setType == "T7" then
-            local defIcon = "Interface\\Icons\\INV_Helmet_23"
-            for _, b in ipairs(bList) do
-                if b.spellId == 60578 or (b.name and (b.name:find("Dreadnaught") or b.name:find("T7 4P"))) then
-                    local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 10
-                    local dur = (b.duration and b.duration > 0) and b.duration or 10
-                    return "ACTIVE", rem, dur, 1, b.icon or defIcon, "T7-4P"
-                end
-            end
-            return "READY", 0, 0, 0, defIcon, "T7"
-        elseif setType == "T9" then
-            return "READY", 0, 0, 0, "Interface\\Icons\\INV_Helmet_05", "T9"
         end
-        return "READY", 0, 0, 0, "Interface\\Icons\\Ability_Warrior_Siegebreaker", "T10"
+
+        -- Valutazione dinamica priorità proc attivi
+        if aT10_4P and aT10_4P.rem > 0.05 then
+            return "ACTIVE", aT10_4P.rem, aT10_4P.dur, aT10_4P.count, aT10_4P.icon, aT10_4P.label
+        end
+        if aT7_4P and aT7_4P.rem > 0.05 then
+            return "ACTIVE", aT7_4P.rem, aT7_4P.dur, aT7_4P.count, aT7_4P.icon, aT7_4P.label
+        end
+        if aT8_2P and aT10_2P then
+            if aT8_2P.rem <= aT10_2P.rem then
+                return "ACTIVE", aT8_2P.rem, aT8_2P.dur, aT8_2P.count, aT8_2P.icon, aT8_2P.label
+            else
+                return "ACTIVE", aT10_2P.rem, aT10_2P.dur, aT10_2P.count, aT10_2P.icon, aT10_2P.label
+            end
+        end
+        if aT8_2P and aT8_2P.rem > 0.05 then
+            return "ACTIVE", aT8_2P.rem, aT8_2P.dur, aT8_2P.count, aT8_2P.icon, aT8_2P.label
+        end
+        if aT10_2P and aT10_2P.rem > 0.05 then
+            return "ACTIVE", aT10_2P.rem, aT10_2P.dur, aT10_2P.count, aT10_2P.icon, aT10_2P.label
+        end
+
+        -- Stato READY: combinazioni ed equipaggiamento
+        if t10 >= 4 then
+            return "READY", 0, 0, 0, "Interface\\Icons\\Ability_Warrior_Siegebreaker", "T10 (4P)"
+        elseif t10 >= 2 and t8 >= 2 then
+            return "READY", 0, 0, 0, "Interface\\Icons\\Ability_Warrior_Siegebreaker", "T10/T8"
+        elseif t10 >= 2 and t9 >= 2 then
+            return "READY", 0, 0, 0, "Interface\\Icons\\Ability_Warrior_Siegebreaker", "T10/T9"
+        elseif t10 >= 2 and t7 >= 2 then
+            return "READY", 0, 0, 0, "Interface\\Icons\\Ability_Warrior_Siegebreaker", "T10/T7"
+        elseif t10 >= 2 then
+            return "READY", 0, 0, 0, "Interface\\Icons\\Ability_Warrior_Siegebreaker", "T10 (2P)"
+        elseif t9 >= 4 then
+            return "READY", 0, 0, 0, "Interface\\Icons\\INV_Helmet_05", "T9 (4P)"
+        elseif t9 >= 2 and t8 >= 2 then
+            return "READY", 0, 0, 0, "Interface\\Icons\\INV_Helmet_05", "T9/T8"
+        elseif t9 >= 2 then
+            return "READY", 0, 0, 0, "Interface\\Icons\\INV_Helmet_05", "T9 (2P)"
+        elseif t8 >= 4 then
+            return "READY", 0, 0, 0, "Interface\\Icons\\Spell_Nature_BloodLust", "T8 (4P)"
+        elseif t8 >= 2 and t7 >= 2 then
+            return "READY", 0, 0, 0, "Interface\\Icons\\Spell_Nature_BloodLust", "T8/T7"
+        elseif t8 >= 2 then
+            return "READY", 0, 0, 0, "Interface\\Icons\\Spell_Nature_BloodLust", "T8 (2P)"
+        elseif t7 >= 4 then
+            return "READY", 0, 0, 0, "Interface\\Icons\\Ability_Warrior_BloodNova", "T7 (4P)"
+        elseif t7 >= 2 then
+            return "READY", 0, 0, 0, "Interface\\Icons\\Ability_Warrior_BloodNova", "T7 (2P)"
+        end
+
+        return "READY", 0, 0, 0, "Interface\\Icons\\Ability_Warrior_Siegebreaker", "Tier"
     end
 
     -- =========================================================================
@@ -1092,7 +1145,7 @@ def build_utility_auras() -> list[dict]:
     - 05 - Trinket 1 warDPS (Icon, Slot 13)
     - 06 - Trinket 2 warDPS (Icon, Slot 14)
     - 07 - Cloak warDPS (Icon, Slot 15)
-    - 08 - Tier Set warDPS (Icon, T10/T8/T7 Proc & ICD)
+    - 08 - Tier Set warDPS (Icon, T10/T8/T7 Proc & Combinazioni 2P+2P)
     - 09 - Enchants warDPS (Icon, Berserking MH/OH x1/x2, Executioner, Mongoose, Ashen Band)
     - 10 - Gloves warDPS (Icon, Slot 10)
     - 11 - Death Wish (Icon, Spell 12292)

@@ -44,6 +44,8 @@ def run_tests():
     assert "FWHUD_T8_Pieces" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca tabella pezzi Tier 8"
     assert "FWHUD_T7_Pieces" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca tabella pezzi Tier 7"
     assert "FWHUD_T9_Pieces" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca tabella pezzi Tier 9"
+    assert "60176" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca spellId 60176 per Spirits of the Lost T7 4P"
+    assert "Spirits of the Lost" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca stringa Spirits of the Lost nel controllo T7"
     assert "FWHUD_CheckTierSet" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione FWHUD_CheckTierSet"
     assert "FWHUD_CheckEnchants" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione FWHUD_CheckEnchants"
     assert "FWHUD_UpdateUtilityRowPositions" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione di riposizionamento dinamico"

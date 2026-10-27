@@ -40,11 +40,12 @@ Barra orizzontale superiore (y = 52) con riposizionamento dinamico centrato, ris
 Fila orizzontale inferiore a y = -45 con riposizionamento e ricentratura automatica (espansione e contrazione dinamica identica a fire-mage-335a-am):
 - **05 - Trinket 1 warDPS & 06 - Trinket 2 warDPS**: Riconoscimento automatico slot 13 & 14 (con suffisso dedicato `warDPS` per prevenire sovrascritture o duplicati `2` in caso di convivenza con la suite Fire Mage). Catalogo integrato di **tutti i monili da mischia 3.3.5a** (Deathbringer's Will, Sharpened Twilight Scale, Death's Choice/Verdict, Whispering Fanged Skull, Herkuml War Token, Needle-Encrusted Scorpion, Mjolnir Runestone, Comet's Trail, Darkmoon Card: Greatness, Grim Toll, Mirror of Truth, Wrathstone, Mark of Supremacy, ecc.) con tracciamento durata attiva, Pixel Glow e conto alla rovescia ICD.
 - **07 - Cloak warDPS**: Attivo con incanti da mischia (Swordguard Embroidery +400 AP o paracadute/flexweave).
-- **08 - Tier Set warDPS (T7 - T10)**: Rilevamento automatico dell'armatura Tier equipaggiata (>= 2 o >= 4 pezzi) e tracciamento proc:
-  - **Tier 10 (Ymirjar Lord)**: 4P Siegebreaker (2 cariche e -0.5s GCD su Slam) e 2P Advantage (+16% AP per 10s da Deep Wounds).
-  - **Tier 8 (Siegebreaker)**: 4P (+20% Attack Speed per 5s) e 2P (+150 Crit per 5s).
-  - **Tier 7 (Dreadnaught)**: 4P (+610 AP per 10s da critico).
+- **08 - Tier Set warDPS (T7 - T10 & Combinazioni Multi-Set)**: Rilevamento automatico dell'armatura Tier equipaggiata (>= 2 o >= 4 pezzi) e tracciamento proc intelligente con supporto combinazioni (es. 2P T10 + 2P T8, 2P T10 + 2P T9, 2P T8 + 2P T7):
+  - **Tier 10 (Ymirjar Lord)**: 4P Siegebreaker (2 cariche e -0.5s GCD su Slam/Execute) e 2P Advantage (+16% AP per 10s da Deep Wounds/Rend).
+  - **Tier 8 (Siegebreaker)**: 2P proc (+150 Haste per 5s da critici di Heroic Strike e Slam); 4P passivo (+10% crit Bloodthirst e Mortal Strike).
+  - **Tier 7 (Heroes' / Valorous Dreadnaught)**: 4P proc **Spirits of the Lost** (Spell 60176 - riduce di 5 il costo in rabbia della prossima abilità con timer e Pixel Glow); 2P passivo (+10% danno a Slam).
   - **Tier 9 (Hellscream/Wrynn)**: Bonus passivi di stance e critico.
+  - **Combinazioni Multi-Set Ibride**: Valutazione dinamica in priorità di esecuzione; se più proc si attivano contemporaneamente, viene evidenziata la finestra più urgente/breve passando istantaneamente all'altro proc al consumo del primo.
 - **09 - Enchants warDPS (Armi & Anello)**: Monitoraggio in tempo reale degli incanti arma ed anello:
   - **Berserking MH & OH**: Rilevamento singolo o doppio stack (**x2 con +800 AP complessivi**) con timer e Pixel Glow.
   - **Executioner**: +120 Armor Penetration per 15s.

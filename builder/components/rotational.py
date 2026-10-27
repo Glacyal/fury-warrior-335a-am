@@ -118,7 +118,7 @@ def build_rotational_auras() -> list[dict]:
     return [
         # Gruppo Contenitore
         {
-            "id": "17 - Rotational Bar",
+            "id": "15 - Rotational Bar",
             "uid": "FWHUD_ROTCENTER_GRP",
             "parent": "Class Warrior (Fury)",
             "regionType": "group",
@@ -146,7 +146,7 @@ def build_rotational_auras() -> list[dict]:
         {
             "id": "Rotational Bar - Background",
             "uid": "FWHUD_ROTCENTER_BG",
-            "parent": "17 - Rotational Bar",
+            "parent": "15 - Rotational Bar",
             "regionType": "texture",
             "internalVersion": 52,
             "xOffset": 0,
@@ -177,7 +177,7 @@ def build_rotational_auras() -> list[dict]:
         {
             "id": "Rotational Bar - MH Swing",
             "uid": "FWHUD_ROTCENTER_MH",
-            "parent": "17 - Rotational Bar",
+            "parent": "15 - Rotational Bar",
             "regionType": "aurabar",
             "internalVersion": 52,
             "width": 137,
@@ -255,7 +255,7 @@ def build_rotational_auras() -> list[dict]:
         {
             "id": "Rotational Bar - OH Swing",
             "uid": "FWHUD_ROTCENTER_OH",
-            "parent": "17 - Rotational Bar",
+            "parent": "15 - Rotational Bar",
             "regionType": "aurabar",
             "internalVersion": 52,
             "width": 137,
@@ -337,7 +337,7 @@ def build_rotational_auras() -> list[dict]:
         {
             "id": "Rotational Bar - HS Queued",
             "uid": "FWHUD_ROTCENTER_HSQ",
-            "parent": "17 - Rotational Bar",
+            "parent": "15 - Rotational Bar",
             "regionType": "texture",
             "internalVersion": 52,
             "width": 278,

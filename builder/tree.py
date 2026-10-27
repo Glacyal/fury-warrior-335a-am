@@ -24,12 +24,12 @@ def build_wa_tree() -> dict:
     Assembla modularmente gli 8 componenti:
     1. 01 - Procs (Dynamic Group con Bloodsurge, Victory Rush, Flurry, Wrecking Crew, Execute)
     2. 02 - Battle Shout, 03 - Commanding Shout, 04 - Berserker Stance
-    3. 05-15 - Utility Row (Trinket 1, Trinket 2, Cloak, Tier Set, Enchants, Gloves, Death Wish, Recklessness, Shattering Throw, Enraged Regen, Boots)
-    4. 16 - Rage Bar, 18 - Castbar
-    5. 17 - Rotational Bar (Dual Swing Timer & Heroic Strike Queued)
-    6. 19 - Alerts (Bloodsurge & Execute Phase)
-    7. 20 - Stats Panel (AP, Crit, ArP con Cap, Hit/Exp)
-    8. 21 - Sunder Armor Tracker (1-5 cariche su boss)
+    3. 05-13 - Utility Row (Trinket 1, Trinket 2, Cloak, Tier Set, Enchants, Gloves, Death Wish, Recklessness, Boots)
+    4. 14 - Rage Bar, 16 - Castbar
+    5. 15 - Rotational Bar (Dual Swing Timer & Heroic Strike Queued)
+    6. 17 - Alerts (Bloodsurge & Execute Phase)
+    7. 18 - Stats Panel (AP, Crit, ArP con Cap, Hit/Exp)
+    8. 19 - Sunder Armor Tracker (1-5 cariche su boss)
     """
     data = {
         "m": "d",
@@ -61,15 +61,13 @@ def build_wa_tree() -> dict:
                 "10 - Gloves",
                 "11 - Death Wish",
                 "12 - Recklessness",
-                "13 - Shattering Throw",
-                "14 - Enraged Regeneration",
-                "15 - Boots",
-                "16 - Rage Bar",
-                "17 - Rotational Bar",
-                "18 - Castbar",
-                "19 - Alerts",
-                "20 - Stats Panel",
-                "21 - Sunder Armor Tracker",
+                "13 - Boots",
+                "14 - Rage Bar",
+                "15 - Rotational Bar",
+                "16 - Castbar",
+                "17 - Alerts",
+                "18 - Stats Panel",
+                "19 - Sunder Armor Tracker",
             ],
             "load": copy.deepcopy(FURY_WARRIOR_LOAD),
         },

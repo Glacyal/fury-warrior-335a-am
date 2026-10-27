@@ -17,11 +17,11 @@ from builder.core.helpers import make_subtext
 def build_sunder_auras() -> list[dict]:
     """
     Costruisce e restituisce l'aura del componente Sunder Armor Tracker:
-    - 21 - Sunder Armor Tracker
+    - 19 - Sunder Armor Tracker
     """
     return [
         {
-            "id": "21 - Sunder Armor Tracker",
+            "id": "19 - Sunder Armor Tracker",
             "uid": "FWHUD_SUNDER_TRACKER",
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",

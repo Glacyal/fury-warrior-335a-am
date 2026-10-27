@@ -25,19 +25,17 @@ def run_tests():
         "10 - Gloves",
         "11 - Death Wish",
         "12 - Recklessness",
-        "13 - Shattering Throw",
-        "14 - Enraged Regeneration",
-        "15 - Boots",
-        "16 - Rage Bar",
-        "17 - Rotational Bar",
-        "18 - Castbar",
-        "19 - Alerts",
-        "20 - Stats Panel",
-        "21 - Sunder Armor Tracker",
+        "13 - Boots",
+        "14 - Rage Bar",
+        "15 - Rotational Bar",
+        "16 - Castbar",
+        "17 - Alerts",
+        "18 - Stats Panel",
+        "19 - Sunder Armor Tracker",
     ]
 
     ctrl = root["controlledChildren"]
-    assert len(ctrl) == 21, f"Expected 21 controlled children, got {len(ctrl)}"
+    assert len(ctrl) == 19, f"Expected 19 controlled children, got {len(ctrl)}"
     for exp in expected_children:
         assert exp in ctrl, f"Missing child in root controlledChildren: {exp}"
 

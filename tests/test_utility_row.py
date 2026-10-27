@@ -7,7 +7,7 @@ def run_tests():
     from builder.components.utility import build_utility_auras, SHARED_WARRIOR_CORE_BOOTSTRAP_LUA
 
     auras = build_utility_auras()
-    assert len(auras) == 11, f"Expected 11 utility auras, got {len(auras)}"
+    assert len(auras) == 9, f"Expected 9 utility auras, got {len(auras)}"
 
     expected_ids = [
         "05 - Trinket 1",
@@ -18,9 +18,7 @@ def run_tests():
         "10 - Gloves",
         "11 - Death Wish",
         "12 - Recklessness",
-        "13 - Shattering Throw",
-        "14 - Enraged Regeneration",
-        "15 - Boots",
+        "13 - Boots",
     ]
 
     for i, a in enumerate(auras):

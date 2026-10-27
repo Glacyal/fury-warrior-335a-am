@@ -88,7 +88,7 @@ def build_stats_auras() -> list[dict]:
 
     return [
         {
-            "id": "20 - Stats Panel",
+            "id": "18 - Stats Panel",
             "uid": "FWHUD_STATS_GRP",
             "parent": "Class Warrior (Fury)",
             "regionType": "group",
@@ -104,7 +104,7 @@ def build_stats_auras() -> list[dict]:
         {
             "id": "Stats Panel - Background",
             "uid": "FWHUD_STATS_BG",
-            "parent": "20 - Stats Panel",
+            "parent": "18 - Stats Panel",
             "regionType": "texture",
             "internalVersion": 52,
             "width": 88,
@@ -135,7 +135,7 @@ def build_stats_auras() -> list[dict]:
         {
             "id": "Stats Panel - Text",
             "uid": "FWHUD_STATS_TEXT",
-            "parent": "20 - Stats Panel",
+            "parent": "18 - Stats Panel",
             "regionType": "text",
             "internalVersion": 52,
             "fontSize": 9,

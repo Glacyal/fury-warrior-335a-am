@@ -20,7 +20,7 @@ Visualizza e interagisci con l'HUD direttamente dal browser senza installare nul
 
 ## 🌟 Caratteristiche Principali
 
-Tutti i componenti del pacchetto sono organizzati con una numerazione sequenziale rigorosa da **01** a **21**:
+Tutti i componenti del pacchetto sono organizzati con una numerazione sequenziale rigorosa da **01** a **19**:
 
 ### 1. Gruppo Dinamico Procs Rotazionali (`01 - Procs`)
 Barra orizzontale superiore (y = 52) con riposizionamento dinamico centrato, riservata **esclusivamente ai proc di combattimento attivi**:
@@ -36,7 +36,7 @@ Barra orizzontale superiore (y = 52) con riposizionamento dinamico centrato, ris
 - **04 - Berserker Stance**: Allerta immediata ad alta visibilità se durante il combattimento il guerriero si trova fuori dalla Berserker Stance.
 - **Caricamento Specifico su [Rampage]**: Il talento passivo *Rampage* (Tab 2, Posizione 24 -> ID WeakAuras 64) è utilizzato come condizione di caricamento esclusiva dell'intero pacchetto: la suite si carica solo se il guerriero è specializzato Fury con Rampage attivo, e non occupa spazio visivo superfluo a schermo.
 
-### 3. Riga Utility Adattiva (`05` - `15`, da 3 a 11 Icone a y = -45)
+### 3. Riga Utility Adattiva (`05` - `13`, da 3 a 9 Icone a y = -45)
 Fila orizzontale inferiore a y = -45 con riposizionamento e ricentratura automatica (espansione e contrazione dinamica identica a fire-mage-335a-am):
 - **05 - Trinket 1 & 06 - Trinket 2**: Riconoscimento automatico slot 13 & 14. Catalogo integrato di **tutti i monili da mischia 3.3.5a** (Deathbringer's Will, Sharpened Twilight Scale, Death's Choice/Verdict, Whispering Fanged Skull, Herkuml War Token, Needle-Encrusted Scorpion, Mjolnir Runestone, Comet's Trail, Darkmoon Card: Greatness, Grim Toll, Mirror of Truth, Wrathstone, Mark of Supremacy, ecc.) con tracciamento durata attiva, Pixel Glow e conto alla rovescia ICD.
 - **07 - Cloak**: Attivo con incanti da mischia (Swordguard Embroidery +400 AP o paracadute/flexweave).
@@ -53,17 +53,15 @@ Fila orizzontale inferiore a y = -45 con riposizionamento e ricentratura automat
 - **10 - Gloves**: Acceleratori Ipersonici Ingegneria (+340 Haste per 12s, 60s CD).
 - **11 - Death Wish**: Durata attiva 30s (+20% danno) e cooldown.
 - **12 - Recklessness**: Tracciamento delle 3 cariche di critico garantito e cooldown.
-- **13 - Shattering Throw**: Debuff -20% armatura sul boss per 10s e cooldown (5 min).
-- **14 - Enraged Regeneration**: Cura 30% HP in 10s e cooldown.
-- **15 - Boots**: Stivali a nitro (Nitro Boosts) o incanti velocità con stato pronto e ricarica.
+- **13 - Boots**: Stivali a nitro (Nitro Boosts) o incanti velocità con stato pronto e ricarica.
 
-### 4. Barra della Rabbia Dinamica (`16 - Rage Bar`)
+### 4. Barra della Rabbia Dinamica (`14 - Rage Bar`)
 Barra orizzontale di precisione (278x14px a y = -20) con lettura numerica (%p) e cambio cromatico a 3 stadi:
 - **< 25 Rage**: Rosso scuro attenuato (allerta starvation).
 - **25 - 44 Rage**: Rosso sangue pieno (capacità di lanciare Bloodthirst/Whirlwind).
 - **>= 45 Rage**: Transizione istantanea ad **Ambra/Oro** per indicare il via libera allo scarico sicuro con Heroic Strike/Cleave!
 
-### 5. Barra Rotazionale & Dual Swing Timer (`17 - Rotational Bar`)
+### 5. Barra Rotazionale & Dual Swing Timer (`15 - Rotational Bar`)
 Posizionata visivamente a centro schermo subito sopra la barra della rabbia (278x7px):
 - **Doppio Swing Timer Speculare con Timing Numerico Live**:
   - **Mezza Barra Sinistra (MH)**: Avanzamento dello swing per la Mano Primaria con etichetta `MH` e countdown numerico al decimo di secondo (es. `1.8s` in combattimento, velocità arma da fermo).
@@ -72,22 +70,22 @@ Posizionata visivamente a centro schermo subito sopra la barra della rabbia (278
   - Non appena Heroic Strike o Cleave viene accodato, l'intera barra si illumina istantaneamente con un **Pixel Glow dorato** e compare la dicitura centrale `[HS QUEUED]`.
   - Fornisce la certezza visiva che il colpo successivo eliminerà i glancing blow sulla mano primaria e applicherà all'arma secondaria il cap di hit speciale (8%) invece della penalità 27% del dual wield!
 
-### 6. Castbar Centrale (`18 - Castbar`)
-Barra sincronizzata (278x20px a y = 8) per lanci di Slam non-proc, Shattering Throw e cannellature, con icona incantesimo a sinistra, nome al centro e tempo a destra.
+### 6. Castbar Centrale (`16 - Castbar`)
+Barra sincronizzata (278x20px a y = 8) per lanci di Slam non-proc e cannellature, con icona incantesimo a sinistra, nome al centro e tempo a destra.
 
-### 7. Avvisi Testuali ad Alta Visibilità (`19 - Alerts`)
+### 7. Avvisi Testuali ad Alta Visibilità (`17 - Alerts`)
 Avvisi a caratteri cubitali a centro schermo (y = 105):
 - `BLOODSURGE! / SLAM READY!` in giallo/arancione quando Bloodsurge si attiva.
 - `EXECUTE PHASE (< 20%)!` in rosso fuoco quando il target scende sotto il 20% di salute.
 
-### 8. Pannello Statistiche in Tempo Reale (`20 - Stats Panel`)
+### 8. Pannello Statistiche in Tempo Reale (`18 - Stats Panel`)
 Pannello compatto (88x48px a x = -190, y = -45) con aggiornamento throttled a 10 Hz:
 - **AP**: Attack power totale con buff e moltiplicatori.
 - **Crit**: Critico in mischia con debuff Heart of the Crusader / Master Poisoner (+3%) sul bersaglio.
 - **ArP**: Percentuale e rating, con dicitura **CAP in verde** al raggiungimento del cap di 1400.
 - **Hit & Exp**: Verifica visiva istantanea del cap 8% Special Hit e soft cap 26 Expertise.
 
-### 9. Sunder Armor Tracker (`21 - Sunder Armor Tracker`)
+### 9. Sunder Armor Tracker (`19 - Sunder Armor Tracker`)
 Colonna destra (x = 169, y = 45):
 - Traccia da 1 a 5 cariche sul bersaglio corrente con countdown di durata.
 - Colore verde al raggiungimento delle 5 cariche massime.

@@ -1,8 +1,8 @@
 """
-Modulo Componente: 05-15 - Utility Row (Warrior Fury)
+Modulo Componente: 05-13 - Utility Row (Warrior Fury)
 =====================================================
 Gestisce la riga orizzontale di utilità a y = -45 con riposizionamento dinamico
-centrato naturale (da 3 a 11 icone) in base all'equipaggiamento e alle abilità:
+centrato naturale (da 3 a 9 icone) in base all'equipaggiamento e alle abilità:
 1. 05 - Trinket 1 (Slot 13: DBW, STS, Death's Choice o altro monile, ICD o On-Use, Pixel Glow su proc)
 2. 06 - Trinket 2 (Slot 14: STS, DBW, Whispering Fanged Skull o altro monile, ICD/On-Use, Pixel Glow)
 3. 07 - Cloak (Slot 15: Swordguard Embroidery +400 AP / Paracadute / Flexweave)
@@ -11,9 +11,7 @@ centrato naturale (da 3 a 11 icone) in base all'equipaggiamento e alle abilità:
 6. 10 - Gloves (Slot 10: Acceleratori Ipersonici Ingegneria +340 Haste per 12s, 60s CD)
 7. 11 - Death Wish (Spell ID 12292, durata attiva 30s + cooldown)
 8. 12 - Recklessness (Spell ID 1719, 3 cariche critico garantite + cooldown)
-9. 13 - Shattering Throw (Spell ID 64382, debuff -20% armatura sul boss 10s + cooldown 5m)
-10. 14 - Enraged Regeneration (Spell ID 55694, cura 30% HP in 10s + cooldown 3m)
-11. 15 - Boots (Slot 8: Acceleratori a Nitro / Nitro Boosts Ingegneria, 180s CD)
+9. 13 - Boots (Slot 8: Acceleratori a Nitro / Nitro Boosts Ingegneria, 180s CD)
 
 Architettura solida: bootstrap centrale idempotente iniettato in tutti i trigger e customText,
 check update con swipe, customDuration, customIcon e customText con PixelGlow reattivo.
@@ -705,15 +703,11 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         if hasGloves then table.insert(activeOrder, "10 - Gloves") end
         table.insert(activeOrder, "11 - Death Wish")
         table.insert(activeOrder, "12 - Recklessness")
-        table.insert(activeOrder, "13 - Shattering Throw")
-        table.insert(activeOrder, "14 - Enraged Regeneration")
-        if hasBoots then table.insert(activeOrder, "15 - Boots") end
+        if hasBoots then table.insert(activeOrder, "13 - Boots") end
 
         local N = #activeOrder
         local step = 38
-        if N >= 11 then step = 26
-        elseif N == 10 then step = 28
-        elseif N == 9 then step = 32
+        if N >= 9 then step = 32
         elseif N == 8 then step = 34
         elseif N == 7 then step = 38
         elseif N == 6 then step = 44
@@ -1103,9 +1097,7 @@ def build_utility_auras() -> list[dict]:
     - 10 - Gloves (Icon, Slot 10)
     - 11 - Death Wish (Icon, Spell 12292)
     - 12 - Recklessness (Icon, Spell 1719)
-    - 13 - Shattering Throw (Icon, Spell 64382)
-    - 14 - Enraged Regeneration (Icon, Spell 55694)
-    - 15 - Boots (Icon, Slot 8)
+    - 13 - Boots (Icon, Slot 8)
     """
     events_list = "PLAYER_EQUIPMENT_CHANGED,UNIT_INVENTORY_CHANGED,PLAYER_ENTERING_WORLD,ZONE_CHANGED_NEW_AREA,UNIT_AURA,SPELL_UPDATE_COOLDOWN,ACTIONBAR_UPDATE_COOLDOWN,BAG_UPDATE_COOLDOWN,COMBAT_LOG_EVENT_UNFILTERED,FWHUD_ROW_UPDATE"
 
@@ -1458,99 +1450,9 @@ end"""
             ],
         },
 
-        # 13 - Shattering Throw (Spell 64382)
+        # 13 - Boots (Slot 8)
         {
-            "id": "13 - Shattering Throw",
-            "uid": "FWHUD_UTIL_SHATTERING",
-            "parent": "Class Warrior (Fury)",
-            "regionType": "icon",
-            "internalVersion": 52,
-            "xOffset": 84,
-            "yOffset": -45,
-            "width": 28,
-            "height": 28,
-            "displayIcon": "Interface\\Icons\\Ability_Warrior_ShatteringThrow",
-            "cooldown": True,
-            "cooldownSwipe": True,
-            "cooldownEdge": True,
-            "cooldownTextDisabled": True,
-            "inverse": False,
-            "customTextUpdate": "update",
-            "customText": make_warrior_spell_custom_text(64382, None, "FWHUD_ST_GLOW"),
-            "init_completed": SHARED_WARRIOR_CORE_BOOTSTRAP_LUA,
-            "triggers": {
-                1: {
-                    "trigger": {
-                        "type": "custom",
-                        "custom_type": "status",
-                        "check": "update",
-                        "events": events_list,
-                        "custom": make_warrior_spell_trigger_custom(64382),
-                        "customDuration": make_warrior_spell_custom_duration(64382, None),
-                        "customIcon": make_warrior_spell_custom_icon(64382, "Interface\\Icons\\Ability_Warrior_ShatteringThrow"),
-                    },
-                    "untrigger": {
-                        "custom": """function(event, ...)
-    return false
-end"""
-                    }
-                },
-                "activeTriggerMode": -10,
-            },
-            "subRegions": [
-                {"type": "subbackground"},
-                make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=10),
-            ],
-        },
-
-        # 14 - Enraged Regeneration (Spell 55694)
-        {
-            "id": "14 - Enraged Regeneration",
-            "uid": "FWHUD_UTIL_ENRAGEDREGEN",
-            "parent": "Class Warrior (Fury)",
-            "regionType": "icon",
-            "internalVersion": 52,
-            "xOffset": 112,
-            "yOffset": -45,
-            "width": 28,
-            "height": 28,
-            "displayIcon": "Interface\\Icons\\Ability_Warrior_EnragedRegeneration",
-            "cooldown": True,
-            "cooldownSwipe": True,
-            "cooldownEdge": True,
-            "cooldownTextDisabled": True,
-            "inverse": False,
-            "customTextUpdate": "update",
-            "customText": make_warrior_spell_custom_text(55694, 55694, "FWHUD_ER_GLOW"),
-            "init_completed": SHARED_WARRIOR_CORE_BOOTSTRAP_LUA,
-            "triggers": {
-                1: {
-                    "trigger": {
-                        "type": "custom",
-                        "custom_type": "status",
-                        "check": "update",
-                        "events": events_list,
-                        "custom": make_warrior_spell_trigger_custom(55694),
-                        "customDuration": make_warrior_spell_custom_duration(55694, 55694),
-                        "customIcon": make_warrior_spell_custom_icon(55694, "Interface\\Icons\\Ability_Warrior_EnragedRegeneration"),
-                    },
-                    "untrigger": {
-                        "custom": """function(event, ...)
-    return false
-end"""
-                    }
-                },
-                "activeTriggerMode": -10,
-            },
-            "subRegions": [
-                {"type": "subbackground"},
-                make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=10),
-            ],
-        },
-
-        # 15 - Boots (Slot 8)
-        {
-            "id": "15 - Boots",
+            "id": "13 - Boots",
             "uid": "FWHUD_UTIL_BOOTS",
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",

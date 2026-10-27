@@ -1,15 +1,15 @@
 """
-Modulo Componente: 16 - Rage Bar & 18 - Castbar
+Modulo Componente: 14 - Rage Bar & 16 - Castbar
 ================================================
 Gestisce le barre centrali sincronizzate a 278px di larghezza:
-1. 16 - Rage Bar (278x14px a y = -20):
+1. 14 - Rage Bar (278x14px a y = -20):
    - Barra della rabbia (powertype = 1) con texture statusbar.
    - Colore base: rosso sangue [0.78, 0.12, 0.12, 1.0].
    - Transizione cromatica dinamica ad ambra dorato [1.0, 0.65, 0.10, 1.0] a >= 45 Rage (soglia scarico sicuro Heroic Strike).
    - Allerta starvation a < 25 Rage: colore rosso scuro [0.45, 0.05, 0.05, 1.0].
    - Testo centrale: valore numerico rabbia (%p).
-2. 18 - Castbar (278x20px a y = +8):
-   - Barra di lancio per Slam non-proc (1.5s), Shattering Throw (1.5s), Lancio armi a distanza o GCD.
+2. 16 - Castbar (278x20px a y = +8):
+   - Barra di lancio per Slam non-proc (1.5s), Lancio armi a distanza o GCD.
    - Mostra icona a sinistra, nome incantesimo a sinistra (%n) e tempo residuo a destra (%p).
 """
 from builder.core.helpers import make_subtext
@@ -19,15 +19,15 @@ from builder.core.constants import TEXTURE_STATUSBAR, COLOR_RAGE, COLOR_RAGE_DUM
 def build_bars_auras() -> list[dict]:
     """
     Costruisce e restituisce le 2 barre principali dell'HUD:
-    - 16 - Rage Bar (Aurabar)
-    - 18 - Castbar (Aurabar)
+    - 14 - Rage Bar (Aurabar)
+    - 16 - Castbar (Aurabar)
     """
     return [
         # =====================================================================
-        # 16 - RAGE BAR
+        # 14 - RAGE BAR
         # =====================================================================
         {
-            "id": "16 - Rage Bar",
+            "id": "14 - Rage Bar",
             "uid": "FWHUD_RAGEBAR",
             "parent": "Class Warrior (Fury)",
             "regionType": "aurabar",
@@ -93,10 +93,10 @@ def build_bars_auras() -> list[dict]:
         },
 
         # =====================================================================
-        # 18 - CASTBAR
+        # 16 - CASTBAR
         # =====================================================================
         {
-            "id": "18 - Castbar",
+            "id": "16 - Castbar",
             "uid": "FWHUD_CASTBAR",
             "parent": "Class Warrior (Fury)",
             "regionType": "aurabar",

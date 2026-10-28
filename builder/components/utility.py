@@ -68,11 +68,11 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
 
     _G.FWHUD_TrinketDB = {
         -- Deathbringer's Will (Normal 50362, Heroic 50363)
-        [50362] = { keywords = { "taunka", "vrykul", "irondwarf", "deathbringer" }, spellIds = { [71485] = true, [71491] = true, [71487] = true, [71556] = true, [71560] = true, [71558] = true }, icd = 105, dur = 30 },
-        [50363] = { keywords = { "taunka", "vrykul", "irondwarf", "deathbringer" }, spellIds = { [71485] = true, [71491] = true, [71487] = true, [71556] = true, [71560] = true, [71558] = true }, icd = 105, dur = 30 },
+        [50362] = { keywords = { "taunka", "vrykul", "irondwarf", "deathbringer", "nanodiferro", "forzadel", "agilitadel", "miradel" }, spellIds = { [71484] = true, [71485] = true, [71486] = true, [71491] = true, [71492] = true, [71487] = true, [71556] = true, [71557] = true, [71558] = true, [71559] = true, [71560] = true, [71561] = true }, icd = 105, dur = 30 },
+        [50363] = { keywords = { "taunka", "vrykul", "irondwarf", "deathbringer", "nanodiferro", "forzadel", "agilitadel", "miradel" }, spellIds = { [71484] = true, [71485] = true, [71486] = true, [71491] = true, [71492] = true, [71487] = true, [71556] = true, [71557] = true, [71558] = true, [71559] = true, [71560] = true, [71561] = true }, icd = 105, dur = 30 },
         -- Sharpened Twilight Scale (Normal 54569, Heroic 54590)
-        [54569] = { keywords = { "twilightprecision", "sharpenedtwilight", "twilight" }, spellIds = { [75473] = true, [75474] = true, [75456] = true }, icd = 45, dur = 15 },
-        [54590] = { keywords = { "twilightprecision", "sharpenedtwilight", "twilight" }, spellIds = { [75473] = true, [75474] = true, [75456] = true }, icd = 45, dur = 15 },
+        [54569] = { keywords = { "twilightprecision", "sharpenedtwilight", "twilight", "crepuscolare", "precisione" }, spellIds = { [75473] = true, [75474] = true, [75466] = true, [75456] = true }, icd = 45, dur = 15 },
+        [54590] = { keywords = { "twilightprecision", "sharpenedtwilight", "twilight", "crepuscolare", "precisione" }, spellIds = { [75473] = true, [75474] = true, [75466] = true, [75456] = true }, icd = 45, dur = 15 },
         -- Death's Choice / Verdict (Normal Alliance 47115, Normal Horde 47131, Heroic Alliance 47303, Heroic Horde 47464)
         [47115] = { keywords = { "paragon" }, spellIds = { [67708] = true, [67703] = true }, icd = 45, dur = 15 },
         [47131] = { keywords = { "paragon" }, spellIds = { [67773] = true, [67772] = true }, icd = 45, dur = 15 },
@@ -121,6 +121,13 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         [45522] = { keywords = { "bloodoftheoldgod" }, spellIds = { [64790] = true }, icd = 45, dur = 10 },
         -- Pyrite Infuser (45286)
         [45286] = { keywords = { "pyriteinfuser" }, spellIds = { [65012] = true }, icd = 45, dur = 10 },
+        -- Coren's Chromium Coaster (49074)
+        [49074] = { keywords = { "chromium", "coaster" }, spellIds = { [60488] = true }, icd = 45, dur = 10 },
+        -- Victor's Call & Vengeance of the Forsaken (47725, 47948, 47728, 47949)
+        [47725] = { keywords = { "victor" }, spellIds = { [67744] = true }, icd = 120, dur = 20, onUse = true },
+        [47948] = { keywords = { "victor" }, spellIds = { [67744] = true }, icd = 120, dur = 20, onUse = true },
+        [47728] = { keywords = { "vengeance" }, spellIds = { [67744] = true }, icd = 120, dur = 20, onUse = true },
+        [47949] = { keywords = { "vengeance" }, spellIds = { [67744] = true }, icd = 120, dur = 20, onUse = true },
         -- Tears of the Vanquished (47215)
         [47215] = { keywords = { "revitalized" }, spellIds = { [67700] = true }, icd = 45, dur = 0 },
         -- PvP Medallions & Battlemaster's
@@ -366,7 +373,12 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
             local link = GetInventoryItemLink("player", slot)
             if link then itemID = tonumber(link:match("item:(%d+)")) end
         end
-        local icdState = _G.FWHUD_ICD[slot]
+        local icdState = _G.FWHUD_ICD and _G.FWHUD_ICD[slot]
+        if not icdState then
+            _G.FWHUD_ICD = _G.FWHUD_ICD or {}
+            icdState = { lastStart = 0, lastEnd = 0, isProc = false, lastItemID = 0 }
+            _G.FWHUD_ICD[slot] = icdState
+        end
         if icdState.lastItemID and itemID and icdState.lastItemID ~= itemID then
             icdState.lastStart = 0
             icdState.lastEnd = 0
@@ -374,7 +386,29 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         end
         if itemID then icdState.lastItemID = itemID end
 
-        local entry = itemID and _G.FWHUD_TrinketDB[itemID]
+        local entry = itemID and _G.FWHUD_TrinketDB and _G.FWHUD_TrinketDB[itemID]
+        if not entry and itemID and (slot == 13 or slot == 14) then
+            local itemName = GetItemInfo and GetItemInfo(itemID)
+            if not itemName then
+                local link = GetInventoryItemLink("player", slot)
+                if link then itemName = link:match("%[(.-)%]") end
+            end
+            if itemName then
+                local inClean = itemName:lower():gsub("[%s%p%c]", "")
+                for dbID, dbEntry in pairs(_G.FWHUD_TrinketDB or {}) do
+                    if dbEntry.keywords then
+                        for _, kw in ipairs(dbEntry.keywords) do
+                            local kwClean = kw:lower():gsub("[%s%p%c]", "")
+                            if inClean:find(kwClean, 1, true) then
+                                entry = dbEntry
+                                break
+                            end
+                        end
+                    end
+                    if entry then break end
+                end
+            end
+        end
         local targetICD = (entry and entry.icd) or (slot == 10 and 60) or (slot == 8 and 180) or (slot == 15 and 45) or 45
         local defaultDur = (entry and entry.dur) or (slot == 10 and 12) or (slot == 8 and 5) or (slot == 15 and 15) or 10
 
@@ -504,19 +538,6 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
             local elapsed = now - icdState.lastStart
             if elapsed < targetICD then
                 local remICD = targetICD - elapsed
-                if not icdState.timerScheduled then
-                    icdState.timerScheduled = true
-                    local timerAfter = (C_Timer and C_Timer.After) or (_G.C_Timer and _G.C_Timer.After)
-                    if timerAfter then
-                        timerAfter(remICD + 0.1, function()
-                            icdState.timerScheduled = false
-                            if _G.FWHUD_SlotCache then _G.FWHUD_SlotCache[slot] = nil end
-                            if WeakAuras and WeakAuras.ScanEvents then
-                                WeakAuras.ScanEvents("FWHUD_ROW_UPDATE")
-                            end
-                        end)
-                    end
-                end
                 return finish("ICD", remICD, targetICD, baseIcon)
             else
                 icdState.lastStart = 0
@@ -1161,6 +1182,37 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                 if isPlayer then
                     local now = GetTime()
                     if subEvent == "SPELL_CAST_SUCCESS" or subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_REFRESH" then
+                        -- Check Trinkets Proc (slot 13 & 14)
+                        for _, s in ipairs({ 13, 14 }) do
+                            local tID = GetInventoryItemID and GetInventoryItemID("player", s)
+                            local tEntry = tID and _G.FWHUD_TrinketDB and _G.FWHUD_TrinketDB[tID]
+                            local isTMatch = false
+                            if tEntry then
+                                if spellId and tEntry.spellIds and tEntry.spellIds[spellId] then
+                                    isTMatch = true
+                                elseif spellName and tEntry.keywords then
+                                    local snClean = spellName:lower():gsub("[%s%p%c]", "")
+                                    for _, kw in ipairs(tEntry.keywords) do
+                                        if snClean:find(kw:lower():gsub("[%s%p%c]", ""), 1, true) then
+                                            isTMatch = true
+                                            break
+                                        end
+                                    end
+                                end
+                            end
+                            if isTMatch then
+                                local sICD = _G.FWHUD_ICD and _G.FWHUD_ICD[s]
+                                if sICD then
+                                    sICD.lastStart = now
+                                    sICD.lastEnd = now + (tEntry.icd or 45)
+                                    sICD.isProc = true
+                                    if WeakAuras and WeakAuras.ScanEvents then
+                                        WeakAuras.ScanEvents("FWHUD_ROW_UPDATE")
+                                    end
+                                end
+                            end
+                        end
+
                         if spellId == 54861 or spellId == 54858 or spellId == 55016 or spellName == "Nitro Boosts" or spellName == "Acceleratori a Nitro" then
                             _G.FWHUD_ICD[8].lastStart = now
                             _G.FWHUD_ICD[8].lastEnd = now + 180
@@ -1191,6 +1243,19 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                             if WeakAuras and WeakAuras.ScanEvents then WeakAuras.ScanEvents("FWHUD_ROW_UPDATE") end
                         end
                     elseif subEvent == "SPELL_AURA_REMOVED" then
+                        for _, s in ipairs({ 13, 14 }) do
+                            local tID = GetInventoryItemID and GetInventoryItemID("player", s)
+                            local tEntry = tID and _G.FWHUD_TrinketDB and _G.FWHUD_TrinketDB[tID]
+                            if tEntry and spellId and tEntry.spellIds and tEntry.spellIds[spellId] then
+                                local sICD = _G.FWHUD_ICD and _G.FWHUD_ICD[s]
+                                if sICD then
+                                    sICD.isProc = false
+                                    if WeakAuras and WeakAuras.ScanEvents then
+                                        WeakAuras.ScanEvents("FWHUD_ROW_UPDATE")
+                                    end
+                                end
+                            end
+                        end
                         if spellId == 59620 or spellName == "Berserking" or spellName == "Furia Berserker" then
                             local buffs = _G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs()
                             local hasB = false
@@ -1266,9 +1331,9 @@ def make_ring_custom_text() -> str:
             if rem >= 60 then
                 local m = math.floor(rem / 60)
                 local s = math.floor(rem % 60)
-                return string.format("%d:%02d", m, s)
+                return string.format("|cFFFF4444%d:%02d|r", m, s)
             else
-                return string.format("%.0f", rem)
+                return string.format("|cFFFF4444%.0fs|r", rem)
             end
         end
         return ""
@@ -1411,9 +1476,9 @@ def make_slot_custom_text(slot: int) -> str:
             if rem >= 60 then
                 local m = math.floor(rem / 60)
                 local s = math.floor(rem % 60)
-                return string.format("%d:%02d", m, s)
+                return string.format("|cFFFF4444%d:%02d|r", m, s)
             else
-                return string.format("%.0f", rem)
+                return string.format("|cFFFF4444%.0fs|r", rem)
             end
         end
         return ""
@@ -1715,7 +1780,7 @@ def build_utility_auras() -> list[dict]:
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": events_list,
                         "custom": make_slot_trigger_custom(13),
                         "customDuration": make_slot_custom_duration(13),
@@ -1757,7 +1822,7 @@ def build_utility_auras() -> list[dict]:
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": events_list,
                         "custom": make_slot_trigger_custom(14),
                         "customDuration": make_slot_custom_duration(14),
@@ -1799,7 +1864,7 @@ def build_utility_auras() -> list[dict]:
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": events_list,
                         "custom": make_ring_trigger_custom(),
                         "customDuration": make_ring_custom_duration(),
@@ -1841,7 +1906,7 @@ def build_utility_auras() -> list[dict]:
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": events_list,
                         "custom": make_slot_trigger_custom(15),
                         "customDuration": make_slot_custom_duration(15),
@@ -1883,7 +1948,7 @@ def build_utility_auras() -> list[dict]:
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": events_list,
                         "custom": make_tierset_trigger_custom(),
                         "customDuration": make_tierset_custom_duration(),
@@ -1925,7 +1990,7 @@ def build_utility_auras() -> list[dict]:
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": events_list,
                         "custom": make_weapon_trigger_custom(16),
                         "customDuration": make_weapon_custom_duration(16),
@@ -1968,7 +2033,7 @@ def build_utility_auras() -> list[dict]:
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": events_list,
                         "custom": make_weapon_trigger_custom(17),
                         "customDuration": make_weapon_custom_duration(17),
@@ -2011,7 +2076,7 @@ def build_utility_auras() -> list[dict]:
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": events_list,
                         "custom": make_slot_trigger_custom(10),
                         "customDuration": make_slot_custom_duration(10),
@@ -2053,7 +2118,7 @@ def build_utility_auras() -> list[dict]:
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": events_list,
                         "custom": make_warrior_spell_trigger_custom(12292),
                         "customDuration": make_warrior_spell_custom_duration(12292, 12292),
@@ -2097,7 +2162,7 @@ end"""
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": events_list,
                         "custom": make_warrior_spell_trigger_custom(1719),
                         "customDuration": make_warrior_spell_custom_duration(1719, 1719),
@@ -2141,7 +2206,7 @@ end"""
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": events_list,
                         "custom": make_slot_trigger_custom(8),
                         "customDuration": make_slot_custom_duration(8),

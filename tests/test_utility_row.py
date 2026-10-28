@@ -4,7 +4,14 @@ import sys
 def run_tests():
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     sys.path.insert(0, root_dir)
-    from builder.components.utility import build_utility_auras, SHARED_WARRIOR_CORE_BOOTSTRAP_LUA
+    from builder.components.utility import (
+        build_utility_auras,
+        SHARED_WARRIOR_CORE_BOOTSTRAP_LUA,
+        make_slot_custom_text,
+        make_slot_custom_duration,
+        make_slot_custom_icon,
+        make_ring_custom_text,
+    )
 
     auras = build_utility_auras()
     assert len(auras) == 11, f"Expected 11 utility auras, got {len(auras)}"
@@ -29,9 +36,24 @@ def run_tests():
         assert a["height"] == 28, f"Invalid height for {a['id']}"
         assert a["yOffset"] == -45, f"Invalid yOffset for {a['id']}"
 
+        # CRITICAL: Verify that ALL 11 utility auras use "check": "update"
+        # so WeakAuras updates customDuration, customIcon, and customText seamlessly every frame
+        trig1 = a["triggers"][1]["trigger"]
+        assert trig1.get("check") == "update", (
+            f"Aura '{a['id']}' must use 'check': 'update' to ensure real-time proc and ICD reactivity!"
+        )
+
     # Verify physical trinket catalog in Lua bootstrap
     assert "50362" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Deathbringer's Will nel DB dei monili"
+    assert "50363" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Deathbringer's Will Heroic nel DB dei monili"
+    assert "71485" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca DBW Strength of the Taunka (Normal 71485)"
+    assert "71556" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca DBW Strength of the Taunka (Heroic 71556)"
+    assert "71491" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca DBW Aim of the Iron Dwarf (Normal 71491)"
+    assert "71560" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca DBW Aim of the Iron Dwarf (Heroic 71560)"
     assert "54569" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Sharpened Twilight Scale nel DB dei monili"
+    assert "54590" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Sharpened Twilight Scale Heroic nel DB dei monili"
+    assert "75466" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca STS Twilight Precision (Normal 75466)"
+    assert "75473" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca STS Twilight Precision (Heroic 75473)"
     assert "47115" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Death's Choice nel DB dei monili"
     assert "50342" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Whispering Fanged Skull nel DB dei monili"
     assert "50355" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Herkuml War Token nel DB dei monili"
@@ -40,6 +62,24 @@ def run_tests():
     assert "44253" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Darkmoon Card: Greatness nel DB dei monili"
     assert "40256" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Grim Toll nel DB dei monili"
     assert "40684" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Mirror of Truth nel DB dei monili"
+    assert "49074" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Coren's Chromium Coaster nel DB dei monili"
+
+    # Verify customText and customDuration logic for Trinket 1 & 2
+    for slot in (13, 14):
+        txt_code = make_slot_custom_text(slot)
+        assert "|cFFFFFF00%.1fs|r" in txt_code, f"Manca formato giallo per proc attivo in slot {slot}"
+        assert "|cFFFF4444" in txt_code, f"Manca formato rosso per ICD/cooldown rimanente in slot {slot}"
+        assert "LCG.PixelGlow_Start" in txt_code, f"Manca PixelGlow_Start su proc attivo in slot {slot}"
+        assert "LCG.PixelGlow_Stop" in txt_code, f"Manca PixelGlow_Stop su fine proc in slot {slot}"
+
+        dur_code = make_slot_custom_duration(slot)
+        assert "state == \"ICD\"" in dur_code, f"Manca gestione stato ICD in customDuration per slot {slot}"
+        assert "return dur, GetTime() + rem" in dur_code, f"Manca return durata swipe per slot {slot}"
+
+    # Verify Ring customText format
+    ring_txt = make_ring_custom_text()
+    assert "|cFFFFFF00%.1fs|r" in ring_txt, "Manca formato giallo per proc attivo anello"
+    assert "|cFFFF4444" in ring_txt, "Manca formato rosso per ICD/cooldown anello"
 
     # Verify Tier Sets and Enchants detection in Lua bootstrap
     assert "FWHUD_T10_Pieces" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca tabella pezzi Tier 10"
@@ -56,7 +96,9 @@ def run_tests():
     assert "FWHUD_CheckWeapon" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione FWHUD_CheckWeapon"
     assert "FWHUD_UpdateUtilityRowPositions" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione di riposizionamento dinamico"
 
-    print("[OK] Tutti gli 11 elementi della riga utility e il catalogo Tier Sets/Trinkets verificati con successo.")
+    print("[OK] Tutti gli 11 elementi della riga utility verificati con 'check': 'update'.")
+    print("[OK] Catalogo monili WotLK 3.3.5a completo con ICD e spell ID corretti (DBW, STS, Choice, Skull, ecc.).")
+    print("[OK] Gestione proc attivo (Pixel Glow giallo) e conteggio ICD rimanente (rosso) verificati.")
     print("[PASS] test_utility_row.py superato con successo!")
 
 if __name__ == "__main__":

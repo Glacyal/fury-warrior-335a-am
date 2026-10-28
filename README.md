@@ -48,7 +48,8 @@ Fila orizzontale inferiore a y = -45 con riposizionamento e ricentratura automat
   - *Darkmoon Card: Greatness*, *Grim Toll*, *Mirror of Truth*, *Banner of Victory*, *Meteorite Whetstone*: ICD reale **45s**.
   - *Wrathstone*, *Mark of Supremacy*, *Incisor Fragment*: On-Use 20s, Cooldown **120s**.
   - *Herkuml War Token*: accumulo cariche (1-20) e durata 10s, nessun ICD.
-  - Tre stati visivi: **READY** (pronto), **PROC ATTIVO** (swipe + Pixel Glow dorato) e **ICD** (timer numerico residuo e swipe di ricarica).
+  - Tre stati visivi in tempo reale a 60+ FPS: **READY** (pronto, icona dell'oggetto senza swipe né testo), **PROC ATTIVO** (icona specifica del buff, swipe di durata attiva, testo giallo `|cFFFFFF00%.1fs|r` e Pixel Glow dorato) e **ICD** (icona dell'oggetto, swipe di ricarica residua e timer numerico rosso `|cFFFF4444%d:%02d|r` o `|cFFFF4444%.0fs|r` fino a 0s).
+  - Motore di aggiornamento reattivo ad alte prestazioni con trigger `check: "update"` e cache temporale frame-by-frame (`_G.FWHUD_SlotCache`), con fallback euristico per nome monile e parsing CLEU `SPELL_AURA_APPLIED` / `SPELL_AURA_REMOVED`.
 - **06b - Ring warDPS**: Monitoraggio dell'anello con proc nello slot 11 o 12 (sul modello di fire-mage-335a-am):
   - *Ashen Band of Endless Vengeance* (Item 50402/50401): Proc *Frostforged Champion* (+480 AP per 10s, ICD **60s**).
   - *Band of the Eternal Champion* (Item 29301): Proc (+160 AP per 10s, ICD **60s**).

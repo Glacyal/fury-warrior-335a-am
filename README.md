@@ -102,12 +102,12 @@ Pannello compatto (88x60px a x = -190, y = -45) con aggiornamento throttled a 10
 - **ArP**: Percentuale e rating, con dicitura **CAP in verde** al raggiungimento del cap di 1400.
 - **Hit & Exp**: Verifica visiva istantanea del cap 8% Special Hit (con aura Draenei Heroic Presence +1%) e soft cap 26 Expertise.
 
-### 9. Sunder Armor Tracker (`19 - Sunder Armor Tracker`)
+### 9. Sunder Armor Tracker (19 - Sunder Armor Tracker)
 Colonna destra (x = 169, y = 45):
-- Traccia da 1 a 5 cariche sul bersaglio corrente con countdown di durata.
-- Colore verde al raggiungimento delle 5 cariche massime.
-- Riconoscimento intelligente di Expose Armor del ladro per non sovrascrivere il debuff.
-- Allerta rossa '0' in combattimento se nessun debuff di armatura è presente sul boss.
+- **Cariche centrate** da 1 a 5 cariche (x1..x5, font 14) al centro dell'icona, con evidenziazione in verde brillante al raggiungimento del cap di 5 cariche (x5).
+- **Timer di scadenza numerico** (es. 27s, font 10) ancorato alla base dell'icona.
+- **Riconoscimento Expose Armor** del Ladro (EA centrato in ciano) per evitare di sovrascrivere il debuff.
+- **Allerta 'OFF'**: se il debuff manca sul bersaglio, mostra esclusivamente la scritta rossa OFF alla base dell'icona.
 
 ---
 

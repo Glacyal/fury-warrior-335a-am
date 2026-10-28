@@ -7,9 +7,10 @@ Gestisce il monitoraggio del debuff Sunder Armor / Expose Armor sul bersaglio co
   * Conteggio cariche (da 1 a 5 cariche, stack count %s).
   * Conto alla rovescia di scadenza (%p o timer formattato).
   * Segnalazione intelligente:
-    - Se presenti 5 cariche: stack count evidenziato in verde.
-    - Se presente Expose Armor del Ladro: mostra icona con etichetta 'EA' per non sovrascrivere.
-    - Se mancante su target nemico in combattimento: allerta rossa 'MISSING'.
+    - Se presenti 5 cariche: stack count centrato 'x5' in verde.
+    - Se presente Expose Armor del Ladro: etichetta centrata 'EA' in ciano per non sovrascrivere.
+    - Se mancante su target nemico: solo allerta rossa 'OFF' posizionata alla base del riquadro.
+    - Timer di scadenza numerico (es. 27s) centrato alla base (%c1), cariche (x1-x5 / EA) centrate (%c2).
 """
 from builder.core.helpers import make_subtext
 
@@ -41,7 +42,9 @@ def build_sunder_auras() -> list[dict]:
             "cooldownTextDisabled": True,
             "customTextUpdate": "update",
             "customText": """function()
-    if not UnitExists("target") or UnitIsFriend("player", "target") or UnitIsDead("target") then return "" end
+    if not UnitExists("target") or UnitIsFriend("player", "target") or UnitIsDead("target") then
+        return "", ""
+    end
     local sunderCount = 0
     local isExpose = false
     local sunderRem = 0
@@ -59,30 +62,35 @@ def build_sunder_auras() -> list[dict]:
             break
         end
     end
+
+    local timerText = ""
+    local centerText = ""
+
     if isExpose then
-        if sunderRem > 0 then
-            return string.format("|cFF00FFFFEA %.0fs|r", sunderRem)
-        else
-            return "|cFF00FFFFEA|r"
+        centerText = "|cFF00FFFFEA|r"
+        if sunderRem > 0.1 then
+            timerText = string.format("%.0fs", sunderRem)
         end
     elseif sunderCount > 0 then
-        local color = (sunderCount >= 5) and "|cFF00FF00" or "|cFFFFFFFF"
-        if sunderRem > 0 then
-            return string.format("%sx%d %.0fs|r", color, sunderCount, sunderRem)
-        else
-            return string.format("%sx%d|r", color, sunderCount)
+        local stackColor = (sunderCount >= 5) and "|cFF00FF00" or "|cFFFFFFFF"
+        centerText = string.format("%sx%d|r", stackColor, sunderCount)
+        if sunderRem > 0.1 then
+            timerText = string.format("%.0fs", sunderRem)
         end
     else
-        local inCombat = UnitAffectingCombat("player")
-        if inCombat then
-            return "|cFFFF0000MISSING|r"
-        end
-        return ""
+        -- Solo 'OFF' in rosso alla base quando manca Sunder Armor (nessuna scritta al centro)
+        timerText = "|cFFFF0000OFF|r"
+        centerText = ""
     end
+
+    return timerText, centerText
 end""",
             "subRegions": [
                 {"type": "subbackground"},
-                make_subtext("%c", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=0),
+                # 1. Timer / Status alla base (%c1): timer esatto (es. 27s) o 'OFF' in rosso quando mancante
+                make_subtext("%c1", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=0),
+                # 2. Cariche al centro (%c2): cariche centrate (x1, x2, x3, x4, x5 o EA)
+                make_subtext("%c2", justify="CENTER", anchor_point="CENTER", font_size=14, y_offset=0),
             ],
             "triggers": {
                 1: {
@@ -124,6 +132,17 @@ end""",
         end
     end
     return 0, 0
+end""",
+                        "customStacks": """function()
+    if not UnitExists("target") or UnitIsFriend("player", "target") or UnitIsDead("target") then return 0 end
+    for i = 1, 40 do
+        local name, _, _, count, _, _, _, _, _, _, spellId = UnitDebuff("target", i)
+        if not name then break end
+        if spellId == 47467 or spellId == 7386 or spellId == 11597 or name == "Sunder Armor" or name == "Fendente d'Armatura" then
+            return (count and count > 0) and count or 1
+        end
+    end
+    return 0
 end""",
                         "customIcon": """function()
     if UnitExists("target") and not UnitIsFriend("player", "target") then

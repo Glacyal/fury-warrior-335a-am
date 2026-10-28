@@ -1156,6 +1156,120 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
     end
 
     -- =========================================================================
+    -- GESTIONE INCANTI ARMA UNIFICATI (FIFO ORDER CON STACK x2 IN ALTO)
+    -- =========================================================================
+    _G.FWHUD_CheckEnchantsEquipped = function()
+        local now = GetTime()
+        local cache = _G.FWHUD_EnchantEquipCache
+        if cache and (now - cache.time < 0.25) then return cache.hasEnchant end
+        if not cache then cache = { time = 0, hasEnchant = false }; _G.FWHUD_EnchantEquipCache = cache end
+        cache.time = now
+
+        local hasMH = _G.FWHUD_CheckWeaponEquipped and _G.FWHUD_CheckWeaponEquipped(16)
+        local hasOH = _G.FWHUD_CheckWeaponEquipped and _G.FWHUD_CheckWeaponEquipped(17)
+        cache.hasEnchant = (hasMH or hasOH) and true or false
+        return cache.hasEnchant
+    end
+
+    _G.FWHUD_CheckEnchants = function()
+        local hasEnchant = _G.FWHUD_CheckEnchantsEquipped and _G.FWHUD_CheckEnchantsEquipped()
+        local defIcon = GetInventoryItemTexture("player", 16) or "Interface\\Icons\\Spell_Nature_BloodLust"
+        if not hasEnchant then
+            return "NONE", 0, 0, 0, defIcon
+        end
+
+        local now = GetTime()
+        local buffs = _G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs()
+        local bList = buffs and buffs.list or {}
+
+        local activeProcs = {}
+        local berserkCount = 0
+
+        for _, b in ipairs(bList) do
+            local sId = b.spellId
+            local name = b.name or ""
+            if sId == 59620 or name == "Berserking" or name == "Furia Berserker" then
+                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 15
+                local dur = (b.duration and b.duration > 0) and b.duration or 15
+                local c = (b.count and b.count > 0) and b.count or 1
+                berserkCount = berserkCount + c
+                table.insert(activeProcs, {
+                    rem = rem,
+                    dur = dur,
+                    icon = b.icon or "Interface\\Icons\\Spell_Nature_BloodLust",
+                    spellId = 59620
+                })
+            elseif sId == 28093 or name:find("Mongoose") then
+                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 15
+                local dur = (b.duration and b.duration > 0) and b.duration or 15
+                table.insert(activeProcs, {
+                    rem = rem,
+                    dur = dur,
+                    icon = b.icon or "Interface\\Icons\\Spell_Nature_PosisonSpike",
+                    spellId = 28093
+                })
+            elseif sId == 42976 or name:find("Executioner") then
+                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 15
+                local dur = (b.duration and b.duration > 0) and b.duration or 15
+                table.insert(activeProcs, {
+                    rem = rem,
+                    dur = dur,
+                    icon = b.icon or "Interface\\Icons\\INV_Sword_48",
+                    spellId = 42976
+                })
+            elseif sId == 59626 or name:find("Black Magic") then
+                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 10
+                local dur = (b.duration and b.duration > 0) and b.duration or 10
+                table.insert(activeProcs, {
+                    rem = rem,
+                    dur = dur,
+                    icon = b.icon or "Interface\\Icons\\Spell_Shadow_Shadowfury",
+                    spellId = 59626
+                })
+            end
+        end
+
+        if berserkCount >= 2 and #activeProcs == 1 then
+            local r1 = _G.FWHUD_WeaponState[16].isProc and (_G.FWHUD_WeaponState[16].lastEnd - now) or activeProcs[1].rem
+            local r2 = _G.FWHUD_WeaponState[17].isProc and (_G.FWHUD_WeaponState[17].lastEnd - now) or activeProcs[1].rem
+            activeProcs[1].rem = r1
+            table.insert(activeProcs, {
+                rem = r2,
+                dur = 15,
+                icon = activeProcs[1].icon,
+                spellId = 59620
+            })
+        end
+
+        if #activeProcs == 0 then
+            for _, s in ipairs({ 16, 17 }) do
+                local st = _G.FWHUD_WeaponState[s]
+                if st and st.isProc and st.lastEnd and (st.lastEnd - now > 0.05) then
+                    table.insert(activeProcs, {
+                        rem = st.lastEnd - now,
+                        dur = 15,
+                        icon = defIcon,
+                        spellId = 59620
+                    })
+                end
+            end
+        end
+
+        local totalCount = math.max(#activeProcs, berserkCount)
+
+        if #activeProcs > 1 then
+            table.sort(activeProcs, function(a, b) return a.rem < b.rem end)
+        end
+
+        if #activeProcs > 0 and activeProcs[1].rem > 0.05 then
+            local fifo = activeProcs[1]
+            return "ACTIVE", fifo.rem, fifo.dur, totalCount, fifo.icon
+        end
+
+        return "READY", 0, 0, 0, defIcon
+    end
+
+    -- =========================================================================
     -- MONITORAGGIO ABILITÀ E COOLDOWN GUERRIERO
     -- =========================================================================
     _G.FWHUD_CheckWarriorSpell = function(spellId, buffId)
@@ -1223,8 +1337,7 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         local hasRing = _G.FWHUD_CheckRingEquipped and _G.FWHUD_CheckRingEquipped()
         local hasCloak = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(15)
         local hasTier = _G.FWHUD_CheckTierSetEquipped and _G.FWHUD_CheckTierSetEquipped()
-        local hasMH = _G.FWHUD_CheckWeaponEquipped and _G.FWHUD_CheckWeaponEquipped(16)
-        local hasOH = _G.FWHUD_CheckWeaponEquipped and _G.FWHUD_CheckWeaponEquipped(17)
+        local hasEnchant = _G.FWHUD_CheckEnchantsEquipped and _G.FWHUD_CheckEnchantsEquipped()
         local hasGloves = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(10)
         local hasBoots = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(8)
 
@@ -1234,8 +1347,7 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         if hasRing then table.insert(activeOrder, "06b - Ring warDPS") end
         if hasCloak then table.insert(activeOrder, "07 - Cloak warDPS") end
         if hasTier then table.insert(activeOrder, "08 - Tier Set warDPS") end
-        if hasMH then table.insert(activeOrder, "09a - Weapon MH warDPS") end
-        if hasOH then table.insert(activeOrder, "09b - Weapon OH warDPS") end
+        if hasEnchant then table.insert(activeOrder, "09 - Enchants warDPS") end
         if hasGloves then table.insert(activeOrder, "10 - Gloves warDPS") end
         table.insert(activeOrder, "11 - Death Wish")
         table.insert(activeOrder, "12 - Recklessness")
@@ -1244,10 +1356,7 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         local N = #activeOrder
         local step = 38
         local targetW = 28
-        if N >= 11 then
-            step = 25
-            targetW = 24
-        elseif N == 10 then
+        if N >= 10 then
             step = 27
             targetW = 26
         elseif N == 9 then
@@ -1362,10 +1471,15 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                                 _G.FWHUD_WeaponState[17].lastStart = now
                                 _G.FWHUD_WeaponState[17].lastEnd = now + 15
                                 _G.FWHUD_WeaponState[17].isProc = true
-                            else
+                            elseif not s16Active then
                                 _G.FWHUD_WeaponState[16].lastStart = now
                                 _G.FWHUD_WeaponState[16].lastEnd = now + 15
                                 _G.FWHUD_WeaponState[16].isProc = true
+                            else
+                                local targetSlot = (_G.FWHUD_WeaponState[16].lastEnd <= _G.FWHUD_WeaponState[17].lastEnd) and 16 or 17
+                                _G.FWHUD_WeaponState[targetSlot].lastStart = now
+                                _G.FWHUD_WeaponState[targetSlot].lastEnd = now + 15
+                                _G.FWHUD_WeaponState[targetSlot].isProc = true
                             end
                             if WeakAuras and WeakAuras.ScanEvents then WeakAuras.ScanEvents("FWHUD_ROW_UPDATE") end
                         end
@@ -1407,17 +1521,23 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                         end
                         if spellId == 59620 or spellName == "Berserking" or spellName == "Furia Berserker" then
                             local buffs = _G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs()
-                            local hasB = false
+                            local bCount = 0
                             if buffs then
                                 for _, b in ipairs(buffs.list or {}) do
                                     if b.spellId == 59620 or (b.name and (b.name == "Berserking" or b.name == "Furia Berserker")) then
-                                        hasB = true break
+                                        bCount = bCount + (b.count and b.count > 0 and b.count or 1)
                                     end
                                 end
                             end
-                            if not hasB then
+                            if bCount == 0 then
                                 _G.FWHUD_WeaponState[16].isProc = false
                                 _G.FWHUD_WeaponState[17].isProc = false
+                            elseif bCount == 1 then
+                                if _G.FWHUD_WeaponState[16].lastEnd <= _G.FWHUD_WeaponState[17].lastEnd then
+                                    _G.FWHUD_WeaponState[16].isProc = false
+                                else
+                                    _G.FWHUD_WeaponState[17].isProc = false
+                                end
                             end
                             if WeakAuras and WeakAuras.ScanEvents then WeakAuras.ScanEvents("FWHUD_ROW_UPDATE") end
                         end
@@ -1753,36 +1873,41 @@ end"""
 
 
 def make_enchants_custom_text() -> str:
-    """Testo descrittivo incanti arma/anello (%c) con cariche (x2 per Berserking MH+OH) e pixel glow."""
+    """Testo descrittivo incanti arma unificati: timer FIFO in basso (%c1), cariche (x2) in alto (%c2), con pixel glow."""
     return """function()
     if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if _G.FWHUD_UpdateUtilityRowPositions then
         _G.FWHUD_UpdateUtilityRowPositions()
     end
-    if not _G.FWHUD_CheckEnchants then return "" end
-    local state, rem, dur, count, icon, enchName = _G.FWHUD_CheckEnchants()
+    if not _G.FWHUD_CheckEnchants then return "", "" end
+    local state, rem, dur, count, icon = _G.FWHUD_CheckEnchants()
     local LCG = LibStub and LibStub("LibCustomGlow-1.0", true)
     local glowKey = "FWHUD_ENCHANT_GLOW"
+    local timerText = ""
+    local stackText = ""
+
     if state == "ACTIVE" then
         if LCG and aura_env and aura_env.region then
             LCG.PixelGlow_Start(aura_env.region, {1, 0.85, 0.1, 1}, 8, 0.25, 10, 2, 0, 0, false, glowKey)
         end
         if count and count > 1 then
-            return string.format("|cFFFFFF00x%d %.1fs|r", count, rem)
-        elseif rem > 0 then
-            return string.format("|cFFFFFF00%.1fs|r", rem)
+            stackText = string.format("|cFFFFFF00x%d|r", count)
         end
-        return "|cFFFFFF00ON|r"
+        if rem > 0 then
+            timerText = string.format("|cFFFFFF00%.1fs|r", rem)
+        end
     else
         if LCG and aura_env and aura_env.region then
             LCG.PixelGlow_Stop(aura_env.region, glowKey)
         end
-        return ""
     end
+
+    return timerText, stackText
 end"""
 
 
 def make_enchants_custom_duration() -> str:
+    """Durata e scadenza dello swipe per il proc FIFO dell'incanto arma."""
     return """function()
     if not _G.FWHUD_CheckEnchants then return 0, 0 end
     local state, rem, dur = _G.FWHUD_CheckEnchants()
@@ -1794,12 +1919,14 @@ end"""
 
 
 def make_enchants_custom_icon() -> str:
+    """Icona dinamica dell'incanto attivo (Berserking, Mongoose, Executioner) o dell'arma principale."""
     return """function()
+    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if _G.FWHUD_CheckEnchants then
         local state, rem, dur, count, icon = _G.FWHUD_CheckEnchants()
         if icon then return icon end
     end
-    return "Interface\\Icons\\Spell_Nature_BloodLust"
+    return GetInventoryItemTexture("player", 16) or "Interface\\Icons\\Spell_Nature_BloodLust"
 end"""
 
 
@@ -2115,10 +2242,10 @@ def build_utility_auras() -> list[dict]:
             ],
         },
 
-        # 09a - Weapon MH warDPS (Slot 16)
+        # 09 - Enchants warDPS (Slot 16/17: Unified Weapon Enchants with FIFO timer & x2 on top)
         {
-            "id": "09a - Weapon MH warDPS",
-            "uid": "FWHUD_UTIL_WEAPON_MH",
+            "id": "09 - Enchants warDPS",
+            "uid": "FWHUD_UTIL_ENCHANTS",
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",
             "internalVersion": 52,
@@ -2133,7 +2260,7 @@ def build_utility_auras() -> list[dict]:
             "cooldownTextDisabled": True,
             "inverse": False,
             "customTextUpdate": "update",
-            "customText": make_weapon_custom_text(16),
+            "customText": make_enchants_custom_text(),
             "triggers": {
                 1: {
                     "trigger": {
@@ -2141,63 +2268,20 @@ def build_utility_auras() -> list[dict]:
                         "custom_type": "status",
                         "check": "update",
                         "events": events_list,
-                        "custom": make_weapon_trigger_custom(16),
-                        "customDuration": make_weapon_custom_duration(16),
-                        "customIcon": make_weapon_custom_icon(16),
+                        "custom": make_enchants_trigger_custom(),
+                        "customDuration": make_enchants_custom_duration(),
+                        "customIcon": make_enchants_custom_icon(),
                     },
                     "untrigger": {
-                        "custom": make_weapon_untrigger_custom(16)
+                        "custom": make_enchants_untrigger_custom()
                     }
                 },
                 "activeTriggerMode": -10,
             },
             "subRegions": [
                 {"type": "subbackground"},
-                make_subtext("MH", justify="LEFT", anchor_point="INNER_BOTTOMLEFT", font_size=8, y_offset=1, extra_props={"text_xOffset": 2, "text_color": [1.0, 0.75, 0.2, 1.0]}),
-                make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=10),
-            ],
-        },
-
-        # 09b - Weapon OH warDPS (Slot 17)
-        {
-            "id": "09b - Weapon OH warDPS",
-            "uid": "FWHUD_UTIL_WEAPON_OH",
-            "parent": "Class Warrior (Fury)",
-            "regionType": "icon",
-            "internalVersion": 52,
-            "xOffset": 28,
-            "yOffset": -45,
-            "width": 28,
-            "height": 28,
-            "displayIcon": "Interface\\Icons\\Spell_Nature_BloodLust",
-            "cooldown": True,
-            "cooldownSwipe": True,
-            "cooldownEdge": True,
-            "cooldownTextDisabled": True,
-            "inverse": False,
-            "customTextUpdate": "update",
-            "customText": make_weapon_custom_text(17),
-            "triggers": {
-                1: {
-                    "trigger": {
-                        "type": "custom",
-                        "custom_type": "status",
-                        "check": "update",
-                        "events": events_list,
-                        "custom": make_weapon_trigger_custom(17),
-                        "customDuration": make_weapon_custom_duration(17),
-                        "customIcon": make_weapon_custom_icon(17),
-                    },
-                    "untrigger": {
-                        "custom": make_weapon_untrigger_custom(17)
-                    }
-                },
-                "activeTriggerMode": -10,
-            },
-            "subRegions": [
-                {"type": "subbackground"},
-                make_subtext("OH", justify="RIGHT", anchor_point="INNER_BOTTOMRIGHT", font_size=8, y_offset=1, extra_props={"text_xOffset": -2, "text_color": [1.0, 0.65, 0.2, 1.0]}),
-                make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=10),
+                make_subtext("%c1", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=0),
+                make_subtext("%c2", justify="CENTER", anchor_point="INNER_TOP", font_size=11, y_offset=-1),
             ],
         },
 

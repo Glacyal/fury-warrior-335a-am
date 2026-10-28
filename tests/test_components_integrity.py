@@ -22,8 +22,7 @@ def run_tests():
         "06b - Ring warDPS",
         "07 - Cloak warDPS",
         "08 - Tier Set warDPS",
-        "09a - Weapon MH warDPS",
-        "09b - Weapon OH warDPS",
+        "09 - Enchants warDPS",
         "10 - Gloves warDPS",
         "11 - Death Wish",
         "12 - Recklessness",
@@ -37,7 +36,7 @@ def run_tests():
     ]
 
     ctrl = root["controlledChildren"]
-    assert len(ctrl) == 21, f"Expected 21 controlled children, got {len(ctrl)}"
+    assert len(ctrl) == 20, f"Expected 20 controlled children, got {len(ctrl)}"
     for exp in expected_children:
         assert exp in ctrl, f"Missing child in root controlledChildren: {exp}"
 
@@ -71,7 +70,7 @@ def run_tests():
     assert root_load.get("talent", {}).get("single") == 64, "Root load talent != 64 (Rampage)"
     assert root_load.get("talent", {}).get("multi", {}).get(64) is True, "Root load talent multi[64] is not True"
 
-    print(f"[OK] Validati {len(tree['c'])} nodi e 21 moduli di primo livello.")
+    print(f"[OK] Validati {len(tree['c'])} nodi e 20 moduli di primo livello.")
     print("[PASS] test_components_integrity.py superato con successo!")
 
 if __name__ == "__main__":

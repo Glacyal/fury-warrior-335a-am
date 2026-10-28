@@ -37,18 +37,37 @@ def run_tests():
     tree = build_wa_tree()
 
     count = 0
-    for child in tree["c"]:
+    
+    # Check root actions
+    root_act = tree.get("d", {}).get("actions", {})
+    init_custom = root_act.get("init", {}).get("custom")
+    if init_custom and isinstance(init_custom, str):
+        count += 1
+        ok = verify_lua(init_custom, "Root -> actions.init.custom")
+        if not ok: all_passed = False
+
+    all_items = [tree["d"]] + tree["c"]
+    for child in all_items:
         cid = child.get("id", "Unknown")
+        # Check actions.init.custom
+        actions = child.get("actions", {})
+        init_c = actions.get("init", {}).get("custom")
+        if init_c and isinstance(init_c, str):
+            count += 1
+            ok = verify_lua(init_c, f"{cid} -> actions.init.custom")
+            if not ok: all_passed = False
+
         # Check triggers
         triggers = child.get("triggers", {})
         for k, v in triggers.items():
             if isinstance(v, dict):
                 trig = v.get("trigger", {})
-                custom_code = trig.get("custom")
-                if custom_code and isinstance(custom_code, str):
-                    count += 1
-                    ok = verify_lua(custom_code, f"{cid} -> Trigger {k}")
-                    if not ok: all_passed = False
+                for field in ("custom", "customDuration", "customIcon", "customOverlay"):
+                    code = trig.get(field)
+                    if code and isinstance(code, str):
+                        count += 1
+                        ok = verify_lua(code, f"{cid} -> Trigger {k} {field}")
+                        if not ok: all_passed = False
 
                 untrig = v.get("untrigger", {})
                 custom_untrig = untrig.get("custom")
@@ -78,4 +97,3 @@ def run_tests():
 
 if __name__ == "__main__":
     run_tests()
-

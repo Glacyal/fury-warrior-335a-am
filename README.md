@@ -31,8 +31,8 @@ Barra orizzontale superiore (y = 52) con riposizionamento dinamico centrato, ris
 5. **Execute Usable**: Icona attiva con bordo luminoso ed etichetta `EXEC` quando il boss scende sotto il 20% di salute.
 
 ### 2. Zero Clutter & Intelligenza Overlap di Raid
-- **02 - Battle Shout**: Nascosto in combattimento se attivo con più di 30 secondi; mostra il timer in scadenza e allerta se assente. **Filtro Overlap**: Viene soppresso automaticamente se è attivo *Blessing of Might* o *Greater Blessing of Might* del Paladino (buff equivalente/superiore).
-- **03 - Commanding Shout**: Diventa la shout di riferimento se Battle Shout è coperto dal Paladino. Viene soppresso automaticamente se è attivo il buff *Blood Pact* dell'Imp del Warlock.
+- **02 - Battle Shout**: Gruppo genitore con architettura Active/OFF (identica a Fire Mage): mostra l'icona con swipe e timer numerico se in scadenza (<= 30s); se mancano sia Battle Shout che BoM/GBoM del Paladino mostra l'avviso "OFF" desaturato sia in combattimento che fuori combattimento; è completamente nascosto se attivo e sano (> 30s) o coperto da Paladino.
+- **03 - Commanding Shout**: Gruppo genitore con architettura Active/OFF (identica a Fire Mage): se mancano sia Commanding Shout che Blood Pact dell'Imp del Warlock mostra l'avviso "OFF" desaturato sia in combattimento che fuori combattimento; mostra l'icona con swipe e timer se in scadenza (<= 30s); è completamente nascosto se attivo e sano (> 30s) o coperto dal Warlock.
 - **04 - Berserker Stance**: Allerta immediata ad alta visibilità se durante il combattimento il guerriero si trova fuori dalla Berserker Stance.
 - **Caricamento Specifico su [Rampage]**: Il talento passivo *Rampage* (Tab 2, Posizione 24 -> ID WeakAuras 64) è utilizzato come condizione di caricamento esclusiva dell'intero pacchetto: la suite si carica solo se il guerriero è specializzato Fury con Rampage attivo, e non occupa spazio visivo superfluo a schermo.
 
@@ -130,6 +130,6 @@ python generate.py
 # 2. Sincronizza la stringa importata nella web app
 python scripts/sync_docs.py
 
-# 3. Esegui la suite di test parallela (8/8 PASS)
+# 3. Esegui la suite di test parallela (9/9 PASS)
 python tests/run_parallel_tests.py
 ```

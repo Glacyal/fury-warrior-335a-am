@@ -69,7 +69,7 @@ def build_procs_auras() -> list[dict]:
                     "trigger": {
                         "type": "aura2",
                         "unit": "player",
-                        "auranames": ["Bloodsurge", "46916"],
+                        "auranames": ["Bloodsurge", "Ondata di Sangue", "46916"],
                         "useName": True,
                         "debuffType": "HELPFUL",
                         "matchesShowOn": "showOnActive",
@@ -105,7 +105,7 @@ def build_procs_auras() -> list[dict]:
                     "trigger": {
                         "type": "aura2",
                         "unit": "player",
-                        "auranames": ["Victorious", "Victory Rush", "32216", "34428"],
+                        "auranames": ["Victorious", "Vittorioso", "Victory Rush", "32216", "34428"],
                         "useName": True,
                         "debuffType": "HELPFUL",
                         "matchesShowOn": "showOnActive",
@@ -138,7 +138,7 @@ def build_procs_auras() -> list[dict]:
                     "trigger": {
                         "type": "aura2",
                         "unit": "player",
-                        "auranames": ["Flurry", "16280", "16284"],
+                        "auranames": ["Flurry", "Raffica", "16280", "16284"],
                         "useName": True,
                         "debuffType": "HELPFUL",
                         "matchesShowOn": "showOnActive",
@@ -170,7 +170,7 @@ def build_procs_auras() -> list[dict]:
                     "trigger": {
                         "type": "aura2",
                         "unit": "player",
-                        "auranames": ["Enrage", "Wrecking Crew", "57519", "57516"],
+                        "auranames": ["Enrage", "Rabbia", "Wrecking Crew", "Squadra della Morte", "57519", "57516"],
                         "useName": True,
                         "debuffType": "HELPFUL",
                         "matchesShowOn": "showOnActive",

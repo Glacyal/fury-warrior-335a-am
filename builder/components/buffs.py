@@ -1,18 +1,19 @@
 """
 Modulo Componente: 02 - Battle Shout, 03 - Commanding Shout, 04 - Berserker Stance
 ===================================================================================
-Gestisce i buff di classe e la stance con intelligenza raid (x = -190, -222, -158 a y = 0):
+Gestisce i buff di classe e la stance con architettura identica a Fire Mage (x = -222, -190, -158 a y = 0):
 1. 02 - Battle Shout:
-   - Zero Clutter: nascosto se attivo con > 30s.
-   - Mostra timer se <= 30s.
-   - Allerta mancante in combat SOLO se NON è presente Greater Blessing of Might (GBoM)
-     o Blessing of Might del Paladino (che non si sommano e sono superiori/equivalenti).
+   - Gruppo a x = -222, y = 0
+   - Active: visibile SOLO quando il buff (Battle Shout o BoM/GBoM del Paladino) sta per scadere (<= 30s).
+   - OFF: visibile (in combat e out of combat) quando manca SIA Battle Shout CHE BoM/GBoM (desaturato + 'OFF').
+   - Nascosto: se attivo e sano (> 30s).
 2. 03 - Commanding Shout:
-   - Zero Clutter: nascosto se attivo con > 30s.
-   - Mostra timer se <= 30s.
-   - Allerta mancante in combat SOLO se NON è presente Blood Pact (Patto di Sangue del Warlock Imp)
-     e il guerriero ha già GBoM (segno che il guerriero deve fornire Commanding Shout).
+   - Gruppo a x = -190, y = 0
+   - Active: visibile SOLO quando il buff (Commanding Shout o Blood Pact dell'Imp) sta per scadere (<= 30s).
+   - OFF: visibile (in combat e out of combat) quando manca SIA Commanding Shout CHE Blood Pact (desaturato + 'OFF').
+   - Nascosto: se attivo e sano (> 30s).
 3. 04 - Berserker Stance:
+   - Gruppo a x = -158, y = 0
    - Allerta immediata se in combattimento il guerriero si trova fuori dalla Berserker Stance (Stance 3).
 """
 from builder.core.helpers import make_subtext
@@ -33,11 +34,15 @@ SHARED_WARRIOR_BUFFS_LUA = r"""function()
         byName = {},
         list = {},
         hasBoM = false,
+        bomDuration = 0,
+        bomExpiration = 0,
         hasBloodPact = false,
+        bpDuration = 0,
+        bpExpiration = 0,
         hasBattleShout = false,
-        hasCommandingShout = false,
         bsDuration = 0,
         bsExpiration = 0,
+        hasCommandingShout = false,
         csDuration = 0,
         csExpiration = 0,
     }
@@ -68,12 +73,16 @@ SHARED_WARRIOR_BUFFS_LUA = r"""function()
            name == "Greater Blessing of Might" or name == "Blessing of Might" or
            name == "Benedizione della Potenza Superiore" or name == "Benedizione della Potenza" then
             c.hasBoM = true
+            c.bomDuration = duration or 1800
+            c.bomExpiration = (expirationTime and expirationTime > 0) and expirationTime or (now_b + 1800)
         end
 
         -- Controllo Blood Pact (Warlock Imp: non stacka con Commanding Shout)
         if spellId == 47982 or spellId == 47981 or spellId == 27268 or spellId == 11767 or
            spellId == 11766 or spellId == 6307 or name == "Blood Pact" or name == "Patto di Sangue" then
             c.hasBloodPact = true
+            c.bpDuration = duration or 1800
+            c.bpExpiration = (expirationTime and expirationTime > 0) and expirationTime or (now_b + 1800)
         end
 
         -- Controllo Battle Shout
@@ -82,14 +91,14 @@ SHARED_WARRIOR_BUFFS_LUA = r"""function()
            name == "Battle Shout" or name == "Urlo di Battaglia" then
             c.hasBattleShout = true
             c.bsDuration = duration or 120
-            c.bsExpiration = expirationTime or (now_b + 120)
+            c.bsExpiration = (expirationTime and expirationTime > 0) and expirationTime or (now_b + 120)
         end
 
         -- Controllo Commanding Shout
         if spellId == 47440 or spellId == 469 or name == "Commanding Shout" or name == "Urlo di Comando" then
             c.hasCommandingShout = true
             c.csDuration = duration or 120
-            c.csExpiration = expirationTime or (now_b + 120)
+            c.csExpiration = (expirationTime and expirationTime > 0) and expirationTime or (now_b + 120)
         end
     end
 
@@ -100,16 +109,16 @@ end"""
 
 def build_buffs_auras() -> list[dict]:
     """
-    Costruisce e restituisce le aure relative ai buff passivi e alla stance del guerriero:
-    - 02 - Battle Shout
-    - 03 - Commanding Shout
-    - 04 - Berserker Stance
+    Costruisce e restituisce le 6 aure (3 gruppi con figli Active e OFF) relative ai buff passivi e alla stance:
+    - 02 - Battle Shout (Active + OFF)
+    - 03 - Commanding Shout (Active + OFF)
+    - 04 - Berserker Stance (OutOfStance)
     """
-    buff_events = "UNIT_AURA,PLAYER_REGEN_DISABLED,PLAYER_REGEN_ENABLED,PLAYER_ENTERING_WORLD"
+    buff_events = "UNIT_AURA,PLAYER_REGEN_DISABLED,PLAYER_REGEN_ENABLED,PLAYER_ENTERING_WORLD,FWHUD_BS_THRESHOLD,FWHUD_CS_THRESHOLD"
 
     return [
         # =====================================================================
-        # 02 - BATTLE SHOUT (Gruppo Madre a x = -190, y = 0)
+        # 02 - BATTLE SHOUT (Gruppo Madre a x = -222, y = 0)
         # =====================================================================
         {
             "id": "02 - Battle Shout",
@@ -117,20 +126,22 @@ def build_buffs_auras() -> list[dict]:
             "parent": "Class Warrior (Fury)",
             "regionType": "group",
             "internalVersion": 52,
-            "xOffset": -190,
+            "xOffset": -222,
             "yOffset": 0,
             "controlledChildren": [
                 "02 - Battle Shout - Active",
-                "02 - Battle Shout - Missing",
+                "02 - Battle Shout - OFF",
             ],
         },
-        # 02 - Active (mostra timer solo se attivo con <= 30 secondi)
+        # 02 - Active (mostra timer solo se il buff o BoM è attivo ma con <= 30 secondi)
         {
             "id": "02 - Battle Shout - Active",
             "uid": "FWHUD_BS_ACTIVE",
             "parent": "02 - Battle Shout",
             "regionType": "icon",
             "internalVersion": 52,
+            "xOffset": 0,
+            "yOffset": 0,
             "width": 28,
             "height": 28,
             "displayIcon": "Interface\\Icons\\Ability_Warrior_BattleShout",
@@ -138,44 +149,27 @@ def build_buffs_auras() -> list[dict]:
             "color": [1, 1, 1, 1],
             "cooldown": True,
             "cooldownSwipe": True,
+            "cooldownEdge": True,
+            "cooldownTextDisabled": True,
+            "customTextUpdate": "update",
+            "customText": """function()
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func()
+    local exp = (c and c.hasBattleShout and c.bsExpiration) or (c and c.hasBoM and c.bomExpiration) or 0
+    if exp > 0 then
+        local rem = exp - GetTime()
+        if rem > 60 then
+            return string.format("|cFFFFFF00%d:%02d|r", math.floor(rem / 60), math.floor(rem % 60))
+        elseif rem > 0 then
+            return string.format("|cFFFF4444%.0fs|r", rem)
+        end
+    end
+    return ""
+end""",
             "subRegions": [
-                make_subtext("%p", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=11, y_offset=0),
+                {"type": "subbackground"},
+                make_subtext("%c", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=0),
             ],
-            "triggers": {
-                1: {
-                    "trigger": {
-                        "type": "aura2",
-                        "unit": "player",
-                        "auranames": ["Battle Shout", "47436"],
-                        "useName": True,
-                        "debuffType": "HELPFUL",
-                        "matchesShowOn": "showOnActive",
-                        "rem_operator": "<=",
-                        "rem": "30",
-                        "use_rem": True,
-                    },
-                    "untrigger": {}
-                },
-                "activeTriggerMode": -10,
-            },
-        },
-        # 02 - Missing (Allerta rossa in combattimento SOLO se manca sia Battle Shout che Blessing of Might del Paladino)
-        {
-            "id": "02 - Battle Shout - Missing",
-            "uid": "FWHUD_BS_MISSING",
-            "parent": "02 - Battle Shout",
-            "regionType": "icon",
-            "internalVersion": 52,
-            "width": 28,
-            "height": 28,
-            "displayIcon": "Interface\\Icons\\Ability_Warrior_BattleShout",
-            "auto": False,
-            "color": [1, 0.2, 0.2, 0.9],
-            "desaturate": True,
-            "subRegions": [
-                make_subtext("MISS", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=1),
-            ],
-            "init_completed": SHARED_WARRIOR_BUFFS_LUA,
             "triggers": {
                 1: {
                     "trigger": {
@@ -184,21 +178,119 @@ def build_buffs_auras() -> list[dict]:
                         "check": "event",
                         "events": buff_events,
                         "custom": """function(event, ...)
-                            local inCombat = UnitAffectingCombat("player")
-                            if not inCombat then return false end
-                            local c = _G.FWHUD_BuffCache or (_G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs())
-                            if (c and c.hasBoM) or (c and c.hasBattleShout) then return false end
-                            return true
-                        end""",
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func()
+    local now = GetTime()
+    local exp = 0
+    if c and c.hasBattleShout and c.bsExpiration and c.bsExpiration > 0 then
+        exp = c.bsExpiration
+    elseif c and c.hasBoM and c.bomExpiration and c.bomExpiration > 0 then
+        exp = c.bomExpiration
+    end
+    if exp > 0 then
+        local rem = exp - now
+        local threshold = 30
+        if rem > threshold then
+            local delay = rem - threshold
+            if _G.FWHUD_BS_ScheduledExp ~= exp then
+                _G.FWHUD_BS_ScheduledExp = exp
+                _G.FWHUD_BS_TimerSeq = (_G.FWHUD_BS_TimerSeq or 0) + 1
+                local mySeq = _G.FWHUD_BS_TimerSeq
+                local timerAfter = (C_Timer and C_Timer.After) or (_G.C_Timer and _G.C_Timer.After)
+                if timerAfter then
+                    timerAfter(delay, function()
+                        if _G.FWHUD_BS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
+                            WeakAuras.ScanEvents("FWHUD_BS_THRESHOLD")
+                        end
+                    end)
+                end
+            end
+            return false
+        elseif rem > 0 then
+            _G.FWHUD_BS_ScheduledExp = nil
+            return true
+        end
+    end
+    _G.FWHUD_BS_ScheduledExp = nil
+    _G.FWHUD_BS_TimerSeq = (_G.FWHUD_BS_TimerSeq or 0) + 1
+    return false
+end""",
+                        "customDuration": """function()
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func()
+    if c and c.hasBattleShout and c.bsExpiration and c.bsExpiration > 0 then
+        return c.bsDuration or 120, c.bsExpiration
+    elseif c and c.hasBoM and c.bomExpiration and c.bomExpiration > 0 then
+        return c.bomDuration or 1800, c.bomExpiration
+    end
+    return 0, 0
+end""",
+                        "customIcon": """function()
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func()
+    if c and c.hasBoM and not c.hasBattleShout then
+        return "Interface\\Icons\\Spell_Holy_GreaterBlessingofMount"
+    end
+    return "Interface\\Icons\\Ability_Warrior_BattleShout"
+end""",
                     },
                     "untrigger": {
                         "custom": """function(event, ...)
-                            local inCombat = UnitAffectingCombat("player")
-                            if not inCombat then return true end
-                            local c = _G.FWHUD_BuffCache or (_G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs())
-                            if (c and c.hasBoM) or (c and c.hasBattleShout) then return true end
-                            return false
-                        end"""
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func()
+    local now = GetTime()
+    local exp = (c and c.hasBattleShout and c.bsExpiration) or (c and c.hasBoM and c.bomExpiration) or 0
+    if exp > 0 then
+        local rem = exp - now
+        return not (rem > 0 and rem <= 30)
+    end
+    return true
+end"""
+                    }
+                },
+                "activeTriggerMode": -10,
+            },
+        },
+        # 02 - OFF (Visibile SIA in combat CHE out of combat quando manca sia Battle Shout che BoM/GBoM)
+        {
+            "id": "02 - Battle Shout - OFF",
+            "uid": "FWHUD_BS_OFF",
+            "parent": "02 - Battle Shout",
+            "regionType": "icon",
+            "internalVersion": 52,
+            "xOffset": 0,
+            "yOffset": 0,
+            "width": 28,
+            "height": 28,
+            "displayIcon": "Interface\\Icons\\Ability_Warrior_BattleShout",
+            "auto": False,
+            "desaturate": True,
+            "color": [0.6, 0.6, 0.6, 0.8],
+            "subRegions": [
+                {"type": "subbackground"},
+                make_subtext("|cFFFF4444OFF|r", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=1),
+            ],
+            "triggers": {
+                1: {
+                    "trigger": {
+                        "type": "custom",
+                        "custom_type": "status",
+                        "check": "event",
+                        "events": buff_events,
+                        "custom": """function(event, ...)
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func()
+    if (c and c.hasBoM) or (c and c.hasBattleShout) then return false end
+    return true
+end""",
+                    },
+                    "untrigger": {
+                        "custom": """function(event, ...)
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func()
+    if (c and c.hasBoM) or (c and c.hasBattleShout) then return true end
+    return false
+end"""
                     }
                 },
                 "activeTriggerMode": -10,
@@ -206,7 +298,7 @@ def build_buffs_auras() -> list[dict]:
         },
 
         # =====================================================================
-        # 03 - COMMANDING SHOUT (Gruppo Madre a x = -222, y = 0)
+        # 03 - COMMANDING SHOUT (Gruppo Madre a x = -190, y = 0)
         # =====================================================================
         {
             "id": "03 - Commanding Shout",
@@ -214,20 +306,22 @@ def build_buffs_auras() -> list[dict]:
             "parent": "Class Warrior (Fury)",
             "regionType": "group",
             "internalVersion": 52,
-            "xOffset": -222,
+            "xOffset": -190,
             "yOffset": 0,
             "controlledChildren": [
                 "03 - Commanding Shout - Active",
-                "03 - Commanding Shout - Missing",
+                "03 - Commanding Shout - OFF",
             ],
         },
-        # 03 - Active (mostra timer solo se attivo con <= 30 secondi)
+        # 03 - Active (mostra timer solo se il buff o Blood Pact è attivo ma con <= 30 secondi)
         {
             "id": "03 - Commanding Shout - Active",
             "uid": "FWHUD_CS_ACTIVE",
             "parent": "03 - Commanding Shout",
             "regionType": "icon",
             "internalVersion": 52,
+            "xOffset": 0,
+            "yOffset": 0,
             "width": 28,
             "height": 28,
             "displayIcon": "Interface\\Icons\\Ability_Warrior_RallyingCry",
@@ -235,44 +329,27 @@ def build_buffs_auras() -> list[dict]:
             "color": [1, 1, 1, 1],
             "cooldown": True,
             "cooldownSwipe": True,
+            "cooldownEdge": True,
+            "cooldownTextDisabled": True,
+            "customTextUpdate": "update",
+            "customText": """function()
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func()
+    local exp = (c and c.hasCommandingShout and c.csExpiration) or (c and c.hasBloodPact and c.bpExpiration) or 0
+    if exp > 0 then
+        local rem = exp - GetTime()
+        if rem > 60 then
+            return string.format("|cFFFFFF00%d:%02d|r", math.floor(rem / 60), math.floor(rem % 60))
+        elseif rem > 0 then
+            return string.format("|cFFFF4444%.0fs|r", rem)
+        end
+    end
+    return ""
+end""",
             "subRegions": [
-                make_subtext("%p", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=11, y_offset=0),
+                {"type": "subbackground"},
+                make_subtext("%c", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=0),
             ],
-            "triggers": {
-                1: {
-                    "trigger": {
-                        "type": "aura2",
-                        "unit": "player",
-                        "auranames": ["Commanding Shout", "47440"],
-                        "useName": True,
-                        "debuffType": "HELPFUL",
-                        "matchesShowOn": "showOnActive",
-                        "rem_operator": "<=",
-                        "rem": "30",
-                        "use_rem": True,
-                    },
-                    "untrigger": {}
-                },
-                "activeTriggerMode": -10,
-            },
-        },
-        # 03 - Missing (Mostra missing se in combat con BoM attivo dal Paladino, ma manca sia Commanding Shout che Blood Pact dell'Imp)
-        {
-            "id": "03 - Commanding Shout - Missing",
-            "uid": "FWHUD_CS_MISSING",
-            "parent": "03 - Commanding Shout",
-            "regionType": "icon",
-            "internalVersion": 52,
-            "width": 28,
-            "height": 28,
-            "displayIcon": "Interface\\Icons\\Ability_Warrior_RallyingCry",
-            "auto": False,
-            "color": [1, 0.4, 0.1, 0.9],
-            "desaturate": True,
-            "subRegions": [
-                make_subtext("CMD", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=1),
-            ],
-            "init_completed": SHARED_WARRIOR_BUFFS_LUA,
             "triggers": {
                 1: {
                     "trigger": {
@@ -281,21 +358,119 @@ def build_buffs_auras() -> list[dict]:
                         "check": "event",
                         "events": buff_events,
                         "custom": """function(event, ...)
-                            local inCombat = UnitAffectingCombat("player")
-                            if not inCombat then return false end
-                            local c = _G.FWHUD_BuffCache or (_G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs())
-                            if (c and c.hasCommandingShout) or (c and c.hasBloodPact) or (c and not c.hasBoM) then return false end
-                            return true
-                        end""",
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func()
+    local now = GetTime()
+    local exp = 0
+    if c and c.hasCommandingShout and c.csExpiration and c.csExpiration > 0 then
+        exp = c.csExpiration
+    elseif c and c.hasBloodPact and c.bpExpiration and c.bpExpiration > 0 then
+        exp = c.bpExpiration
+    end
+    if exp > 0 then
+        local rem = exp - now
+        local threshold = 30
+        if rem > threshold then
+            local delay = rem - threshold
+            if _G.FWHUD_CS_ScheduledExp ~= exp then
+                _G.FWHUD_CS_ScheduledExp = exp
+                _G.FWHUD_CS_TimerSeq = (_G.FWHUD_CS_TimerSeq or 0) + 1
+                local mySeq = _G.FWHUD_CS_TimerSeq
+                local timerAfter = (C_Timer and C_Timer.After) or (_G.C_Timer and _G.C_Timer.After)
+                if timerAfter then
+                    timerAfter(delay, function()
+                        if _G.FWHUD_CS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
+                            WeakAuras.ScanEvents("FWHUD_CS_THRESHOLD")
+                        end
+                    end)
+                end
+            end
+            return false
+        elseif rem > 0 then
+            _G.FWHUD_CS_ScheduledExp = nil
+            return true
+        end
+    end
+    _G.FWHUD_CS_ScheduledExp = nil
+    _G.FWHUD_CS_TimerSeq = (_G.FWHUD_CS_TimerSeq or 0) + 1
+    return false
+end""",
+                        "customDuration": """function()
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func()
+    if c and c.hasCommandingShout and c.csExpiration and c.csExpiration > 0 then
+        return c.csDuration or 120, c.csExpiration
+    elseif c and c.hasBloodPact and c.bpExpiration and c.bpExpiration > 0 then
+        return c.bpDuration or 1800, c.bpExpiration
+    end
+    return 0, 0
+end""",
+                        "customIcon": """function()
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func()
+    if c and c.hasBloodPact and not c.hasCommandingShout then
+        return "Interface\\Icons\\Spell_Shadow_BloodPact"
+    end
+    return "Interface\\Icons\\Ability_Warrior_RallyingCry"
+end""",
                     },
                     "untrigger": {
                         "custom": """function(event, ...)
-                            local inCombat = UnitAffectingCombat("player")
-                            if not inCombat then return true end
-                            local c = _G.FWHUD_BuffCache or (_G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs())
-                            if (c and c.hasCommandingShout) or (c and c.hasBloodPact) or (c and not c.hasBoM) then return true end
-                            return false
-                        end"""
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func()
+    local now = GetTime()
+    local exp = (c and c.hasCommandingShout and c.csExpiration) or (c and c.hasBloodPact and c.bpExpiration) or 0
+    if exp > 0 then
+        local rem = exp - now
+        return not (rem > 0 and rem <= 30)
+    end
+    return true
+end"""
+                    }
+                },
+                "activeTriggerMode": -10,
+            },
+        },
+        # 03 - OFF (Visibile SIA in combat CHE out of combat quando manca sia Commanding Shout che Blood Pact)
+        {
+            "id": "03 - Commanding Shout - OFF",
+            "uid": "FWHUD_CS_OFF",
+            "parent": "03 - Commanding Shout",
+            "regionType": "icon",
+            "internalVersion": 52,
+            "xOffset": 0,
+            "yOffset": 0,
+            "width": 28,
+            "height": 28,
+            "displayIcon": "Interface\\Icons\\Ability_Warrior_RallyingCry",
+            "auto": False,
+            "desaturate": True,
+            "color": [0.6, 0.6, 0.6, 0.8],
+            "subRegions": [
+                {"type": "subbackground"},
+                make_subtext("|cFFFF4444OFF|r", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=1),
+            ],
+            "triggers": {
+                1: {
+                    "trigger": {
+                        "type": "custom",
+                        "custom_type": "status",
+                        "check": "event",
+                        "events": buff_events,
+                        "custom": """function(event, ...)
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func()
+    if (c and c.hasCommandingShout) or (c and c.hasBloodPact) then return false end
+    return true
+end""",
+                    },
+                    "untrigger": {
+                        "custom": """function(event, ...)
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func()
+    if (c and c.hasCommandingShout) or (c and c.hasBloodPact) then return true end
+    return false
+end"""
                     }
                 },
                 "activeTriggerMode": -10,
@@ -303,7 +478,7 @@ def build_buffs_auras() -> list[dict]:
         },
 
         # =====================================================================
-        # 04 - BERSERKER STANCE (x = -158, y = 0)
+        # 04 - BERSERKER STANCE (Gruppo Madre a x = -158, y = 0)
         # =====================================================================
         {
             "id": "04 - Berserker Stance",
@@ -330,6 +505,7 @@ def build_buffs_auras() -> list[dict]:
             "color": [1, 0.2, 0.1, 1],
             "desaturate": False,
             "subRegions": [
+                {"type": "subbackground"},
                 make_subtext("STANCE", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=9, y_offset=1),
             ],
             "triggers": {

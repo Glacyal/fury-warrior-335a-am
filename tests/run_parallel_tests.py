@@ -31,6 +31,7 @@ TEST_SCRIPTS = [
     "test_utility_row.py",
     "test_rotational.py",
     "test_sunder_tracker.py",
+    "test_buffs.py",
 ]
 
 def run_single_test_script(script_name):

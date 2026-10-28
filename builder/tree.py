@@ -6,6 +6,7 @@ applicando le condizioni di caricamento di classe e talento su tutti i nodi fogl
 """
 import copy
 from builder.core.constants import FURY_WARRIOR_LOAD
+from builder.components.utility import SHARED_WARRIOR_CORE_BOOTSTRAP_LUA
 from builder.components import (
     build_procs_auras,
     build_buffs_auras,
@@ -72,6 +73,14 @@ def build_wa_tree() -> dict:
                 "19 - Sunder Armor Tracker",
             ],
             "load": copy.deepcopy(FURY_WARRIOR_LOAD),
+            "actions": {
+                "init": {
+                    "do_custom": True,
+                    "custom": f"_G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}\nif not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end",
+                },
+                "start": {},
+                "finish": {},
+            },
         },
         "c": [],
     }

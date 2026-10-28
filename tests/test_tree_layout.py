@@ -39,7 +39,7 @@ def run_tests():
     stats_bg = c_map.get("Stats Panel - Background warDPS")
     assert stats_bg is not None, "Missing Stats Panel - Background warDPS"
     assert stats_bg["width"] == 88, f"Invalid Stats Panel Background width: {stats_bg.get('width')}"
-    assert stats_bg["height"] == 48, f"Invalid Stats Panel Background height: {stats_bg.get('height')}"
+    assert stats_bg["height"] == 60, f"Invalid Stats Panel Background height: {stats_bg.get('height')}"
 
     # Check 19 - Sunder Armor Tracker
     sunder = c_map.get("19 - Sunder Armor Tracker")

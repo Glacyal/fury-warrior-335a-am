@@ -94,11 +94,12 @@ Avvisi a caratteri cubitali a centro schermo (y = 105):
 - `EXECUTE PHASE (< 20%)!` in rosso fuoco quando il target scende sotto il 20% di salute.
 
 ### 8. Pannello Statistiche in Tempo Reale (`18 - Stats Panel warDPS`)
-Pannello compatto (88x48px a x = -190, y = -45) con aggiornamento throttled a 10 Hz:
-- **AP**: Attack power totale con buff e moltiplicatori.
-- **Crit**: Critico in mischia con debuff Heart of the Crusader / Master Poisoner (+3%) sul bersaglio.
+Pannello compatto (88x60px a x = -190, y = -45) con aggiornamento throttled a 10 Hz e 5 righe dinamiche:
+- **AP**: Attack power totale con buff e moltiplicatori (Battle Shout, GBoM, Berserking MH/OH, Ashen Band, DBW, STS, T10 2P).
+- **Crit**: Critico in mischia con debuff Heart of the Crusader / Master Poisoner / Totem of Wrath (+3%) sul bersaglio.
+- **Haste**: Melee Haste dinamica calcolata con moltiplicatori raid: Windfury Totem / Improved Icy Talons (+20%), Swift Retribution / Improved Moonkin (+3%), Bloodlust (+30%), Flurry (+25%), Berserking Troll (+20%) e Power Infusion (+20%).
 - **ArP**: Percentuale e rating, con dicitura **CAP in verde** al raggiungimento del cap di 1400.
-- **Hit & Exp**: Verifica visiva istantanea del cap 8% Special Hit e soft cap 26 Expertise.
+- **Hit & Exp**: Verifica visiva istantanea del cap 8% Special Hit (con aura Draenei Heroic Presence +1%) e soft cap 26 Expertise.
 
 ### 9. Sunder Armor Tracker (`19 - Sunder Armor Tracker`)
 Colonna destra (x = 169, y = 45):

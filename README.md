@@ -65,8 +65,9 @@ Fila orizzontale inferiore a y = -45 con riposizionamento e ricentratura automat
   - **Tier 9 (Hellscream/Wrynn)**: Bonus passivi di stance e critico.
   - **Combinazioni Multi-Set Ibride**: Valutazione dinamica in priorità di esecuzione; se più proc si attivano contemporaneamente, viene evidenziata la finestra più urgente/breve passando istantaneamente all'altro proc al consumo del primo.
 - **09 - Enchants warDPS**: Monitoraggio unificato ed ergonomico degli incanti arma (Slot 16 MH e Slot 17 OH):
-  - **Badge Cariche `x2` in Alto**: Se entrambe le armi proccano contemporaneamente (es. doppio Berserking per **+800 AP complessivi**), viene mostrato `x2` in alto in giallo (`INNER_TOP`). Se è attivo un solo proc, la scritta è assente.
-  - **Timer FIFO alla Base**: Mostra sempre la durata residua del proc che scadrà per primo (`INNER_BOTTOM`). Alla sua scadenza, transiziona istantaneamente al secondo proc residuo azzerando contemporaneamente il badge `x2`.
+  - **Meccanica PPM & Assenza di ICD**: In WotLK 3.3.5a, *Berserking* (così come *Mongoose* ed *Executioner*) è regolato dal sistema **PPM (~1.0 PPM)** e **NON possiede alcun Cooldown Interno (ICD = 0s)**. Può riattivarsi back-to-back, eseguire refresh continuativo dei 15s e tornare subito in stato READY senza blocchi né countdown rossi di lockout.
+  - **Badge Cariche `x2` in Alto**: Ciascuna arma (MH e OH) calcola il proc in modo indipendente. Se entrambe le armi attivano l'incanto contemporaneamente (doppio Berserking per **+800 AP complessivi**), compare il badge `x2` in alto in giallo (`INNER_TOP`, font 11). Quando è attivo 1 solo proc, il badge è vuoto.
+  - **Timer FIFO alla Base**: Mostra sempre la durata residua del proc che scadrà per primo (`INNER_BOTTOM`, font 10). Alla sua scadenza, transiziona istantaneamente al secondo proc residuo azzerando contemporaneamente il badge `x2`.
   - **Swipe e Glow**: Swipe radiale coordinato sulla durata del proc FIFO e Pixel Glow dorato attivo su qualsiasi proc attivo. Supporta anche *Executioner*, *Mongoose* e *Black Magic*.
 - **10 - Gloves warDPS**: Acceleratori Ipersonici Ingegneria (+340 Haste per 12s, 60s CD).
 - **11 - Death Wish**: Durata attiva 30s (+20% danno) e cooldown.

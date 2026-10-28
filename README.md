@@ -38,16 +38,19 @@ Barra orizzontale superiore (y = 52) con riposizionamento dinamico centrato, ris
 
 ### 3. Riga Utility Adattiva (`05` - `13`, da 3 a 11 Icone a y = -45)
 Fila orizzontale inferiore a y = -45 con riposizionamento e ricentratura automatica naturale (espansione e contrazione dinamica identica a fire-mage-335a-am, con proporzioni geometriche auto-calibrate per rimanere contenuta entro i 278px della Rage Bar):
-- **05 - Trinket 1 warDPS & 06 - Trinket 2 warDPS**: Riconoscimento automatico slot 13 & 14 (suffisso `warDPS` anti-collisione). Catalogo esaustivo di **tutti i monili da mischia 3.3.5a con ICD reali verificati online**:
+- **05 - Trinket 1 warDPS & 06 - Trinket 2 warDPS**: Riconoscimento automatico slot 13 & 14 (suffisso `warDPS` anti-collisione). Catalogo esaustivo di **tutti i monili da mischia DPS e Tank 3.3.5a con ICD reali verificati online**:
   - *Deathbringer's Will*: proc 30s, ICD reale **105s** (trasformazioni Vrykul, Taunka, Iron Dwarf con icone dinamiche).
   - *Sharpened Twilight Scale*: proc 15s, ICD reale **45s** (+1472 / +1304 AP).
   - *Death's Choice / Verdict*: proc 15s, ICD reale **45s** (+510 / +450 Strength).
   - *Whispering Fanged Skull*: proc 15s, ICD reale **45s** (+1250 / +1100 AP).
-  - *Needle-Encrusted Scorpion*: proc 10s, ICD reale **45s** (+678 ArP).
+  - *Mirror of Truth*, *Anvil of Titans*, *Coren's Chromium Coaster*: proc *Reflection of Torment* (+1000 AP per 10s, ICD reale **45s**, Spell 60065).
+  - *Needle-Encrusted Scorpion*: proc *Now is the Time!* (+678 ArP per 10s, ICD reale **45s**).
+  - *Dark-Matter*: proc critico (+612 Crit per 10s, ICD reale **45s**).
   - *Mjolnir Runestone* & *Comet's Trail*: proc 10s, ICD reale **45s** (+665 ArP / +722 Haste).
-  - *Darkmoon Card: Greatness*, *Grim Toll*, *Mirror of Truth*, *Banner of Victory*, *Meteorite Whetstone*: ICD reale **45s**.
-  - *Wrathstone*, *Mark of Supremacy*, *Incisor Fragment*: On-Use 20s, Cooldown **120s**.
+  - *Darkmoon Card: Greatness*, *Grim Toll*, *Banner of Victory*, *Meteorite Whetstone*, *Vestige of Haldor*: ICD reale **45s**.
+  - *Wrathstone*, *Mark of Supremacy*, *Incisor Fragment*, *Loatheb's Shadow*, *Shard of Crystal Heart*: On-Use 20s, Cooldown **120s**.
   - *Herkuml War Token*: accumulo cariche (1-20) e durata 10s, nessun ICD.
+  - **Monili Tank Supportati**: *Juggernaut's Vitality* / *Satrina's Impeding Scarab* (+4610/+5186 Max HP, 180s CD), *Corroded Skeleton Key* (Hardened Skin assorbe 6400 danni, 120s CD), *Unidentifiable Organ* (stacking armor fino a 10 cariche), *Sindragosa's Flawless Fang* (Aegis of Dalaran, 60s CD), *Glyph of Indomitability* (Dodge +512, 120s CD), *The Black Heart* (+705 Armor, 45s ICD), *Essence of Gossamer* (absorb, 45s ICD), *Lavanthor's Talisman*, *Heart of Iron*, *Ick's Rotting Thumb*, *Purified Onyxia Blood Talisman*, *Royal Seal of King Llane*, *The General's Heart*, *Monarch Crab*, *Ruby Hare*, *Brawler's Souvenir*, *Seal of the Pantheon* e Medaglioni PvP / Battlemaster's.
   - Tre stati visivi in tempo reale a 60+ FPS: **READY** (pronto, icona dell'oggetto senza swipe né testo), **PROC ATTIVO** (icona specifica del buff, swipe di durata attiva, testo giallo `|cFFFFFF00%.1fs|r` e Pixel Glow dorato) e **ICD** (icona dell'oggetto, swipe di ricarica residua e timer numerico rosso `|cFFFF4444%d:%02d|r` o `|cFFFF4444%.0fs|r` fino a 0s).
   - Motore di aggiornamento reattivo ad alte prestazioni con trigger `check: "update"` e cache temporale frame-by-frame (`_G.FWHUD_SlotCache`), con fallback euristico per nome monile e parsing CLEU `SPELL_AURA_APPLIED` / `SPELL_AURA_REMOVED`.
 - **06b - Ring warDPS**: Monitoraggio dell'anello con proc nello slot 11 o 12 (sul modello di fire-mage-335a-am):

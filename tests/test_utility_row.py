@@ -62,7 +62,27 @@ def run_tests():
     assert "44253" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Darkmoon Card: Greatness nel DB dei monili"
     assert "40256" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Grim Toll nel DB dei monili"
     assert "40684" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Mirror of Truth nel DB dei monili"
+    assert "60065" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Spell ID 60065 (Reflection of Torment) per Mirror of Truth"
+    assert "reflection" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca keyword reflection per Mirror of Truth"
+    assert "torment" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca keyword torment per Mirror of Truth"
     assert "49074" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Coren's Chromium Coaster nel DB dei monili"
+    assert "46038" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Dark-Matter nel DB dei monili"
+    assert "44093" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Anvil of Titans nel DB dei monili"
+
+    # Verify Tank Trinkets in Lua bootstrap
+    assert "47290" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Juggernaut's Vitality nel DB"
+    assert "47080" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Satrina's Impeding Scarab nel DB"
+    assert "50356" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Corroded Skeleton Key nel DB"
+    assert "71586" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca spell 71586 Hardened Skin per Corroded Skeleton Key"
+    assert "50341" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Unidentifiable Organ nel DB"
+    assert "50361" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Sindragosa's Flawless Fang nel DB"
+    assert "47735" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Glyph of Indomitability nel DB"
+    assert "47216" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca The Black Heart nel DB"
+    assert "37264" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Essence of Gossamer nel DB"
+    assert "37844" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Lavanthor's Talisman nel DB"
+    assert "45158" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Heart of Iron nel DB"
+    assert "50235" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Ick's Rotting Thumb nel DB"
+    assert "42341" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Figurine - Monarch Crab nel DB"
 
     # Verify customText and customDuration logic for Trinket 1 & 2
     for slot in (13, 14):

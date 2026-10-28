@@ -67,93 +67,217 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
     }
 
     _G.FWHUD_TrinketDB = {
-        -- Deathbringer's Will (Normal 50362, Heroic 50363)
-        [50362] = { keywords = { "taunka", "vrykul", "irondwarf", "deathbringer", "nanodiferro", "forzadel", "agilitadel", "miradel" }, spellIds = { [71484] = true, [71485] = true, [71486] = true, [71491] = true, [71492] = true, [71487] = true, [71556] = true, [71557] = true, [71558] = true, [71559] = true, [71560] = true, [71561] = true }, icd = 105, dur = 30 },
-        [50363] = { keywords = { "taunka", "vrykul", "irondwarf", "deathbringer", "nanodiferro", "forzadel", "agilitadel", "miradel" }, spellIds = { [71484] = true, [71485] = true, [71486] = true, [71491] = true, [71492] = true, [71487] = true, [71556] = true, [71557] = true, [71558] = true, [71559] = true, [71560] = true, [71561] = true }, icd = 105, dur = 30 },
-        -- Sharpened Twilight Scale (Normal 54569, Heroic 54590)
+        -- ====================================================================
+        -- PHYSICAL / MELEE DPS TRINKETS (WotLK 3.3.5a)
+        -- ====================================================================
+        -- Deathbringer's Will (Normal 50362, Heroic 50363 - ICC 25 Saurfang)
+        [50362] = { keywords = { "taunka", "vrykul", "irondwarf", "deathbringer", "nanodiferro", "forzadel", "agilitadel", "miradel", "volonta" }, spellIds = { [71484] = true, [71485] = true, [71486] = true, [71491] = true, [71492] = true, [71487] = true, [71556] = true, [71557] = true, [71558] = true, [71559] = true, [71560] = true, [71561] = true }, icd = 105, dur = 30 },
+        [50363] = { keywords = { "taunka", "vrykul", "irondwarf", "deathbringer", "nanodiferro", "forzadel", "agilitadel", "miradel", "volonta" }, spellIds = { [71484] = true, [71485] = true, [71486] = true, [71491] = true, [71492] = true, [71487] = true, [71556] = true, [71557] = true, [71558] = true, [71559] = true, [71560] = true, [71561] = true }, icd = 105, dur = 30 },
+
+        -- Sharpened Twilight Scale (Normal 54569, Heroic 54590 - RS 25 Halion)
         [54569] = { keywords = { "twilightprecision", "sharpenedtwilight", "twilight", "crepuscolare", "precisione" }, spellIds = { [75473] = true, [75474] = true, [75466] = true, [75456] = true }, icd = 45, dur = 15 },
         [54590] = { keywords = { "twilightprecision", "sharpenedtwilight", "twilight", "crepuscolare", "precisione" }, spellIds = { [75473] = true, [75474] = true, [75466] = true, [75456] = true }, icd = 45, dur = 15 },
-        -- Death's Choice / Verdict (Normal Alliance 47115, Normal Horde 47131, Heroic Alliance 47303, Heroic Horde 47464)
-        [47115] = { keywords = { "paragon" }, spellIds = { [67708] = true, [67703] = true }, icd = 45, dur = 15 },
-        [47131] = { keywords = { "paragon" }, spellIds = { [67773] = true, [67772] = true }, icd = 45, dur = 15 },
-        [47303] = { keywords = { "paragon" }, spellIds = { [67708] = true, [67703] = true }, icd = 45, dur = 15 },
-        [47464] = { keywords = { "paragon" }, spellIds = { [67773] = true, [67772] = true }, icd = 45, dur = 15 },
-        -- Whispering Fanged Skull (Normal 50342, Heroic 50343)
-        [50342] = { keywords = { "whisperingfangedskull" }, spellIds = { [71541] = true, [71540] = true }, icd = 45, dur = 15 },
-        [50343] = { keywords = { "whisperingfangedskull" }, spellIds = { [71541] = true, [71540] = true }, icd = 45, dur = 15 },
-        -- Herkuml War Token (50355) - Stacking AP
-        [50355] = { keywords = { "herkuml" }, spellIds = { [71396] = true }, icd = 0, dur = 10 },
-        -- Needle-Encrusted Scorpion (50198)
-        [50198] = { keywords = { "needleencrusted", "scorpion" }, spellIds = { [71403] = true, [71401] = true }, icd = 45, dur = 10 },
-        -- Mjolnir Runestone (45931, 45866)
-        [45931] = { keywords = { "mjolnirrunestone", "runestone" }, spellIds = { [65019] = true, [65014] = true }, icd = 45, dur = 10 },
-        [45866] = { keywords = { "mjolnirrunestone", "runestone" }, spellIds = { [65019] = true, [65014] = true }, icd = 45, dur = 10 },
-        -- Comet's Trail (45609)
-        [45609] = { keywords = { "cometstrail" }, spellIds = { [64772] = true }, icd = 45, dur = 10 },
+
+        -- Death's Choice / Verdict (Normal Alliance 47115, Normal Horde 47131, Heroic Alliance 47303, Heroic Horde 47464 - ToC 25 Twins)
+        [47115] = { keywords = { "paragon", "choice", "verdict", "scelta", "verdetto" }, spellIds = { [67708] = true, [67703] = true, [67707] = true }, icd = 45, dur = 15 },
+        [47131] = { keywords = { "paragon", "choice", "verdict", "scelta", "verdetto" }, spellIds = { [67773] = true, [67772] = true, [67771] = true }, icd = 45, dur = 15 },
+        [47303] = { keywords = { "paragon", "choice", "verdict", "scelta", "verdetto" }, spellIds = { [67708] = true, [67703] = true, [67707] = true }, icd = 45, dur = 15 },
+        [47464] = { keywords = { "paragon", "choice", "verdict", "scelta", "verdetto" }, spellIds = { [67773] = true, [67772] = true, [67771] = true }, icd = 45, dur = 15 },
+
+        -- Whispering Fanged Skull (Normal 50342, Heroic 50343 - ICC 10 Lady Deathwhisper)
+        [50342] = { keywords = { "whisperingfangedskull", "fanged", "skull", "teschio", "sussurrante" }, spellIds = { [71541] = true, [71540] = true }, icd = 45, dur = 15 },
+        [50343] = { keywords = { "whisperingfangedskull", "fanged", "skull", "teschio", "sussurrante" }, spellIds = { [71541] = true, [71540] = true }, icd = 45, dur = 15 },
+
+        -- Herkuml War Token (50355 - 60 Frost Emblems) - Stacking AP
+        [50355] = { keywords = { "herkuml", "token" }, spellIds = { [71396] = true }, icd = 0, dur = 10 },
+
+        -- Needle-Encrusted Scorpion (50198 - Forge of Souls Heroic)
+        [50198] = { keywords = { "nowisthetime", "oraeilmomento", "needleencrusted", "scorpion", "scorpione" }, spellIds = { [71403] = true, [71401] = true }, icd = 45, dur = 10 },
+
+        -- Mjolnir Runestone (45931, 45866 - Ulduar 10 Thorim)
+        [45931] = { keywords = { "mjolnirrunestone", "runestone", "mjolnir", "pietrarunica" }, spellIds = { [65019] = true, [65014] = true }, icd = 45, dur = 10 },
+        [45866] = { keywords = { "mjolnirrunestone", "runestone", "mjolnir", "pietrarunica" }, spellIds = { [65019] = true, [65014] = true }, icd = 45, dur = 10 },
+
+        -- Comet's Trail (45609 - Ulduar 25 Algalon)
+        [45609] = { keywords = { "cometstrail", "comet", "cometa" }, spellIds = { [64772] = true }, icd = 45, dur = 10 },
+
         -- Darkmoon Card: Greatness (44253, 44254, 44255, 42987)
-        [44253] = { keywords = { "greatness" }, spellIds = { [60229] = true, [60233] = true }, icd = 45, dur = 15 },
-        [44254] = { keywords = { "greatness" }, spellIds = { [60229] = true, [60233] = true }, icd = 45, dur = 15 },
-        [44255] = { keywords = { "greatness" }, spellIds = { [60229] = true, [60233] = true }, icd = 45, dur = 15 },
-        [42987] = { keywords = { "greatness" }, spellIds = { [60229] = true, [60233] = true }, icd = 45, dur = 15 },
-        -- Grim Toll (40256)
-        [40256] = { keywords = { "grimtoll" }, spellIds = { [60486] = true, [60485] = true }, icd = 45, dur = 10 },
-        -- Mirror of Truth (40684)
-        [40684] = { keywords = { "mirroroftruth" }, spellIds = { [60488] = true }, icd = 45, dur = 10 },
-        -- Banner of Victory (44914)
-        [44914] = { keywords = { "bannerofvictory" }, spellIds = { [67671] = true }, icd = 45, dur = 10 },
-        -- Meteorite Whetstone (37390)
-        [37390] = { keywords = { "meteorite" }, spellIds = { [60305] = true }, icd = 45, dur = 10 },
-        -- Vestige of Haldor (37220)
-        [37220] = { keywords = { "haldor" }, spellIds = { [60302] = true }, icd = 45, dur = 10 },
-        -- Wrathstone (45263) - On-Use
+        [44253] = { keywords = { "greatness", "nobilt", "grandezza" }, spellIds = { [60229] = true, [60233] = true, [60234] = true, [60235] = true }, icd = 45, dur = 15 },
+        [44254] = { keywords = { "greatness", "nobilt", "grandezza" }, spellIds = { [60229] = true, [60233] = true, [60234] = true, [60235] = true }, icd = 45, dur = 15 },
+        [44255] = { keywords = { "greatness", "nobilt", "grandezza" }, spellIds = { [60229] = true, [60233] = true, [60234] = true, [60235] = true }, icd = 45, dur = 15 },
+        [42987] = { keywords = { "greatness", "nobilt", "grandezza" }, spellIds = { [60229] = true, [60233] = true, [60234] = true, [60235] = true }, icd = 45, dur = 15 },
+
+        -- Grim Toll (40256 - Naxxramas 25)
+        [40256] = { keywords = { "grimtoll", "toll", "rintocco" }, spellIds = { [60486] = true, [60485] = true }, icd = 45, dur = 10 },
+
+        -- Mirror of Truth (40684 - 40 Emblem of Heroism) - Proc: Reflection of Torment / Riflesso del Tormento (+1000 AP)
+        [40684] = { keywords = { "reflection", "torment", "riflesso", "tormento", "mirroroftruth", "mirror", "truth", "specchio" }, spellIds = { [60065] = true, [60064] = true }, icd = 45, dur = 10 },
+
+        -- Anvil of Titans (44093 - Wintergrasp PvP) - Proc: Reflection of Torment (+1000 AP)
+        [44093] = { keywords = { "reflection", "torment", "riflesso", "tormento", "anvil", "incudine" }, spellIds = { [60065] = true, [60064] = true }, icd = 45, dur = 10 },
+
+        -- Coren's Chromium Coaster (49074 - Brewfest) - Proc: Reflection of Torment (+1000 AP)
+        [49074] = { keywords = { "chromium", "coaster", "reflection", "torment", "riflesso", "tormento" }, spellIds = { [60065] = true, [60064] = true, [48480] = true, [60488] = true }, icd = 45, dur = 10 },
+
+        -- Dark-Matter (46038 - Ulduar 10 Algalon)
+        [46038] = { keywords = { "darkmatter", "materiaoscura", "dark", "matter" }, spellIds = { [65024] = true, [65023] = true }, icd = 45, dur = 10 },
+
+        -- Banner of Victory (44914 - ToC 5 Normal)
+        [44914] = { keywords = { "bannerofvictory", "banner", "victory", "stendardo" }, spellIds = { [67671] = true, [67670] = true }, icd = 45, dur = 10 },
+
+        -- Meteorite Whetstone (37390 - Utgarde Pinnacle Heroic)
+        [37390] = { keywords = { "meteorite", "whetstone", "cote" }, spellIds = { [60305] = true, [60304] = true }, icd = 45, dur = 10 },
+
+        -- Vestige of Haldor (37220 - Utgarde Pinnacle Normal)
+        [37220] = { keywords = { "haldor" }, spellIds = { [60302] = true, [60301] = true }, icd = 45, dur = 10 },
+
+        -- Feast of the Greatfather (44431 - Winter Veil)
+        [44431] = { keywords = { "greatfather", "grandepadre" }, spellIds = { [60490] = true, [60489] = true }, icd = 45, dur = 15 },
+
+        -- Blood of the Old God (45522 - Ulduar 25 Yogg-Saron)
+        [45522] = { keywords = { "bloodoftheoldgod", "oldgod", "sangue" }, spellIds = { [64790] = true, [64789] = true }, icd = 45, dur = 10 },
+
+        -- Pyrite Infuser (45286 - Ulduar 10 Flame Leviathan)
+        [45286] = { keywords = { "pyriteinfuser", "pyrite", "pirite" }, spellIds = { [65012] = true, [65011] = true }, icd = 45, dur = 10 },
+
+        -- Wrathstone (45263 - Emblem of Conquest) - On-Use
         [45263] = { keywords = { "wrathstone" }, spellIds = { [64765] = true }, icd = 120, dur = 20, onUse = true },
-        -- Mark of Supremacy (47734) - On-Use
-        [47734] = { keywords = { "markofsupremacy" }, spellIds = { [67708] = true, [67706] = true }, icd = 120, dur = 20, onUse = true },
-        -- Incisor Fragment (37723) - On-Use
+
+        -- Mark of Supremacy (47734 - Emblem of Triumph) - On-Use
+        [47734] = { keywords = { "markofsupremacy", "supremacy" }, spellIds = { [67708] = true, [67706] = true, [67707] = true }, icd = 120, dur = 20, onUse = true },
+
+        -- Incisor Fragment (37723 - Drak'Tharon Keep Heroic) - On-Use
         [37723] = { keywords = { "incisor" }, spellIds = { [60298] = true }, icd = 120, dur = 20, onUse = true },
-        -- Loatheb's Shadow (39257) - On-Use
+
+        -- Loatheb's Shadow (39257 - Naxxramas 10) - On-Use
         [39257] = { keywords = { "loatheb" }, spellIds = { [60314] = true }, icd = 120, dur = 20, onUse = true },
-        -- Sphere of Red Dragon's Blood (37111) - On-Use
+
+        -- Sphere of Red Dragon's Blood (37111 - Nexus Heroic) - On-Use
         [37111] = { keywords = { "reddragonsblood" }, spellIds = { [60290] = true }, icd = 120, dur = 20, onUse = true },
-        -- Feast of the Greatfather (44431)
-        [44431] = { keywords = { "greatfather" }, spellIds = { [60490] = true }, icd = 45, dur = 15 },
-        -- Blood of the Old God (45522)
-        [45522] = { keywords = { "bloodoftheoldgod" }, spellIds = { [64790] = true }, icd = 45, dur = 10 },
-        -- Pyrite Infuser (45286)
-        [45286] = { keywords = { "pyriteinfuser" }, spellIds = { [65012] = true }, icd = 45, dur = 10 },
-        -- Coren's Chromium Coaster (49074)
-        [49074] = { keywords = { "chromium", "coaster" }, spellIds = { [60488] = true }, icd = 45, dur = 10 },
-        -- Victor's Call & Vengeance of the Forsaken (47725, 47948, 47728, 47949)
-        [47725] = { keywords = { "victor" }, spellIds = { [67744] = true }, icd = 120, dur = 20, onUse = true },
-        [47948] = { keywords = { "victor" }, spellIds = { [67744] = true }, icd = 120, dur = 20, onUse = true },
-        [47728] = { keywords = { "vengeance" }, spellIds = { [67744] = true }, icd = 120, dur = 20, onUse = true },
-        [47949] = { keywords = { "vengeance" }, spellIds = { [67744] = true }, icd = 120, dur = 20, onUse = true },
-        -- Tears of the Vanquished (47215)
+
+        -- Victor's Call & Vengeance of the Forsaken (47725, 47948, 47728, 47949 - ToC 10) - On-Use
+        [47725] = { keywords = { "victor" }, spellIds = { [67744] = true, [67745] = true }, icd = 120, dur = 20, onUse = true },
+        [47948] = { keywords = { "victor" }, spellIds = { [67744] = true, [67745] = true }, icd = 120, dur = 20, onUse = true },
+        [47728] = { keywords = { "vengeance", "vendetta" }, spellIds = { [67744] = true, [67745] = true }, icd = 120, dur = 20, onUse = true },
+        [47949] = { keywords = { "vengeance", "vendetta" }, spellIds = { [67744] = true, [67745] = true }, icd = 120, dur = 20, onUse = true },
+
+        -- Shard of the Crystal Heart (48722 - Emblem of Triumph) - On-Use Haste
+        [48722] = { keywords = { "crystalheart", "shard" }, spellIds = { [67683] = true }, icd = 120, dur = 20, onUse = true },
+
+        -- Bitter Balebrew Charm & Bubbling Brightbrew Charm (49080, 49078, 37863, 37862 - Brewfest) - On-Use
+        [49080] = { keywords = { "balebrew", "brightbrew" }, spellIds = { [48480] = true, [51348] = true }, icd = 120, dur = 20, onUse = true },
+        [49078] = { keywords = { "balebrew", "brightbrew" }, spellIds = { [48480] = true, [51348] = true }, icd = 120, dur = 20, onUse = true },
+        [37863] = { keywords = { "balebrew", "brightbrew" }, spellIds = { [48480] = true, [51348] = true }, icd = 120, dur = 20, onUse = true },
+        [37862] = { keywords = { "balebrew", "brightbrew" }, spellIds = { [48480] = true, [51348] = true }, icd = 120, dur = 20, onUse = true },
+
+        -- Tears of the Vanquished (47215 - ToC 5 Normal)
         [47215] = { keywords = { "revitalized" }, spellIds = { [67700] = true }, icd = 45, dur = 0 },
-        -- PvP Medallions & Battlemaster's
-        [42122] = { keywords = { "medallion" }, icd = 120, dur = 0, onUse = true },
-        [42123] = { keywords = { "medallion" }, icd = 120, dur = 0, onUse = true },
-        [51377] = { keywords = { "medallion" }, icd = 120, dur = 0, onUse = true },
-        [51378] = { keywords = { "medallion" }, icd = 120, dur = 0, onUse = true },
-        [42133] = { keywords = { "battlemaster" }, spellIds = { [59754] = true }, icd = 120, dur = 15, onUse = true },
-        [44063] = { keywords = { "battlemaster" }, spellIds = { [59754] = true }, icd = 120, dur = 15, onUse = true },
-        [50356] = { keywords = { "battlemaster" }, spellIds = { [59754] = true }, icd = 120, dur = 15, onUse = true },
+
+        -- ====================================================================
+        -- TANK TRINKETS (WotLK 3.3.5a)
+        -- ====================================================================
+        -- Juggernaut's Vitality (Normal 47290, Heroic 47451 - ToC 25 Horde) - On-Use Max Health
+        [47290] = { keywords = { "juggernaut", "vitality", "vigore" }, spellIds = { [67753] = true }, icd = 180, dur = 15, onUse = true },
+        [47451] = { keywords = { "juggernaut", "vitality", "vigore" }, spellIds = { [67752] = true }, icd = 180, dur = 15, onUse = true },
+
+        -- Satrina's Impeding Scarab (Normal 47080, Heroic 47088 - ToC 25 Alliance) - On-Use Max Health
+        [47080] = { keywords = { "satrina", "impeding", "scarab", "scarabeo" }, spellIds = { [67694] = true }, icd = 180, dur = 15, onUse = true },
+        [47088] = { keywords = { "satrina", "impeding", "scarab", "scarabeo" }, spellIds = { [67693] = true }, icd = 180, dur = 15, onUse = true },
+
+        -- Corroded Skeleton Key (50356 - 60 Frost Emblems) - On-Use Absorbs 6400
+        [50356] = { keywords = { "corroded", "skeletonkey", "hardenedskin", "pelleindurita", "chiave" }, spellIds = { [71586] = true }, icd = 120, dur = 10, onUse = true },
+
+        -- Unidentifiable Organ (Normal 50341, Heroic 50344 - ICC 10 Putricide) - Stacking Armor on Melee Hit
+        [50341] = { keywords = { "unidentifiableorgan", "organ", "organo" }, spellIds = { [71536] = true, [71578] = true }, icd = 0, dur = 10 },
+        [50344] = { keywords = { "unidentifiableorgan", "organ", "organo" }, spellIds = { [71537] = true, [71578] = true }, icd = 0, dur = 10 },
+
+        -- Sindragosa's Flawless Fang (Normal 50361, Heroic 50364 - ICC 25 Sindragosa) - On-Use Resistances
+        [50361] = { keywords = { "sindragosa", "fang", "zanna", "aegis", "dalaran" }, spellIds = { [71635] = true }, icd = 60, dur = 10, onUse = true },
+        [50364] = { keywords = { "sindragosa", "fang", "zanna", "aegis", "dalaran" }, spellIds = { [71638] = true }, icd = 60, dur = 10, onUse = true },
+
+        -- Glyph of Indomitability (47735 - 50 Emblem of Triumph) - On-Use Dodge
+        [47735] = { keywords = { "indomitability", "glyph", "glifo", "indomitable", "indomito" }, spellIds = { [67713] = true }, icd = 120, dur = 20, onUse = true },
+
+        -- The Black Heart (47216 - ToC 5 Normal Black Knight) - Chance on struck +705 Armor
+        [47216] = { keywords = { "blackheart", "cuorenero", "parryingarmor", "parrying" }, spellIds = { [67702] = true }, icd = 45, dur = 10 },
+
+        -- Essence of Gossamer (37264 - Azjol-Nerub Heroic Hadronox) - Chance on struck absorb
+        [37264] = { keywords = { "gossamer", "tessitura" }, spellIds = { [60295] = true }, icd = 45, dur = 10 },
+
+        -- Lavanthor's Talisman (37844 - Violet Hold Heroic Lavanthor) - On-Use Defense
+        [37844] = { keywords = { "lavanthor", "talisman" }, spellIds = { [60307] = true }, icd = 120, dur = 20, onUse = true },
+
+        -- Heart of Iron (45158 - Ulduar 25 Ignis) - On-Use Armor
+        [45158] = { keywords = { "heartofiron", "cuorediferro" }, spellIds = { [64761] = true }, icd = 120, dur = 20, onUse = true },
+
+        -- Ick's Rotting Thumb (50235 - Pit of Saron Heroic Ick) - On-Use Max Health
+        [50235] = { keywords = { "rottingthumb", "thumb", "pollice" }, spellIds = { [71412] = true }, icd = 180, dur = 15, onUse = true },
+
+        -- Purified Onyxia Blood Talisman (10m 49487, 25m 49308 - Onyxia) - On-Use Armor
+        [49487] = { keywords = { "onyxia", "bloodtalisman" }, spellIds = { [67756] = true }, icd = 120, dur = 20, onUse = true },
+        [49308] = { keywords = { "onyxia", "bloodtalisman" }, spellIds = { [67757] = true }, icd = 120, dur = 20, onUse = true },
+
+        -- Royal Seal of King Llane (45507 - Ulduar 10 Yogg-Saron) - Chance on melee strike +Armor
+        [45507] = { keywords = { "royalseal", "kingllane", "sigilloreale" }, spellIds = { [64784] = true }, icd = 45, dur = 10 },
+
+        -- The General's Heart (45285 - Ulduar 10 General Vezax) - Chance on hit/block +Armor
+        [45285] = { keywords = { "general", "generale" }, spellIds = { [64761] = true, [65017] = true }, icd = 45, dur = 10 },
+
+        -- Figurine - Monarch Crab (42341 - Jewelcrafting) - On-Use Dodge
+        [42341] = { keywords = { "monarchcrab", "granchio" }, spellIds = { [59706] = true }, icd = 120, dur = 20, onUse = true },
+
+        -- Figurine - Ruby Hare (42345 - Jewelcrafting) - On-Use Run Speed / Health
+        [42345] = { keywords = { "rubyhare", "lepre" }, spellIds = { [59703] = true }, icd = 120, dur = 20, onUse = true },
+
+        -- Brawler's Souvenir (37784 - Violet Hold Heroic) - Chance on struck Dodge
+        [37784] = { keywords = { "brawler", "souvenir" }, spellIds = { [60293] = true }, icd = 45, dur = 10 },
+
+        -- Seal of the Pantheon (36993 - Halls of Lightning Normal/Heroic Loken) - Chance on struck +Armor
+        [36993] = { keywords = { "pantheon" }, spellIds = { [60288] = true }, icd = 45, dur = 10 },
+
+        -- ====================================================================
+        -- PVP MEDALLIONS & BATTLEMASTER'S TRINKETS
+        -- ====================================================================
+        [42122] = { keywords = { "medallion", "medaglione" }, icd = 120, dur = 0, onUse = true },
+        [42123] = { keywords = { "medallion", "medaglione" }, icd = 120, dur = 0, onUse = true },
+        [51377] = { keywords = { "medallion", "medaglione" }, icd = 120, dur = 0, onUse = true },
+        [51378] = { keywords = { "medallion", "medaglione" }, icd = 120, dur = 0, onUse = true },
+        [42133] = { keywords = { "battlemaster" }, spellIds = { [59754] = true }, icd = 180, dur = 15, onUse = true },
+        [44063] = { keywords = { "battlemaster" }, spellIds = { [59754] = true }, icd = 180, dur = 15, onUse = true },
+        [42134] = { keywords = { "battlemaster" }, spellIds = { [59754] = true }, icd = 180, dur = 15, onUse = true },
+        [44064] = { keywords = { "battlemaster" }, spellIds = { [59754] = true }, icd = 180, dur = 15, onUse = true },
     }
 
     _G.FWHUD_AllMeleeKeywords = {
-        "taunka", "vrykul", "irondwarf", "deathbringer", "spezzassedio",
+        -- DPS Procs
+        "taunka", "vrykul", "irondwarf", "deathbringer", "spezzassedio", "nanodiferro", "volonta",
         "twilight", "sharpened", "crepuscolare", "precision",
         "paragon", "choice", "verdict", "scelta", "verdetto",
         "fanged", "skull", "whispering", "teschio", "sussurrante",
-        "scorpion", "needle", "scorpione",
-        "runestone", "mjolnir", "pietra",
+        "scorpion", "needle", "scorpione", "nowisthetime", "oraeilmomento",
+        "runestone", "mjolnir", "pietrarunica",
         "comet", "trail", "cometa",
-        "greatness", "nobilt",
+        "greatness", "nobilt", "grandezza",
         "grimtoll", "toll", "rintocco",
-        "mirror", "truth", "specchio",
+        "mirror", "truth", "specchio", "reflection", "torment", "riflesso", "tormento",
         "banner", "victory", "stendardo",
         "meteorite", "whetstone", "cote",
-        "herkuml",
+        "haldor", "wrathstone", "supremacy", "incisor", "loatheb",
+        "herkuml", "darkmatter", "materiaoscura", "bloodoftheoldgod",
+        "pyrite", "pirite", "chromium", "coaster", "balebrew", "brightbrew",
+        -- Tank Procs & On-Use
+        "juggernaut", "vitality", "vigore",
+        "satrina", "impeding", "scarab", "scarabeo",
+        "skeleton", "hardened", "skin", "indurita", "chiave",
+        "organ", "organo",
+        "fang", "zanna", "aegis", "dalaran",
+        "indomitable", "indomito", "glyph", "glifo",
+        "blackheart", "cuorenero", "parrying",
+        "gossamer", "tessitura",
+        "lavanthor", "cuorediferro", "heartofiron",
+        "rottingthumb", "thumb", "pollice",
+        "onyxia", "bloodtalisman", "sigilloreale", "royalseal",
+        "monarchcrab", "granchio", "brawler", "pantheon"
     }
 
     _G.FWHUD_RingDB = {
@@ -503,6 +627,9 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                             end
                         end
                     end
+                end
+                if not isMatch and b.icon and baseIcon and b.icon == baseIcon then
+                    isMatch = true
                 end
             end
 
@@ -1246,7 +1373,29 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                         for _, s in ipairs({ 13, 14 }) do
                             local tID = GetInventoryItemID and GetInventoryItemID("player", s)
                             local tEntry = tID and _G.FWHUD_TrinketDB and _G.FWHUD_TrinketDB[tID]
-                            if tEntry and spellId and tEntry.spellIds and tEntry.spellIds[spellId] then
+                            local isTMatch = false
+                            if tEntry then
+                                if spellId and tEntry.spellIds and tEntry.spellIds[spellId] then
+                                    isTMatch = true
+                                elseif spellName and tEntry.keywords then
+                                    local snClean = spellName:lower():gsub("[%s%p%c]", "")
+                                    for _, kw in ipairs(tEntry.keywords) do
+                                        if snClean:find(kw:lower():gsub("[%s%p%c]", ""), 1, true) then
+                                            isTMatch = true
+                                            break
+                                        end
+                                    end
+                                end
+                            elseif spellName and _G.FWHUD_AllMeleeKeywords then
+                                local snClean = spellName:lower():gsub("[%s%p%c]", "")
+                                for _, kw in ipairs(_G.FWHUD_AllMeleeKeywords) do
+                                    if snClean:find(kw:lower():gsub("[%s%p%c]", ""), 1, true) then
+                                        isTMatch = true
+                                        break
+                                    end
+                                end
+                            end
+                            if isTMatch then
                                 local sICD = _G.FWHUD_ICD and _G.FWHUD_ICD[s]
                                 if sICD then
                                     sICD.isProc = false

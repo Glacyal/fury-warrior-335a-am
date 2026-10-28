@@ -3,15 +3,17 @@ Modulo Componente: 05-13 - Utility Row (Warrior Fury)
 =====================================================
 Gestisce la riga orizzontale di utilità a y = -45 con riposizionamento dinamico
 centrato naturale (da 3 a 9 icone) in base all'equipaggiamento e alle abilità:
-1. 05 - Trinket 1 warDPS (Slot 13: DBW, STS, Death's Choice o altro monile, ICD o On-Use, Pixel Glow su proc)
-2. 06 - Trinket 2 warDPS (Slot 14: STS, DBW, Whispering Fanged Skull o altro monile, ICD/On-Use, Pixel Glow)
-3. 07 - Cloak (Slot 15: Swordguard Embroidery +400 AP / Paracadute / Flexweave)
-4. 08 - Tier Set warDPS (T10 Siegebreaker/Advantage, T8 Haste, T7 Spirits of the Lost, T9 e combinazioni 2P+2P)
-5. 09 - Enchants (Slot 16/17: Berserking MH/OH x1/x2 +800 AP, Executioner, Mongoose, Ashen Band)
-6. 10 - Gloves (Slot 10: Acceleratori Ipersonici Ingegneria +340 Haste per 12s, 60s CD)
-7. 11 - Death Wish (Spell ID 12292, durata attiva 30s + cooldown)
-8. 12 - Recklessness (Spell ID 1719, 3 cariche critico garantite + cooldown)
-9. 13 - Boots (Slot 8: Acceleratori a Nitro / Nitro Boosts Ingegneria, 180s CD)
+1. 05 - Trinket 1 warDPS (Slot 13: DBW, STS, Death's Choice, Skull, Scorpion, Mjolnir, ecc. con ICD reale/On-Use)
+2. 06 - Trinket 2 warDPS (Slot 14: STS, DBW, Skull, Comet, Grim Toll, Mirror, ecc. con ICD reale/On-Use)
+3. 06b - Ring warDPS (Slot 11/12: Ashen Band of Endless Vengeance +480 AP, Eternal Champion +160 AP, 60s ICD)
+4. 07 - Cloak warDPS (Slot 15: Swordguard Embroidery +400 AP / Paracadute / Flexweave)
+5. 08 - Tier Set warDPS (T10 Siegebreaker/Advantage, T8 Haste, T7 Spirits of the Lost, T9 e combinazioni 2P+2P)
+6. 09a - Weapon MH warDPS (Slot 16: Berserking MH +400 AP, Mongoose, Executioner con tracking indipendente)
+7. 09b - Weapon OH warDPS (Slot 17: Berserking OH +400 AP, Mongoose, Executioner con tracking indipendente)
+8. 10 - Gloves warDPS (Slot 10: Acceleratori Ipersonici Ingegneria +340 Haste per 12s, 60s CD)
+9. 11 - Death Wish (Spell ID 12292, durata attiva 30s + cooldown)
+10. 12 - Recklessness (Spell ID 1719, 3 cariche critico garantite + cooldown)
+11. 13 - Boots warDPS (Slot 8: Acceleratori a Nitro / Nitro Boosts Ingegneria, 180s CD)
 
 Architettura solida: bootstrap centrale idempotente iniettato in tutti i trigger e customText,
 check update con swipe, customDuration, customIcon e customText con PixelGlow reattivo.
@@ -129,6 +131,29 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         [42133] = { keywords = { "battlemaster" }, spellIds = { [59754] = true }, icd = 120, dur = 15, onUse = true },
         [44063] = { keywords = { "battlemaster" }, spellIds = { [59754] = true }, icd = 120, dur = 15, onUse = true },
         [50356] = { keywords = { "battlemaster" }, spellIds = { [59754] = true }, icd = 120, dur = 15, onUse = true },
+    }
+
+    _G.FWHUD_RingDB = {
+        -- Ashen Band of Endless Vengeance (Exalted Melee DPS - 277)
+        [50402] = { keywords = { "frostforgedchampion" }, spellIds = { [72412] = true, [72414] = true }, icd = 60, dur = 10 },
+        -- Ashen Band of Unmatched Vengeance (Revered Melee DPS - 268)
+        [50401] = { keywords = { "frostforgedchampion" }, spellIds = { [72412] = true, [72414] = true }, icd = 60, dur = 10 },
+        -- Ashen Band of Endless Might (Exalted Tank - 277)
+        [50404] = { keywords = { "frostforgeddefender" }, spellIds = { [72410] = true }, icd = 60, dur = 10 },
+        -- Band of the Eternal Champion (TBC Hyjal Exalted Melee DPS - 152)
+        [29301] = { keywords = { "eternalchampion" }, spellIds = { [35081] = true }, icd = 60, dur = 10 },
+    }
+    _G.FWHUD_RingState = _G.FWHUD_RingState or { lastStart = 0, lastEnd = 0, isProc = false, lastItemID = 0 }
+
+    _G.FWHUD_WeaponEnchantDB = {
+        [3789] = { name = "Berserking", spellId = 59620, dur = 15, icon = "Interface\\Icons\\Spell_Nature_BloodLust", kw = "berserk" },
+        [2673] = { name = "Mongoose", spellId = 28093, dur = 15, icon = "Interface\\Icons\\Spell_Nature_PosisonSpike", kw = "mongoose" },
+        [3225] = { name = "Executioner", spellId = 42976, dur = 15, icon = "Interface\\Icons\\INV_Sword_48", kw = "executioner" },
+        [3790] = { name = "Black Magic", spellId = 59626, dur = 10, icon = "Interface\\Icons\\Spell_Shadow_Shadowfury", kw = "blackmagic" },
+    }
+    _G.FWHUD_WeaponState = _G.FWHUD_WeaponState or {
+        [16] = { lastStart = 0, lastEnd = 0, isProc = false },
+        [17] = { lastStart = 0, lastEnd = 0, isProc = false }
     }
 
     _G.FWHUD_CloakKeywords = { "swordguard", "spadatesta", "parachute", "flexweave", "flessibile" }
@@ -441,6 +466,153 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
     end
 
     -- =========================================================================
+    -- GESTIONE ANELLO CON PROC (ASHEN BAND, ETERNAL CHAMPION)
+    -- =========================================================================
+    _G.FWHUD_CheckRingEquipped = function()
+        local now_r = GetTime()
+        local cache = _G.FWHUD_RingEquipCache
+        if cache and (now_r - cache.time < 0.25) then
+            return cache.isEquipped, cache.slot, cache.itemID
+        end
+        if not cache then
+            cache = { time = 0, isEquipped = false, slot = nil, itemID = nil }
+            _G.FWHUD_RingEquipCache = cache
+        end
+        cache.time = now_r
+
+        for _, s in ipairs({ 11, 12 }) do
+            local id = GetInventoryItemID("player", s)
+            if not id then
+                local link = GetInventoryItemLink("player", s)
+                if link then id = tonumber(link:match("item:(%d+)")) end
+            end
+            if id and _G.FWHUD_RingDB and _G.FWHUD_RingDB[id] then
+                cache.isEquipped = true
+                cache.slot = s
+                cache.itemID = id
+                return true, s, id
+            end
+        end
+
+        local buffs = _G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs()
+        if buffs then
+            if buffs.bySpellId[72412] or buffs.bySpellId[72414] or buffs.bySpellId[72410] or buffs.bySpellId[35081] then
+                cache.isEquipped = true
+                cache.slot = 11
+                cache.itemID = 50402
+                return true, 11, 50402
+            end
+        end
+
+        local tt = _G.FWHUD_ScanTT
+        if not tt then
+            tt = CreateFrame("GameTooltip", "FWHUD_ScanTT", UIParent, "GameTooltipTemplate")
+            tt:SetOwner(UIParent, "ANCHOR_NONE")
+            _G.FWHUD_ScanTT = tt
+        end
+        for _, s in ipairs({ 11, 12 }) do
+            local id = GetInventoryItemID("player", s)
+            if id then
+                tt:ClearLines()
+                tt:SetInventoryItem("player", s)
+                for j = 1, tt:NumLines() do
+                    local line = _G["FWHUD_ScanTTTextLeft"..j]
+                    local text = line and line:GetText()
+                    if text then
+                        local lt = text:lower()
+                        if lt:find("frostforged") or lt:find("chilling knowledge") or
+                           lt:find("attack power by 480") or lt:find("potenza d'attacco di 480") or
+                           lt:find("eternal champion") or lt:find("attack power by 160") or lt:find("potenza d'attacco di 160") then
+                            cache.isEquipped = true
+                            cache.slot = s
+                            cache.itemID = id
+                            return true, s, id
+                        end
+                    end
+                end
+            end
+        end
+
+        cache.isEquipped = false
+        cache.slot = nil
+        cache.itemID = nil
+        return false, nil, nil
+    end
+
+    _G.FWHUD_CheckRing = function()
+        local isEquipped, ringSlot, ringItemID = _G.FWHUD_CheckRingEquipped()
+        local defIcon = (ringItemID and GetItemIcon(ringItemID)) or "Interface\\Icons\\INV_Jewelry_Ring_81"
+        if not isEquipped then return "NONE", 0, 0, defIcon, false end
+
+        local now_rk = GetTime()
+        local state = _G.FWHUD_RingState
+        local entry = ringItemID and _G.FWHUD_RingDB and _G.FWHUD_RingDB[ringItemID]
+        local targetICD = (entry and entry.icd) or 60
+        local defaultDur = (entry and entry.dur) or 10
+
+        if state.lastItemID and ringItemID and state.lastItemID ~= ringItemID then
+            state.lastStart = 0
+            state.lastEnd = 0
+            state.isProc = false
+        end
+        if ringItemID then state.lastItemID = ringItemID end
+
+        local foundBuff = false
+        local remBuff = 0
+        local durBuff = defaultDur
+        local buffIcon = nil
+
+        local buffs = _G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs()
+        local buffList = buffs and buffs.list or {}
+
+        for _, b in ipairs(buffList) do
+            local isMatch = false
+            if b.spellId and (b.spellId == 72412 or b.spellId == 72414 or b.spellId == 72410 or b.spellId == 35081) then
+                isMatch = true
+            elseif b.name then
+                local cName = string.lower(b.name):gsub("[%s%p%c]", "")
+                if cName:find("frostforgedchampion", 1, true) or cName:find("eternalchampion", 1, true) then
+                    isMatch = true
+                end
+            end
+
+            if isMatch then
+                foundBuff = true
+                durBuff = (b.duration and b.duration > 0) and b.duration or defaultDur
+                remBuff = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now_rk) or durBuff
+                buffIcon = b.icon or defIcon
+                break
+            end
+        end
+
+        if foundBuff and remBuff > 0.05 then
+            if not state.isProc or (now_rk - state.lastStart > durBuff + 2) then
+                state.lastStart = now_rk - (durBuff - remBuff)
+                state.lastEnd = state.lastStart + targetICD
+                state.isProc = true
+            end
+            return "ACTIVE", remBuff, durBuff, buffIcon or defIcon, true
+        end
+
+        if state.isProc then
+            state.isProc = false
+            if state.lastEnd == 0 or state.lastEnd > now_rk then
+                state.lastEnd = now_rk
+            end
+        end
+
+        if state.lastStart > 0 and targetICD > 0 then
+            local elapsed = now_rk - state.lastStart
+            if elapsed < targetICD then
+                local remICD = targetICD - elapsed
+                return "ICD", remICD, targetICD, defIcon, true
+            end
+        end
+
+        return "READY", 0, 0, defIcon, true
+    end
+
+    -- =========================================================================
     -- GESTIONE TIER SETS WARRIOR DPS (T10, T8, T7, T9)
     -- =========================================================================
     _G.FWHUD_CheckTierSetEquipped = function()
@@ -601,79 +773,164 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
     end
 
     -- =========================================================================
-    -- GESTIONE INCANTI ARMA (BERSERKING MH/OH, EXECUTIONER, MONGOOSE) & ANELLO
+    -- GESTIONE INCANTI ARMA SEPARATI (MH SLOT 16 & OH SLOT 17)
     -- =========================================================================
-    _G.FWHUD_CheckEnchantsEquipped = function()
-        local now = GetTime()
-        local cache = _G.FWHUD_EnchantEquipCache
-        if cache and (now - cache.time < 0.25) then return cache.hasEnchant end
-        if not cache then cache = { time = 0, hasEnchant = false }; _G.FWHUD_EnchantEquipCache = cache end
-        cache.time = now
+    _G.FWHUD_CheckWeaponEquipped = function(slot)
+        local now_w = GetTime()
+        _G.FWHUD_WeaponEquipCache = _G.FWHUD_WeaponEquipCache or {}
+        local cache = _G.FWHUD_WeaponEquipCache[slot]
+        if cache and (now_w - cache.time < 0.25) then return cache.hasWeapon, cache.enchantID end
+        if not cache then cache = { time = 0, hasWeapon = false, enchantID = nil }; _G.FWHUD_WeaponEquipCache[slot] = cache end
+        cache.time = now_w
 
-        local mh = GetInventoryItemID("player", 16)
-        local oh = GetInventoryItemID("player", 17)
-        if mh or oh then
-            cache.hasEnchant = true
-            return true
+        local itemID = GetInventoryItemID("player", slot)
+        if not itemID then
+            local link = GetInventoryItemLink("player", slot)
+            if link then itemID = tonumber(link:match("item:(%d+)")) end
         end
-        cache.hasEnchant = false
-        return false
+        if not itemID or itemID == 0 then
+            cache.hasWeapon = false
+            cache.enchantID = nil
+            return false, nil
+        end
+
+        local itemLink = GetInventoryItemLink("player", slot)
+        local enchantID = itemLink and tonumber(itemLink:match("item:%d+:(%d+)"))
+        if enchantID and _G.FWHUD_WeaponEnchantDB[enchantID] then
+            cache.hasWeapon = true
+            cache.enchantID = enchantID
+            return true, enchantID
+        end
+
+        local tt = _G.FWHUD_ScanTT
+        if not tt then
+            tt = CreateFrame("GameTooltip", "FWHUD_ScanTT", UIParent, "GameTooltipTemplate")
+            tt:SetOwner(UIParent, "ANCHOR_NONE")
+            _G.FWHUD_ScanTT = tt
+        end
+        tt:ClearLines()
+        tt:SetInventoryItem("player", slot)
+        for j = 1, tt:NumLines() do
+            local line = _G["FWHUD_ScanTTTextLeft"..j]
+            local text = line and line:GetText()
+            if text then
+                local lt = text:lower()
+                if lt:find("berserk") or lt:find("furia") or lt:find("400 attack power") or lt:find("400 potenza d'attacco") then
+                    cache.hasWeapon = true
+                    cache.enchantID = 3789
+                    return true, 3789
+                elseif lt:find("mongoose") or lt:find("fulminea") or lt:find("120 agility") then
+                    cache.hasWeapon = true
+                    cache.enchantID = 2673
+                    return true, 2673
+                elseif lt:find("executioner") or lt:find("carnefice") then
+                    cache.hasWeapon = true
+                    cache.enchantID = 3225
+                    return true, 3225
+                end
+            end
+        end
+
+        cache.hasWeapon = true
+        cache.enchantID = 3789
+        return true, 3789
     end
 
-    _G.FWHUD_CheckEnchants = function()
-        local now = GetTime()
+    _G.FWHUD_CheckWeapon = function(slot)
+        local isEquipped, enchantID = _G.FWHUD_CheckWeaponEquipped(slot)
+        local slotLabel = (slot == 16 and "MH") or "OH"
+        local defIcon = GetInventoryItemTexture("player", slot) or "Interface\\Icons\\Spell_Nature_BloodLust"
+        if not isEquipped then return "NONE", 0, 0, defIcon, slotLabel, false end
+
+        local now_wk = GetTime()
+        local state = _G.FWHUD_WeaponState[slot]
+        local eInfo = enchantID and _G.FWHUD_WeaponEnchantDB[enchantID]
+        local targetDur = (eInfo and eInfo.dur) or 15
+        local icon = (eInfo and eInfo.icon) or defIcon
+
         local buffs = _G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs()
         local bList = buffs and buffs.list or {}
-        local defIcon = "Interface\\Icons\\Spell_Nature_BloodLust"
 
-        -- 1. Berserking (Spell 59620 - MH e/o OH)
-        local berserkCount = 0
+        local isBerserkActive = false
         local berserkRem = 0
-        local berserkDur = 15
-        local berserkIcon = nil
+        local berserkCount = 0
+        local isMongooseActive = false
+        local mongooseRem = 0
+        local isExecutionerActive = false
+        local executionerRem = 0
+
         for _, b in ipairs(bList) do
             if b.spellId == 59620 or (b.name and (b.name == "Berserking" or b.name == "Furia Berserker")) then
+                isBerserkActive = true
                 berserkCount = berserkCount + (b.count and b.count > 0 and b.count or 1)
-                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 15
-                if rem > berserkRem then
-                    berserkRem = rem
-                    berserkDur = (b.duration and b.duration > 0) and b.duration or 15
+                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now_wk) or targetDur
+                if rem > berserkRem then berserkRem = rem end
+            elseif b.spellId == 28093 or (b.name and b.name:find("Mongoose")) then
+                isMongooseActive = true
+                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now_wk) or 15
+                if rem > mongooseRem then mongooseRem = rem end
+            elseif b.spellId == 42976 or (b.name and b.name:find("Executioner")) then
+                isExecutionerActive = true
+                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now_wk) or 15
+                if rem > executionerRem then executionerRem = rem end
+            end
+        end
+
+        local isThisSlotActive = false
+        local thisRem = 0
+
+        if enchantID == 3789 or (eInfo and eInfo.name == "Berserking") then
+            if isBerserkActive and berserkRem > 0.05 then
+                local otherSlot = (slot == 16 and 17 or 16)
+                local otherEquipped, otherEnchant = _G.FWHUD_CheckWeaponEquipped(otherSlot)
+                local otherHasBerserk = otherEquipped and (otherEnchant == 3789)
+                if not otherHasBerserk then
+                    isThisSlotActive = true
+                    thisRem = berserkRem
+                else
+                    if berserkCount >= 2 then
+                        isThisSlotActive = true
+                        thisRem = berserkRem
+                    else
+                        if state.isProc and (state.lastEnd and state.lastEnd > now_wk) then
+                            isThisSlotActive = true
+                            thisRem = math.min(berserkRem, state.lastEnd - now_wk)
+                        elseif not _G.FWHUD_WeaponState[otherSlot].isProc then
+                            isThisSlotActive = (slot == 16)
+                            thisRem = berserkRem
+                        else
+                            isThisSlotActive = false
+                        end
+                    end
                 end
-                berserkIcon = b.icon or defIcon
             end
-        end
-        if berserkCount > 0 then
-            return "ACTIVE", berserkRem, berserkDur, berserkCount, berserkIcon or defIcon, "Berserking"
-        end
-
-        -- 2. Executioner (Spell 42976)
-        for _, b in ipairs(bList) do
-            if b.spellId == 42976 or (b.name and (b.name == "Executioner" or b.name == "Carnefice")) then
-                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 15
-                local dur = (b.duration and b.duration > 0) and b.duration or 15
-                return "ACTIVE", rem, dur, 1, b.icon or "Interface\\Icons\\INV_Sword_48", "Executioner"
+        elseif enchantID == 2673 then
+            if isMongooseActive and mongooseRem > 0.05 then
+                isThisSlotActive = true
+                thisRem = mongooseRem
+            end
+        elseif enchantID == 3225 then
+            if isExecutionerActive and executionerRem > 0.05 then
+                isThisSlotActive = true
+                thisRem = executionerRem
             end
         end
 
-        -- 3. Mongoose (Spell 28093)
-        for _, b in ipairs(bList) do
-            if b.spellId == 28093 or (b.name and (b.name == "Lightning Speed" or b.name == "Velocità Fulminea" or b.name:find("Mongoose"))) then
-                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 15
-                local dur = (b.duration and b.duration > 0) and b.duration or 15
-                return "ACTIVE", rem, dur, 1, b.icon or "Interface\\Icons\\Spell_Nature_PosisonSpike", "Mongoose"
+        if isThisSlotActive and thisRem > 0.05 then
+            if not state.isProc or (now_wk - state.lastStart > targetDur + 2) then
+                state.lastStart = now_wk - (targetDur - thisRem)
+                state.lastEnd = now_wk + thisRem
+                state.isProc = true
             end
+            return "ACTIVE", thisRem, targetDur, icon, slotLabel, true
         end
 
-        -- 4. Ashen Band of Endless Might (Spell 72412, 72414, 72416)
-        for _, b in ipairs(bList) do
-            if b.spellId == 72412 or b.spellId == 72414 or b.spellId == 72416 or (b.name and (b.name:find("Peerless") or b.name:find("Endless Might"))) then
-                local rem = (b.expirationTime and b.expirationTime > 0) and (b.expirationTime - now) or 10
-                local dur = (b.duration and b.duration > 0) and b.duration or 10
-                return "ACTIVE", rem, dur, 1, b.icon or "Interface\\Icons\\INV_Jewelry_Ring_81", "Ashen Band"
-            end
+        if state.isProc then
+            state.isProc = false
+            state.lastEnd = now_wk
         end
 
-        return "READY", 0, 0, 0, defIcon, "Enchants"
+        return "READY", 0, 0, icon, slotLabel, true
     end
 
     -- =========================================================================
@@ -741,18 +998,22 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
 
         local hasT1 = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(13)
         local hasT2 = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(14)
+        local hasRing = _G.FWHUD_CheckRingEquipped and _G.FWHUD_CheckRingEquipped()
         local hasCloak = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(15)
         local hasTier = _G.FWHUD_CheckTierSetEquipped and _G.FWHUD_CheckTierSetEquipped()
-        local hasEnchants = _G.FWHUD_CheckEnchantsEquipped and _G.FWHUD_CheckEnchantsEquipped()
+        local hasMH = _G.FWHUD_CheckWeaponEquipped and _G.FWHUD_CheckWeaponEquipped(16)
+        local hasOH = _G.FWHUD_CheckWeaponEquipped and _G.FWHUD_CheckWeaponEquipped(17)
         local hasGloves = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(10)
         local hasBoots = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(8)
 
         local activeOrder = {}
         if hasT1 then table.insert(activeOrder, "05 - Trinket 1 warDPS") end
         if hasT2 then table.insert(activeOrder, "06 - Trinket 2 warDPS") end
+        if hasRing then table.insert(activeOrder, "06b - Ring warDPS") end
         if hasCloak then table.insert(activeOrder, "07 - Cloak warDPS") end
         if hasTier then table.insert(activeOrder, "08 - Tier Set warDPS") end
-        if hasEnchants then table.insert(activeOrder, "09 - Enchants warDPS") end
+        if hasMH then table.insert(activeOrder, "09a - Weapon MH warDPS") end
+        if hasOH then table.insert(activeOrder, "09b - Weapon OH warDPS") end
         if hasGloves then table.insert(activeOrder, "10 - Gloves warDPS") end
         table.insert(activeOrder, "11 - Death Wish")
         table.insert(activeOrder, "12 - Recklessness")
@@ -760,12 +1021,32 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
 
         local N = #activeOrder
         local step = 38
-        if N >= 9 then step = 32
-        elseif N == 8 then step = 34
-        elseif N == 7 then step = 38
-        elseif N == 6 then step = 44
-        elseif N == 5 then step = 48
-        else step = 52 end
+        local targetW = 28
+        if N >= 11 then
+            step = 25
+            targetW = 24
+        elseif N == 10 then
+            step = 27
+            targetW = 26
+        elseif N == 9 then
+            step = 29
+            targetW = 28
+        elseif N == 8 then
+            step = 32
+            targetW = 28
+        elseif N == 7 then
+            step = 38
+            targetW = 28
+        elseif N == 6 then
+            step = 44
+            targetW = 28
+        elseif N == 5 then
+            step = 48
+            targetW = 28
+        else
+            step = 52
+            targetW = 28
+        end
 
         for i, id in ipairs(activeOrder) do
             local targetX = math.floor(((i - (N + 1) / 2) * step) + 0.5)
@@ -774,6 +1055,10 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
             if r and r.ClearAllPoints and r.SetPoint then
                 r:ClearAllPoints()
                 r:SetPoint("CENTER", group, "CENTER", targetX, -45)
+                if r.SetWidth and r.SetHeight then
+                    r:SetWidth(targetW)
+                    r:SetHeight(targetW)
+                end
             end
         end
     end
@@ -799,7 +1084,7 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                 local _, subEvent, _, sourceGUID, _, _, _, _, _, _, _, spellId, spellName = ...
                 if not playerGUID then playerGUID = UnitGUID("player") end
                 if sourceGUID == playerGUID then
-                    if subEvent == "SPELL_CAST_SUCCESS" or subEvent == "SPELL_AURA_APPLIED" then
+                    if subEvent == "SPELL_CAST_SUCCESS" or subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_REFRESH" then
                         local now = GetTime()
                         if spellId == 54861 or spellId == 54858 or spellId == 55016 or spellName == "Nitro Boosts" or spellName == "Acceleratori a Nitro" then
                             _G.FWHUD_ICD[8].lastStart = now
@@ -810,6 +1095,24 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                             _G.FWHUD_ICD[10].lastStart = now
                             _G.FWHUD_ICD[10].lastEnd = now + 60
                             _G.FWHUD_ICD[10].isProc = true
+                            if WeakAuras and WeakAuras.ScanEvents then WeakAuras.ScanEvents("FWHUD_ROW_UPDATE") end
+                        elseif spellId == 72412 or spellId == 72414 or spellId == 72410 or spellId == 35081 or spellName == "Frostforged Champion" or spellName == "Campione Forgiagelo" then
+                            _G.FWHUD_RingState.lastStart = now
+                            _G.FWHUD_RingState.lastEnd = now + 60
+                            _G.FWHUD_RingState.isProc = true
+                            if WeakAuras and WeakAuras.ScanEvents then WeakAuras.ScanEvents("FWHUD_ROW_UPDATE") end
+                        elseif spellId == 59620 or spellName == "Berserking" or spellName == "Furia Berserker" then
+                            local s16Active = _G.FWHUD_WeaponState[16].isProc and (_G.FWHUD_WeaponState[16].lastEnd > now)
+                            local s17Active = _G.FWHUD_WeaponState[17].isProc and (_G.FWHUD_WeaponState[17].lastEnd > now)
+                            if s16Active and not s17Active then
+                                _G.FWHUD_WeaponState[17].lastStart = now
+                                _G.FWHUD_WeaponState[17].lastEnd = now + 15
+                                _G.FWHUD_WeaponState[17].isProc = true
+                            else
+                                _G.FWHUD_WeaponState[16].lastStart = now
+                                _G.FWHUD_WeaponState[16].lastEnd = now + 15
+                                _G.FWHUD_WeaponState[16].isProc = true
+                            end
                             if WeakAuras and WeakAuras.ScanEvents then WeakAuras.ScanEvents("FWHUD_ROW_UPDATE") end
                         end
                     end
@@ -847,6 +1150,149 @@ end"""
 # =============================================================================
 # HELPER PYTHON PER TRIGGER, CUSTOM TEXT, DURATION, ICON
 # =============================================================================
+def make_ring_custom_text() -> str:
+    """Testo descrittivo del proc dell'anello (%c), con pixel glow su proc attivo e timer ICD."""
+    return """function()
+    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if _G.FWHUD_UpdateUtilityRowPositions then
+        _G.FWHUD_UpdateUtilityRowPositions()
+    end
+    if not _G.FWHUD_CheckRing then return "" end
+    local state, rem, dur, icon, isEquipped = _G.FWHUD_CheckRing()
+    local LCG = LibStub and LibStub("LibCustomGlow-1.0", true)
+    local glowKey = "FWHUD_RING_GLOW"
+    if state == "ACTIVE" then
+        if LCG and aura_env and aura_env.region then
+            LCG.PixelGlow_Start(aura_env.region, {{1, 0.85, 0.1, 1}}, 8, 0.25, 10, 2, 0, 0, false, glowKey)
+        end
+        return string.format("|cFFFFFF00%.1fs|r", rem)
+    else
+        if LCG and aura_env and aura_env.region then
+            LCG.PixelGlow_Stop(aura_env.region, glowKey)
+        end
+        if (state == "ICD" or state == "COOLDOWN") and rem > 0.1 then
+            if rem >= 60 then
+                local m = math.floor(rem / 60)
+                local s = math.floor(rem % 60)
+                return string.format("%d:%02d", m, s)
+            else
+                return string.format("%.0f", rem)
+            end
+        end
+        return ""
+    end
+end"""
+
+
+def make_ring_custom_duration() -> str:
+    """Durata e scadenza dello swipe di ricarica/ICD per l'anello."""
+    return """function()
+    if not _G.FWHUD_CheckRing then return 0, 0 end
+    local state, rem, dur = _G.FWHUD_CheckRing()
+    if (state == "ACTIVE" or state == "ICD" or state == "COOLDOWN") and rem > 0 and dur > 0 then
+        return dur, GetTime() + rem
+    end
+    return 0, 0
+end"""
+
+
+def make_ring_custom_icon() -> str:
+    """Icona dinamica dell'anello equipaggiato o del proc attivo."""
+    return """function()
+    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if _G.FWHUD_CheckRing then
+        local state, rem, dur, icon = _G.FWHUD_CheckRing()
+        if icon then return icon end
+    end
+    return "Interface\\Icons\\INV_Jewelry_Ring_81"
+end"""
+
+
+def make_ring_trigger_custom() -> str:
+    """Trigger custom per verificare se un anello con proc è equipaggiato."""
+    return """function(event, ...)
+    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if not _G.FWHUD_CheckRingEquipped then return false end
+    return _G.FWHUD_CheckRingEquipped()
+end"""
+
+
+def make_ring_untrigger_custom() -> str:
+    """Untrigger custom per l'anello con proc."""
+    return """function(event, ...)
+    if not _G.FWHUD_CheckRingEquipped then return true end
+    return not _G.FWHUD_CheckRingEquipped()
+end"""
+
+
+def make_weapon_custom_text(slot: int) -> str:
+    """Testo descrittivo dell'incanto arma (%c) per slot 16 (MH) o 17 (OH), con pixel glow su proc attivo."""
+    return f"""function()
+    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if _G.FWHUD_UpdateUtilityRowPositions then
+        _G.FWHUD_UpdateUtilityRowPositions()
+    end
+    if not _G.FWHUD_CheckWeapon then return "" end
+    local state, rem, dur, icon, slotLabel = _G.FWHUD_CheckWeapon({slot})
+    local LCG = LibStub and LibStub("LibCustomGlow-1.0", true)
+    local glowKey = "FWHUD_WEAPON_{slot}_GLOW"
+    if state == "ACTIVE" then
+        if LCG and aura_env and aura_env.region then
+            LCG.PixelGlow_Start(aura_env.region, {{{{1, 0.45, 0.1, 1}}}}, 8, 0.25, 10, 2, 0, 0, false, glowKey)
+        end
+        return string.format("|cFFFFFF00%.1fs|r", rem)
+    else
+        if LCG and aura_env and aura_env.region then
+            LCG.PixelGlow_Stop(aura_env.region, glowKey)
+        end
+        return ""
+    end
+end"""
+
+
+def make_weapon_custom_duration(slot: int) -> str:
+    """Durata e scadenza dello swipe di proc attivo per l'arma indicata."""
+    return f"""function()
+    if not _G.FWHUD_CheckWeapon then return 0, 0 end
+    local state, rem, dur = _G.FWHUD_CheckWeapon({slot})
+    if state == "ACTIVE" and rem > 0 and dur > 0 then
+        return dur, GetTime() + rem
+    end
+    return 0, 0
+end"""
+
+
+def make_weapon_custom_icon(slot: int) -> str:
+    """Icona dinamica dell'arma equipaggiata o dell'incanto attivo."""
+    return f"""function()
+    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if _G.FWHUD_CheckWeapon then
+        local state, rem, dur, icon = _G.FWHUD_CheckWeapon({slot})
+        if icon then return icon end
+    end
+    return GetInventoryItemTexture("player", {slot}) or "Interface\\Icons\\Spell_Nature_BloodLust"
+end"""
+
+
+def make_weapon_trigger_custom(slot: int) -> str:
+    """Trigger custom per verificare se l'arma nello slot 16 o 17 è equipaggiata con incanto."""
+    return f"""function(event, ...)
+    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if not _G.FWHUD_CheckWeaponEquipped then return false end
+    local hasW = _G.FWHUD_CheckWeaponEquipped({slot})
+    return hasW == true
+end"""
+
+
+def make_weapon_untrigger_custom(slot: int) -> str:
+    """Untrigger custom per l'arma."""
+    return f"""function(event, ...)
+    if not _G.FWHUD_CheckWeaponEquipped then return true end
+    local hasW = _G.FWHUD_CheckWeaponEquipped({slot})
+    return not hasW
+end"""
+
+
 def make_slot_custom_text(slot: int) -> str:
     """Testo descrittivo del monile/mantello/guanti/scarpe (%c), con pixel glow su proc attivo e riposizionamento dinamico."""
     bootstrap = f"""    _G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
@@ -1137,12 +1583,14 @@ end"""
 
 def build_utility_auras() -> list[dict]:
     """
-    Costruisce e restituisce le 9 aure della riga utility adattiva centrata a y = -45:
+    Costruisce e restituisce le 11 aure della riga utility adattiva centrata a y = -45:
     - 05 - Trinket 1 warDPS (Icon, Slot 13)
     - 06 - Trinket 2 warDPS (Icon, Slot 14)
+    - 06b - Ring warDPS (Icon, Slot 11/12 - Ashen Band / Eternal Champion)
     - 07 - Cloak warDPS (Icon, Slot 15)
     - 08 - Tier Set warDPS (Icon, T10/T8/T7 Proc & Combinazioni 2P+2P)
-    - 09 - Enchants warDPS (Icon, Berserking MH/OH x1/x2, Executioner, Mongoose, Ashen Band)
+    - 09a - Weapon MH warDPS (Icon, Slot 16 - Berserking MH, Mongoose, Executioner)
+    - 09b - Weapon OH warDPS (Icon, Slot 17 - Berserking OH, Mongoose, Executioner)
     - 10 - Gloves warDPS (Icon, Slot 10)
     - 11 - Death Wish (Icon, Spell 12292)
     - 12 - Recklessness (Icon, Spell 1719)
@@ -1235,6 +1683,48 @@ def build_utility_auras() -> list[dict]:
             ],
         },
 
+        # 06b - Ring warDPS (Slot 11 or 12 - Ashen Band / Eternal Champion)
+        {
+            "id": "06b - Ring warDPS",
+            "uid": "FWHUD_UTIL_RING",
+            "parent": "Class Warrior (Fury)",
+            "regionType": "icon",
+            "internalVersion": 52,
+            "xOffset": -84,
+            "yOffset": -45,
+            "width": 28,
+            "height": 28,
+            "displayIcon": "Interface\\Icons\\INV_Jewelry_Ring_81",
+            "cooldown": True,
+            "cooldownSwipe": True,
+            "cooldownEdge": True,
+            "cooldownTextDisabled": True,
+            "inverse": False,
+            "customTextUpdate": "update",
+            "customText": make_ring_custom_text(),
+            "triggers": {
+                1: {
+                    "trigger": {
+                        "type": "custom",
+                        "custom_type": "status",
+                        "check": "update",
+                        "events": events_list,
+                        "custom": make_ring_trigger_custom(),
+                        "customDuration": make_ring_custom_duration(),
+                        "customIcon": make_ring_custom_icon(),
+                    },
+                    "untrigger": {
+                        "custom": make_ring_untrigger_custom()
+                    }
+                },
+                "activeTriggerMode": -10,
+            },
+            "subRegions": [
+                {"type": "subbackground"},
+                make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=10),
+            ],
+        },
+
         # 07 - Cloak warDPS (Slot 15)
         {
             "id": "07 - Cloak warDPS",
@@ -1242,7 +1732,7 @@ def build_utility_auras() -> list[dict]:
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",
             "internalVersion": 52,
-            "xOffset": -84,
+            "xOffset": -56,
             "yOffset": -45,
             "width": 28,
             "height": 28,
@@ -1284,7 +1774,7 @@ def build_utility_auras() -> list[dict]:
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",
             "internalVersion": 52,
-            "xOffset": -56,
+            "xOffset": -28,
             "yOffset": -45,
             "width": 28,
             "height": 28,
@@ -1319,14 +1809,14 @@ def build_utility_auras() -> list[dict]:
             ],
         },
 
-        # 09 - Enchants warDPS (Berserking MH/OH x1/x2, Executioner, Mongoose, Ashen Band)
+        # 09a - Weapon MH warDPS (Slot 16)
         {
-            "id": "09 - Enchants warDPS",
-            "uid": "FWHUD_UTIL_ENCHANTS",
+            "id": "09a - Weapon MH warDPS",
+            "uid": "FWHUD_UTIL_WEAPON_MH",
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",
             "internalVersion": 52,
-            "xOffset": -28,
+            "xOffset": 0,
             "yOffset": -45,
             "width": 28,
             "height": 28,
@@ -1337,7 +1827,7 @@ def build_utility_auras() -> list[dict]:
             "cooldownTextDisabled": True,
             "inverse": False,
             "customTextUpdate": "update",
-            "customText": make_enchants_custom_text(),
+            "customText": make_weapon_custom_text(16),
             "triggers": {
                 1: {
                     "trigger": {
@@ -1345,18 +1835,62 @@ def build_utility_auras() -> list[dict]:
                         "custom_type": "status",
                         "check": "update",
                         "events": events_list,
-                        "custom": make_enchants_trigger_custom(),
-                        "customDuration": make_enchants_custom_duration(),
-                        "customIcon": make_enchants_custom_icon(),
+                        "custom": make_weapon_trigger_custom(16),
+                        "customDuration": make_weapon_custom_duration(16),
+                        "customIcon": make_weapon_custom_icon(16),
                     },
                     "untrigger": {
-                        "custom": make_enchants_untrigger_custom()
+                        "custom": make_weapon_untrigger_custom(16)
                     }
                 },
                 "activeTriggerMode": -10,
             },
             "subRegions": [
                 {"type": "subbackground"},
+                make_subtext("MH", justify="LEFT", anchor_point="INNER_BOTTOMLEFT", font_size=8, y_offset=1, extra_props={"text_xOffset": 2, "text_color": [1.0, 0.75, 0.2, 1.0]}),
+                make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=10),
+            ],
+        },
+
+        # 09b - Weapon OH warDPS (Slot 17)
+        {
+            "id": "09b - Weapon OH warDPS",
+            "uid": "FWHUD_UTIL_WEAPON_OH",
+            "parent": "Class Warrior (Fury)",
+            "regionType": "icon",
+            "internalVersion": 52,
+            "xOffset": 28,
+            "yOffset": -45,
+            "width": 28,
+            "height": 28,
+            "displayIcon": "Interface\\Icons\\Spell_Nature_BloodLust",
+            "cooldown": True,
+            "cooldownSwipe": True,
+            "cooldownEdge": True,
+            "cooldownTextDisabled": True,
+            "inverse": False,
+            "customTextUpdate": "update",
+            "customText": make_weapon_custom_text(17),
+            "triggers": {
+                1: {
+                    "trigger": {
+                        "type": "custom",
+                        "custom_type": "status",
+                        "check": "update",
+                        "events": events_list,
+                        "custom": make_weapon_trigger_custom(17),
+                        "customDuration": make_weapon_custom_duration(17),
+                        "customIcon": make_weapon_custom_icon(17),
+                    },
+                    "untrigger": {
+                        "custom": make_weapon_untrigger_custom(17)
+                    }
+                },
+                "activeTriggerMode": -10,
+            },
+            "subRegions": [
+                {"type": "subbackground"},
+                make_subtext("OH", justify="RIGHT", anchor_point="INNER_BOTTOMRIGHT", font_size=8, y_offset=1, extra_props={"text_xOffset": -2, "text_color": [1.0, 0.65, 0.2, 1.0]}),
                 make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=10),
             ],
         },
@@ -1368,7 +1902,7 @@ def build_utility_auras() -> list[dict]:
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",
             "internalVersion": 52,
-            "xOffset": 0,
+            "xOffset": 56,
             "yOffset": -45,
             "width": 28,
             "height": 28,
@@ -1410,7 +1944,7 @@ def build_utility_auras() -> list[dict]:
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",
             "internalVersion": 52,
-            "xOffset": 28,
+            "xOffset": 84,
             "yOffset": -45,
             "width": 28,
             "height": 28,
@@ -1454,7 +1988,7 @@ end"""
             "parent": "Class Warrior (Fury)",
             "regionType": "icon",
             "internalVersion": 52,
-            "xOffset": 56,
+            "xOffset": 112,
             "yOffset": -45,
             "width": 28,
             "height": 28,

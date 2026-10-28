@@ -19,9 +19,11 @@ def run_tests():
         "04 - Berserker Stance",
         "05 - Trinket 1 warDPS",
         "06 - Trinket 2 warDPS",
+        "06b - Ring warDPS",
         "07 - Cloak warDPS",
         "08 - Tier Set warDPS",
-        "09 - Enchants warDPS",
+        "09a - Weapon MH warDPS",
+        "09b - Weapon OH warDPS",
         "10 - Gloves warDPS",
         "11 - Death Wish",
         "12 - Recklessness",
@@ -35,7 +37,7 @@ def run_tests():
     ]
 
     ctrl = root["controlledChildren"]
-    assert len(ctrl) == 19, f"Expected 19 controlled children, got {len(ctrl)}"
+    assert len(ctrl) == 21, f"Expected 21 controlled children, got {len(ctrl)}"
     for exp in expected_children:
         assert exp in ctrl, f"Missing child in root controlledChildren: {exp}"
 

@@ -36,9 +36,23 @@ Barra orizzontale superiore (y = 52) con riposizionamento dinamico centrato, ris
 - **04 - Berserker Stance**: Allerta immediata ad alta visibilità se durante il combattimento il guerriero si trova fuori dalla Berserker Stance.
 - **Caricamento Specifico su [Rampage]**: Il talento passivo *Rampage* (Tab 2, Posizione 24 -> ID WeakAuras 64) è utilizzato come condizione di caricamento esclusiva dell'intero pacchetto: la suite si carica solo se il guerriero è specializzato Fury con Rampage attivo, e non occupa spazio visivo superfluo a schermo.
 
-### 3. Riga Utility Adattiva (`05` - `13`, da 3 a 9 Icone a y = -45)
-Fila orizzontale inferiore a y = -45 con riposizionamento e ricentratura automatica (espansione e contrazione dinamica identica a fire-mage-335a-am):
-- **05 - Trinket 1 warDPS & 06 - Trinket 2 warDPS**: Riconoscimento automatico slot 13 & 14 (con suffisso dedicato `warDPS` per prevenire sovrascritture o duplicati `2` in caso di convivenza con la suite Fire Mage). Catalogo integrato di **tutti i monili da mischia 3.3.5a** (Deathbringer's Will, Sharpened Twilight Scale, Death's Choice/Verdict, Whispering Fanged Skull, Herkuml War Token, Needle-Encrusted Scorpion, Mjolnir Runestone, Comet's Trail, Darkmoon Card: Greatness, Grim Toll, Mirror of Truth, Wrathstone, Mark of Supremacy, ecc.) con tracciamento durata attiva, Pixel Glow e conto alla rovescia ICD.
+### 3. Riga Utility Adattiva (`05` - `13`, da 3 a 11 Icone a y = -45)
+Fila orizzontale inferiore a y = -45 con riposizionamento e ricentratura automatica naturale (espansione e contrazione dinamica identica a fire-mage-335a-am, con proporzioni geometriche auto-calibrate per rimanere contenuta entro i 278px della Rage Bar):
+- **05 - Trinket 1 warDPS & 06 - Trinket 2 warDPS**: Riconoscimento automatico slot 13 & 14 (suffisso `warDPS` anti-collisione). Catalogo esaustivo di **tutti i monili da mischia 3.3.5a con ICD reali verificati online**:
+  - *Deathbringer's Will*: proc 30s, ICD reale **105s** (trasformazioni Vrykul, Taunka, Iron Dwarf con icone dinamiche).
+  - *Sharpened Twilight Scale*: proc 15s, ICD reale **45s** (+1472 / +1304 AP).
+  - *Death's Choice / Verdict*: proc 15s, ICD reale **45s** (+510 / +450 Strength).
+  - *Whispering Fanged Skull*: proc 15s, ICD reale **45s** (+1250 / +1100 AP).
+  - *Needle-Encrusted Scorpion*: proc 10s, ICD reale **45s** (+678 ArP).
+  - *Mjolnir Runestone* & *Comet's Trail*: proc 10s, ICD reale **45s** (+665 ArP / +722 Haste).
+  - *Darkmoon Card: Greatness*, *Grim Toll*, *Mirror of Truth*, *Banner of Victory*, *Meteorite Whetstone*: ICD reale **45s**.
+  - *Wrathstone*, *Mark of Supremacy*, *Incisor Fragment*: On-Use 20s, Cooldown **120s**.
+  - *Herkuml War Token*: accumulo cariche (1-20) e durata 10s, nessun ICD.
+  - Tre stati visivi: **READY** (pronto), **PROC ATTIVO** (swipe + Pixel Glow dorato) e **ICD** (timer numerico residuo e swipe di ricarica).
+- **06b - Ring warDPS**: Monitoraggio dell'anello con proc nello slot 11 o 12 (sul modello di fire-mage-335a-am):
+  - *Ashen Band of Endless Vengeance* (Item 50402/50401): Proc *Frostforged Champion* (+480 AP per 10s, ICD **60s**).
+  - *Band of the Eternal Champion* (Item 29301): Proc (+160 AP per 10s, ICD **60s**).
+  - Compare solo se equipaggiato, con Pixel Glow dorato su proc e timer di ICD.
 - **07 - Cloak warDPS**: Attivo con incanti da mischia (Swordguard Embroidery +400 AP o paracadute/flexweave).
 - **08 - Tier Set warDPS (T7 - T10 & Combinazioni Multi-Set)**: Rilevamento automatico dell'armatura Tier equipaggiata (>= 2 o >= 4 pezzi) e tracciamento proc intelligente con supporto combinazioni (es. 2P T10 + 2P T8, 2P T10 + 2P T9, 2P T8 + 2P T7):
   - **Tier 10 (Ymirjar Lord)**: 4P Siegebreaker (2 cariche e -0.5s GCD su Slam/Execute) e 2P Advantage (+16% AP per 10s da Deep Wounds/Rend).
@@ -46,11 +60,10 @@ Fila orizzontale inferiore a y = -45 con riposizionamento e ricentratura automat
   - **Tier 7 (Heroes' / Valorous Dreadnaught)**: 4P proc **Spirits of the Lost** (Spell 60176 - riduce di 5 il costo in rabbia della prossima abilità con timer e Pixel Glow); 2P passivo (+10% danno a Slam).
   - **Tier 9 (Hellscream/Wrynn)**: Bonus passivi di stance e critico.
   - **Combinazioni Multi-Set Ibride**: Valutazione dinamica in priorità di esecuzione; se più proc si attivano contemporaneamente, viene evidenziata la finestra più urgente/breve passando istantaneamente all'altro proc al consumo del primo.
-- **09 - Enchants warDPS (Armi & Anello)**: Monitoraggio in tempo reale degli incanti arma ed anello:
-  - **Berserking MH & OH**: Rilevamento singolo o doppio stack (**x2 con +800 AP complessivi**) con timer e Pixel Glow.
-  - **Executioner**: +120 Armor Penetration per 15s.
-  - **Mongoose**: +120 Agilità e 2% Haste per 15s.
-  - **Ashen Band of Endless Might**: Proc anello +480 AP per 10s (60s ICD).
+- **09a - Weapon MH warDPS & 09b - Weapon OH warDPS**: Monitoraggio indipendente degli incanti arma per Mano Primaria (Slot 16) e Mano Secondaria (Slot 17):
+  - **Berserking MH & OH**: Ciascuna arma ha la propria icona con badge dedicato (`MH` a sinistra e `OH` a destra), durata attiva 15s (+400 AP ciascuna), swipe e Pixel Glow.
+  - **Doppio Stack Visibile**: Se entrambe le armi proccano contemporaneamente, entrambe le icone si accendono evidenziando la finestra di **+800 AP complessivi**.
+  - Supporta dinamicamente anche *Executioner* (+120 ArP) e *Mongoose* (+120 Agilità e 2% Haste).
 - **10 - Gloves warDPS**: Acceleratori Ipersonici Ingegneria (+340 Haste per 12s, 60s CD).
 - **11 - Death Wish**: Durata attiva 30s (+20% danno) e cooldown.
 - **12 - Recklessness**: Tracciamento delle 3 cariche di critico garantito e cooldown.

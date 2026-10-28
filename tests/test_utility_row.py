@@ -7,14 +7,16 @@ def run_tests():
     from builder.components.utility import build_utility_auras, SHARED_WARRIOR_CORE_BOOTSTRAP_LUA
 
     auras = build_utility_auras()
-    assert len(auras) == 9, f"Expected 9 utility auras, got {len(auras)}"
+    assert len(auras) == 11, f"Expected 11 utility auras, got {len(auras)}"
 
     expected_ids = [
         "05 - Trinket 1 warDPS",
         "06 - Trinket 2 warDPS",
+        "06b - Ring warDPS",
         "07 - Cloak warDPS",
         "08 - Tier Set warDPS",
-        "09 - Enchants warDPS",
+        "09a - Weapon MH warDPS",
+        "09b - Weapon OH warDPS",
         "10 - Gloves warDPS",
         "11 - Death Wish",
         "12 - Recklessness",
@@ -47,7 +49,11 @@ def run_tests():
     assert "60176" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca spellId 60176 per Spirits of the Lost T7 4P"
     assert "Spirits of the Lost" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca stringa Spirits of the Lost nel controllo T7"
     assert "FWHUD_CheckTierSet" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione FWHUD_CheckTierSet"
-    assert "FWHUD_CheckEnchants" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione FWHUD_CheckEnchants"
+    assert "FWHUD_RingDB" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca tabella FWHUD_RingDB"
+    assert "50402" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Ashen Band 50402 nel RingDB"
+    assert "FWHUD_CheckRing" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione FWHUD_CheckRing"
+    assert "FWHUD_WeaponEnchantDB" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca FWHUD_WeaponEnchantDB"
+    assert "FWHUD_CheckWeapon" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione FWHUD_CheckWeapon"
     assert "FWHUD_UpdateUtilityRowPositions" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione di riposizionamento dinamico"
 
     print("[OK] Tutti gli 11 elementi della riga utility e il catalogo Tier Sets/Trinkets verificati con successo.")

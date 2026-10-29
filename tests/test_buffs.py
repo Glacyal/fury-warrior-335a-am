@@ -22,14 +22,21 @@ def run_tests():
     assert bs_act["parent"] == "02 - Battle Shout"
     assert bs_act["cooldown"] is True
     assert bs_act["cooldownSwipe"] is True
-    assert bs_act["triggers"][1]["trigger"]["check"] == "update", "Battle Shout Active deve usare check: update per reattivita istantanea"
+    assert bs_act["auto"] is False, "Battle Shout Active deve avere auto=False per forzare l'icona del guerriero"
+    assert bs_act["displayIcon"] == "Interface\\Icons\\Ability_Warrior_BattleShout"
+    assert "customIcon" not in bs_act["triggers"][1]["trigger"], "Non deve esserci customIcon che sovrascrive l'icona del guerriero con icone di paladino/altre classi"
+    assert bs_act["triggers"][1]["trigger"]["check"] == "update", "Battle Shout Active deve usare check: update per precisione timer"
+    assert "custom" in bs_act["triggers"][1]["untrigger"], "Battle Shout Active deve avere untrigger.custom definito per prevenire flickering"
 
     bs_off = c_map.get("02 - Battle Shout - OFF")
     assert bs_off is not None, "Missing 02 - Battle Shout - OFF"
     assert bs_off["parent"] == "02 - Battle Shout"
     assert bs_off["desaturate"] is True
     assert bs_off["color"] == [0.6, 0.6, 0.6, 0.8]
-    assert bs_off["triggers"][1]["trigger"]["check"] == "update", "Battle Shout OFF deve usare check: update per reattivita istantanea"
+    assert bs_off["auto"] is False
+    assert bs_off["displayIcon"] == "Interface\\Icons\\Ability_Warrior_BattleShout"
+    assert bs_off["triggers"][1]["trigger"]["check"] == "event", "Battle Shout OFF deve usare check: event per reagire a UNIT_AURA senza flickering OnUpdate"
+    assert "custom" in bs_off["triggers"][1]["untrigger"], "Battle Shout OFF deve avere untrigger.custom definito per nascondersi istantaneamente all'applicazione del buff"
     subtext_off = bs_off["subRegions"][1]["text_text"]
     assert "OFF" in subtext_off, f"Missing OFF label in BS OFF: {subtext_off}"
 
@@ -44,15 +51,20 @@ def run_tests():
     cs_act = c_map.get("03 - Commanding Shout - Active")
     assert cs_act is not None, "Missing 03 - Commanding Shout - Active"
     assert cs_act["parent"] == "03 - Commanding Shout"
+    assert cs_act["auto"] is False, "Commanding Shout Active deve avere auto=False per forzare l'icona del guerriero"
     assert cs_act["displayIcon"] == "Interface\\Icons\\Ability_Warrior_CommandingShout", f"Invalid icon for CS Active: {cs_act.get('displayIcon')}"
-    assert cs_act["triggers"][1]["trigger"]["check"] == "update", "Commanding Shout Active deve usare check: update per reattivita istantanea"
+    assert "customIcon" not in cs_act["triggers"][1]["trigger"], "Non deve esserci customIcon che sovrascrive l'icona del guerriero con icone di warlock/altre classi"
+    assert cs_act["triggers"][1]["trigger"]["check"] == "update", "Commanding Shout Active deve usare check: update per precisione timer"
+    assert "custom" in cs_act["triggers"][1]["untrigger"], "Commanding Shout Active deve avere untrigger.custom definito per prevenire flickering"
 
     cs_off = c_map.get("03 - Commanding Shout - OFF")
     assert cs_off is not None, "Missing 03 - Commanding Shout - OFF"
     assert cs_off["parent"] == "03 - Commanding Shout"
     assert cs_off["desaturate"] is True
+    assert cs_off["auto"] is False
     assert cs_off["displayIcon"] == "Interface\\Icons\\Ability_Warrior_CommandingShout", f"Invalid icon for CS OFF: {cs_off.get('displayIcon')}"
-    assert cs_off["triggers"][1]["trigger"]["check"] == "update", "Commanding Shout OFF deve usare check: update per reattivita istantanea"
+    assert cs_off["triggers"][1]["trigger"]["check"] == "event", "Commanding Shout OFF deve usare check: event per reagire a UNIT_AURA senza flickering OnUpdate"
+    assert "custom" in cs_off["triggers"][1]["untrigger"], "Commanding Shout OFF deve avere untrigger.custom definito per nascondersi istantaneamente all'applicazione del buff"
     subtext_cs_off = cs_off["subRegions"][1]["text_text"]
     assert "OFF" in subtext_cs_off, f"Missing OFF label in CS OFF: {subtext_cs_off}"
 
@@ -60,7 +72,7 @@ def run_tests():
     auras_str = str(auras)
     assert "Ability_Warrior_RallyingCry" not in auras_str, "Rallying Cry non esiste in 3.3.5a (aggiunto in 4.1.0)"
     assert "Spell_Holy_GreaterBlessingofMount" not in auras_str, "Spell_Holy_GreaterBlessingofMount non esiste in 3.3.5a"
-    assert "Spell_Shadow_BloodPact" not in auras_str, "Spell_Shadow_BloodPact non esiste in 3.3.5a (usare Spell_Shadow_BloodBoil o GetSpellInfo)"
+    assert "Spell_Shadow_BloodPact" not in auras_str, "Spell_Shadow_BloodPact non esiste in 3.3.5a"
 
     # 6. Berserker Stance Parent Group
     stance_grp = c_map.get("04 - Berserker Stance")
@@ -78,14 +90,14 @@ def run_tests():
 
     # 7. Check Raid Substitutes in SHARED_WARRIOR_BUFFS_LUA
     assert "hasBoM" in SHARED_WARRIOR_BUFFS_LUA, "Manca controllo BoM in SHARED_WARRIOR_BUFFS_LUA"
-    assert "Greater Blessing of Might" in SHARED_WARRIOR_BUFFS_LUA
+    assert "greater blessing of might" in SHARED_WARRIOR_BUFFS_LUA.lower()
     assert "hasBloodPact" in SHARED_WARRIOR_BUFFS_LUA, "Manca controllo Blood Pact in SHARED_WARRIOR_BUFFS_LUA"
-    assert "Patto di Sangue" in SHARED_WARRIOR_BUFFS_LUA
+    assert "patto di sangue" in SHARED_WARRIOR_BUFFS_LUA.lower()
     assert "47439" in SHARED_WARRIOR_BUFFS_LUA, "Manca spellId 47439 (Commanding Shout Rank 2) in SHARED_WARRIOR_BUFFS_LUA"
-    assert "bomIcon" in SHARED_WARRIOR_BUFFS_LUA, "Manca cattura dinamica bomIcon in SHARED_WARRIOR_BUFFS_LUA"
-    assert "csIcon" in SHARED_WARRIOR_BUFFS_LUA, "Manca cattura dinamica csIcon in SHARED_WARRIOR_BUFFS_LUA"
+    assert "ability_warrior_battleshout" in SHARED_WARRIOR_BUFFS_LUA, "Manca fallback su icona texture ability_warrior_battleshout"
+    assert "ability_warrior_commandingshout" in SHARED_WARRIOR_BUFFS_LUA, "Manca fallback su icona texture ability_warrior_commandingshout"
 
-    print("[OK] Battle Shout, Commanding Shout e Berserker Stance validati con successo (check update, icone 3.3.5a corrette).")
+    print("[OK] Battle Shout, Commanding Shout e Berserker Stance validati con successo (zero flickering, icone war esclusive, untrigger completi).")
     print("[PASS] test_buffs.py superato con successo!")
 
 if __name__ == "__main__":

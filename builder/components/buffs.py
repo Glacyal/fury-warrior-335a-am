@@ -22,10 +22,10 @@ from builder.core.helpers import make_subtext
 # =============================================================================
 # LOGICA LUA CONDIVISA: CACHE BUFF GUERRIERO & VERIFICA SOVRAPPOSIZIONI RAID
 # =============================================================================
-SHARED_WARRIOR_BUFFS_LUA = r"""function()
+SHARED_WARRIOR_BUFFS_LUA = r"""function(force)
     local now_b = GetTime()
     local c = _G.FWHUD_BuffCache
-    if c and c.time == now_b then
+    if not force and c and c.time == now_b then
         return c
     end
     c = {
@@ -36,26 +36,22 @@ SHARED_WARRIOR_BUFFS_LUA = r"""function()
         hasBoM = false,
         bomDuration = 0,
         bomExpiration = 0,
-        bomIcon = nil,
         hasBloodPact = false,
         bpDuration = 0,
         bpExpiration = 0,
-        bpIcon = nil,
         hasBattleShout = false,
         bsDuration = 0,
         bsExpiration = 0,
-        bsIcon = nil,
         hasCommandingShout = false,
         csDuration = 0,
         csExpiration = 0,
-        csIcon = nil,
     }
 
-    local bsNameLocal = select(1, GetSpellInfo(47436))
-    local csNameLocal = select(1, GetSpellInfo(47440))
-    local bomNameLocal1 = select(1, GetSpellInfo(48934))
-    local bomNameLocal2 = select(1, GetSpellInfo(19740))
-    local bpNameLocal = select(1, GetSpellInfo(47982))
+    local bsNameLocal = (GetSpellInfo and select(1, GetSpellInfo(47436))) or "Battle Shout"
+    local csNameLocal = (GetSpellInfo and select(1, GetSpellInfo(47440))) or "Commanding Shout"
+    local bomNameLocal1 = (GetSpellInfo and select(1, GetSpellInfo(48934))) or "Greater Blessing of Might"
+    local bomNameLocal2 = (GetSpellInfo and select(1, GetSpellInfo(19740))) or "Blessing of Might"
+    local bpNameLocal = (GetSpellInfo and select(1, GetSpellInfo(47982))) or "Blood Pact"
 
     for i = 1, 40 do
         local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitBuff("player", i)
@@ -77,45 +73,49 @@ SHARED_WARRIOR_BUFFS_LUA = r"""function()
         if spellId then c.bySpellId[spellId] = b end
         if name then c.byName[name] = b end
 
+        local lowerName = string.lower(name)
+        local lowerIcon = icon and string.lower(icon) or ""
+
         -- Controllo Blessing of Might / Greater Blessing of Might (Paladino: non stacka con Battle Shout)
-        if spellId == 48934 or spellId == 48932 or spellId == 25782 or spellId == 25916 or
-           spellId == 27140 or spellId == 19740 or spellId == 19834 or spellId == 19835 or
+        if spellId == 48934 or spellId == 48933 or spellId == 48932 or spellId == 48931 or
+           spellId == 27141 or spellId == 27140 or spellId == 25916 or spellId == 25782 or
+           spellId == 25291 or spellId == 19838 or spellId == 19837 or spellId == 19836 or
+           spellId == 19835 or spellId == 19834 or spellId == 19740 or
            (bomNameLocal1 and name == bomNameLocal1) or (bomNameLocal2 and name == bomNameLocal2) or
-           name == "Greater Blessing of Might" or name == "Blessing of Might" or
-           name == "Benedizione della Potenza Superiore" or name == "Benedizione della Potenza" then
+           string.find(lowerName, "might") or string.find(lowerName, "potenza") or
+           string.find(lowerIcon, "spell_holy_greaterblessingofkings") or string.find(lowerIcon, "spell_holy_fistofjustice") then
             c.hasBoM = true
             c.bomDuration = duration or 1800
             c.bomExpiration = (expirationTime and expirationTime > 0) and expirationTime or (now_b + 1800)
-            c.bomIcon = icon or select(3, GetSpellInfo(48934)) or select(3, GetSpellInfo(19740))
         end
 
         -- Controllo Blood Pact (Warlock Imp: non stacka con Commanding Shout)
         if spellId == 47982 or spellId == 47981 or spellId == 27268 or spellId == 11767 or
            spellId == 11766 or spellId == 6307 or (bpNameLocal and name == bpNameLocal) or
-           name == "Blood Pact" or name == "Patto di Sangue" then
+           string.find(lowerName, "blood pact") or string.find(lowerName, "patto di sangue") or
+           string.find(lowerIcon, "spell_shadow_bloodboil") then
             c.hasBloodPact = true
             c.bpDuration = duration or 1800
             c.bpExpiration = (expirationTime and expirationTime > 0) and expirationTime or (now_b + 1800)
-            c.bpIcon = icon or select(3, GetSpellInfo(47982))
         end
 
         -- Controllo Battle Shout
         if spellId == 47436 or spellId == 25289 or spellId == 11551 or spellId == 11550 or
            spellId == 11549 or spellId == 6192 or spellId == 5242 or spellId == 2048 or spellId == 6673 or
-           (bsNameLocal and name == bsNameLocal) or name == "Battle Shout" or name == "Urlo di Battaglia" then
+           (bsNameLocal and name == bsNameLocal) or string.find(lowerName, "battle shout") or string.find(lowerName, "urlo di battaglia") or
+           string.find(lowerIcon, "ability_warrior_battleshout") then
             c.hasBattleShout = true
             c.bsDuration = duration or 120
             c.bsExpiration = (expirationTime and expirationTime > 0) and expirationTime or (now_b + 120)
-            c.bsIcon = icon or select(3, GetSpellInfo(47436))
         end
 
         -- Controllo Commanding Shout (Rank 1: 469/45517, Rank 2: 47439, Rank 3: 47440)
         if spellId == 47440 or spellId == 47439 or spellId == 469 or spellId == 45517 or
-           (csNameLocal and name == csNameLocal) or name == "Commanding Shout" or name == "Urlo di Comando" then
+           (csNameLocal and name == csNameLocal) or string.find(lowerName, "commanding shout") or string.find(lowerName, "urlo di comando") or
+           string.find(lowerIcon, "ability_warrior_commandingshout") then
             c.hasCommandingShout = true
             c.csDuration = duration or 120
             c.csExpiration = (expirationTime and expirationTime > 0) and expirationTime or (now_b + 120)
-            c.csIcon = icon or select(3, GetSpellInfo(47440))
         end
     end
 
@@ -162,7 +162,7 @@ def build_buffs_auras() -> list[dict]:
             "width": 28,
             "height": 28,
             "displayIcon": "Interface\\Icons\\Ability_Warrior_BattleShout",
-            "auto": True,
+            "auto": False,
             "color": [1, 1, 1, 1],
             "cooldown": True,
             "cooldownSwipe": True,
@@ -197,10 +197,9 @@ end""",
                         "custom": """function()
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
     local c = _G.FWHUD_BuffCache_Func()
-    local now = GetTime()
     local exp = (c and c.hasBattleShout and c.bsExpiration) or (c and c.hasBoM and c.bomExpiration) or 0
     if exp > 0 then
-        local rem = exp - now
+        local rem = exp - GetTime()
         return rem > 0 and rem <= 30
     end
     return false
@@ -215,16 +214,19 @@ end""",
     end
     return 0, 0
 end""",
-                        "customIcon": """function()
+                    },
+                    "untrigger": {
+                        "custom": """function()
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
     local c = _G.FWHUD_BuffCache_Func()
-    if c and c.hasBoM and not c.hasBattleShout then
-        return c.bomIcon or select(3, GetSpellInfo(48934)) or select(3, GetSpellInfo(19740)) or "Interface\\Icons\\Spell_Holy_GreaterBlessingofKings"
+    local exp = (c and c.hasBattleShout and c.bsExpiration) or (c and c.hasBoM and c.bomExpiration) or 0
+    if exp > 0 then
+        local rem = exp - GetTime()
+        return not (rem > 0 and rem <= 30)
     end
-    return c.bsIcon or select(3, GetSpellInfo(47436)) or "Interface\\Icons\\Ability_Warrior_BattleShout"
-end""",
+    return true
+end"""
                     },
-                    "untrigger": {},
                 },
                 "activeTriggerMode": -10,
             },
@@ -253,16 +255,23 @@ end""",
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "update",
+                        "check": "event",
                         "events": buff_events,
-                        "custom": """function()
+                        "custom": """function(event, ...)
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func()
+    local c = _G.FWHUD_BuffCache_Func(true)
     if (c and c.hasBoM) or (c and c.hasBattleShout) then return false end
     return true
 end""",
                     },
-                    "untrigger": {},
+                    "untrigger": {
+                        "custom": """function(event, ...)
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func(true)
+    if (c and c.hasBoM) or (c and c.hasBattleShout) then return true end
+    return false
+end"""
+                    },
                 },
                 "activeTriggerMode": -10,
             },
@@ -296,7 +305,7 @@ end""",
             "width": 28,
             "height": 28,
             "displayIcon": "Interface\\Icons\\Ability_Warrior_CommandingShout",
-            "auto": True,
+            "auto": False,
             "color": [1, 1, 1, 1],
             "cooldown": True,
             "cooldownSwipe": True,
@@ -331,10 +340,9 @@ end""",
                         "custom": """function()
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
     local c = _G.FWHUD_BuffCache_Func()
-    local now = GetTime()
     local exp = (c and c.hasCommandingShout and c.csExpiration) or 0
     if exp > 0 then
-        local rem = exp - now
+        local rem = exp - GetTime()
         return rem > 0 and rem <= 30
     end
     return false
@@ -347,16 +355,19 @@ end""",
     end
     return 0, 0
 end""",
-                        "customIcon": """function()
+                    },
+                    "untrigger": {
+                        "custom": """function()
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
     local c = _G.FWHUD_BuffCache_Func()
-    if c and c.hasBloodPact and not c.hasCommandingShout then
-        return c.bpIcon or select(3, GetSpellInfo(47982)) or "Interface\\Icons\\Spell_Shadow_BloodBoil"
+    local exp = (c and c.hasCommandingShout and c.csExpiration) or 0
+    if exp > 0 then
+        local rem = exp - GetTime()
+        return not (rem > 0 and rem <= 30)
     end
-    return c.csIcon or select(3, GetSpellInfo(47440)) or "Interface\\Icons\\Ability_Warrior_CommandingShout"
-end""",
+    return true
+end"""
                     },
-                    "untrigger": {},
                 },
                 "activeTriggerMode": -10,
             },
@@ -385,16 +396,23 @@ end""",
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "update",
+                        "check": "event",
                         "events": buff_events,
-                        "custom": """function()
+                        "custom": """function(event, ...)
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func()
+    local c = _G.FWHUD_BuffCache_Func(true)
     if (c and c.hasCommandingShout) or (c and c.hasBloodPact) then return false end
     return true
 end""",
                     },
-                    "untrigger": {},
+                    "untrigger": {
+                        "custom": """function(event, ...)
+    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
+    local c = _G.FWHUD_BuffCache_Func(true)
+    if (c and c.hasCommandingShout) or (c and c.hasBloodPact) then return true end
+    return false
+end"""
+                    },
                 },
                 "activeTriggerMode": -10,
             },

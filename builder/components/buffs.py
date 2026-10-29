@@ -124,6 +124,237 @@ SHARED_WARRIOR_BUFFS_LUA = r"""function(force)
 end"""
 
 
+SHARED_GET_PLAYER_BUFFS_LUA = r"""function()
+    local now_b = GetTime()
+    local c = _G.FWHUD_BuffCache
+    if c and c.time == now_b then
+        return c
+    end
+    c = { time = now_b, bySpellId = {}, byName = {}, list = {} }
+    for i = 1, 40 do
+        local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitBuff("player", i)
+        if not name then break end
+        local b = {
+            name = name,
+            rank = rank,
+            icon = icon,
+            count = count,
+            debuffType = debuffType,
+            duration = duration,
+            expirationTime = expirationTime,
+            unitCaster = unitCaster,
+            isStealable = isStealable,
+            shouldConsolidate = shouldConsolidate,
+            spellId = spellId,
+        }
+        c.list[#c.list + 1] = b
+        if spellId then c.bySpellId[spellId] = b end
+        if name then c.byName[name] = b end
+    end
+    _G.FWHUD_BuffCache = c
+    return c
+end"""
+
+
+# =============================================================================
+# HELPER LUA: BATTLE SHOUT ACTIVE (ARCHITETTURA IDENTICA A MOLTEN ARMOR)
+# =============================================================================
+BS_BUFF_LOOKUP_LUA = """local b = c.bySpellId[47436] or c.bySpellId[25289] or c.bySpellId[11551] or c.bySpellId[11550] or c.bySpellId[11549] or c.bySpellId[6192] or c.bySpellId[5242] or c.bySpellId[2048] or c.bySpellId[6673]
+        or c.bySpellId[48934] or c.bySpellId[48933] or c.bySpellId[48932] or c.bySpellId[48931] or c.bySpellId[27141] or c.bySpellId[27140] or c.bySpellId[25916] or c.bySpellId[25782] or c.bySpellId[25291] or c.bySpellId[19838] or c.bySpellId[19837] or c.bySpellId[19836] or c.bySpellId[19835] or c.bySpellId[19834] or c.bySpellId[19740]
+        or c.byName["Battle Shout"] or c.byName["Urlo di Battaglia"]
+        or c.byName["Greater Blessing of Might"] or c.byName["Blessing of Might"]
+        or c.byName["Benedizione della Potenza Superiore"] or c.byName["Benedizione della Potenza"]"""
+
+
+def make_bs_custom_text() -> str:
+    """Conto alla rovescia formattato per Battle Shout (visibile quando rem <= 30)."""
+    return f"""function()
+    _G.FWHUD_GetPlayerBuffs = _G.FWHUD_GetPlayerBuffs or {SHARED_GET_PLAYER_BUFFS_LUA}
+    local c = _G.FWHUD_GetPlayerBuffs()
+    {BS_BUFF_LOOKUP_LUA}
+    if b and b.expirationTime and b.expirationTime > 0 then
+        local rem = b.expirationTime - GetTime()
+        if rem > 60 then
+            local m = math.floor(rem / 60)
+            local s = math.floor(rem % 60)
+            return string.format("|cFFFFFF00%d:%02d|r", m, s)
+        elseif rem > 0 then
+            return string.format("|cFFFF4444%.0fs|r", rem)
+        end
+    end
+    return ""
+end"""
+
+
+def make_bs_trigger() -> str:
+    """Trigger Lua per Battle Shout Active con schedulazione timer su soglia 30s (zero sfarfallio)."""
+    return f"""function(event, ...)
+    _G.FWHUD_GetPlayerBuffs = _G.FWHUD_GetPlayerBuffs or {SHARED_GET_PLAYER_BUFFS_LUA}
+    local now = GetTime()
+    local c = _G.FWHUD_GetPlayerBuffs()
+    {BS_BUFF_LOOKUP_LUA}
+    if b and b.expirationTime and b.expirationTime > 0 then
+        local rem = b.expirationTime - now
+        if rem > 30 then
+            local delay = rem - 30
+            if _G.FWHUD_BS_ScheduledExp ~= b.expirationTime then
+                _G.FWHUD_BS_ScheduledExp = b.expirationTime
+                _G.FWHUD_BS_TimerSeq = (_G.FWHUD_BS_TimerSeq or 0) + 1
+                local mySeq = _G.FWHUD_BS_TimerSeq
+                local timerAfter = (C_Timer and C_Timer.After) or (_G.C_Timer and _G.C_Timer.After)
+                if timerAfter then
+                    timerAfter(delay, function()
+                        if _G.FWHUD_BS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
+                            WeakAuras.ScanEvents("FWHUD_BS_THRESHOLD")
+                        end
+                    end)
+                elseif WeakAuras and WeakAuras.timer and WeakAuras.timer.ScheduleTimer then
+                    WeakAuras.timer:ScheduleTimer(function()
+                        if _G.FWHUD_BS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
+                            WeakAuras.ScanEvents("FWHUD_BS_THRESHOLD")
+                        end
+                    end, delay)
+                end
+            end
+            return false
+        elseif rem > 0 then
+            _G.FWHUD_BS_ScheduledExp = nil
+            return true
+        end
+    end
+    _G.FWHUD_BS_ScheduledExp = nil
+    _G.FWHUD_BS_TimerSeq = (_G.FWHUD_BS_TimerSeq or 0) + 1
+    return false
+end"""
+
+
+def make_bs_custom_duration() -> str:
+    """Durata e scadenza per lo swipe cooldown di Battle Shout."""
+    return f"""function()
+    _G.FWHUD_GetPlayerBuffs = _G.FWHUD_GetPlayerBuffs or {SHARED_GET_PLAYER_BUFFS_LUA}
+    local c = _G.FWHUD_GetPlayerBuffs()
+    {BS_BUFF_LOOKUP_LUA}
+    if b then
+        return b.duration or 120, b.expirationTime
+    end
+    return 0, 0
+end"""
+
+
+def make_bs_untrigger() -> str:
+    """Untrigger Lua per Battle Shout Active."""
+    return f"""function(event, ...)
+    _G.FWHUD_GetPlayerBuffs = _G.FWHUD_GetPlayerBuffs or {SHARED_GET_PLAYER_BUFFS_LUA}
+    local now = GetTime()
+    local c = _G.FWHUD_GetPlayerBuffs()
+    {BS_BUFF_LOOKUP_LUA}
+    if b and b.expirationTime and b.expirationTime > 0 then
+        local rem = b.expirationTime - now
+        return not (rem > 0 and rem <= 30)
+    end
+    return true
+end"""
+
+
+# =============================================================================
+# HELPER LUA: COMMANDING SHOUT ACTIVE (ARCHITETTURA IDENTICA A MOLTEN ARMOR)
+# =============================================================================
+CS_BUFF_LOOKUP_LUA = """local b = c.bySpellId[47440] or c.bySpellId[47439] or c.bySpellId[469] or c.bySpellId[45517]
+        or c.bySpellId[47982] or c.bySpellId[47981] or c.bySpellId[27268] or c.bySpellId[11767] or c.bySpellId[11766] or c.bySpellId[6307]
+        or c.byName["Commanding Shout"] or c.byName["Urlo di Comando"]
+        or c.byName["Blood Pact"] or c.byName["Patto di Sangue"]"""
+
+
+def make_cs_custom_text() -> str:
+    """Conto alla rovescia formattato per Commanding Shout (visibile quando rem <= 30)."""
+    return f"""function()
+    _G.FWHUD_GetPlayerBuffs = _G.FWHUD_GetPlayerBuffs or {SHARED_GET_PLAYER_BUFFS_LUA}
+    local c = _G.FWHUD_GetPlayerBuffs()
+    {CS_BUFF_LOOKUP_LUA}
+    if b and b.expirationTime and b.expirationTime > 0 then
+        local rem = b.expirationTime - GetTime()
+        if rem > 60 then
+            local m = math.floor(rem / 60)
+            local s = math.floor(rem % 60)
+            return string.format("|cFFFFFF00%d:%02d|r", m, s)
+        elseif rem > 0 then
+            return string.format("|cFFFF4444%.0fs|r", rem)
+        end
+    end
+    return ""
+end"""
+
+
+def make_cs_trigger() -> str:
+    """Trigger Lua per Commanding Shout Active con schedulazione timer su soglia 30s (zero sfarfallio)."""
+    return f"""function(event, ...)
+    _G.FWHUD_GetPlayerBuffs = _G.FWHUD_GetPlayerBuffs or {SHARED_GET_PLAYER_BUFFS_LUA}
+    local now = GetTime()
+    local c = _G.FWHUD_GetPlayerBuffs()
+    {CS_BUFF_LOOKUP_LUA}
+    if b and b.expirationTime and b.expirationTime > 0 then
+        local rem = b.expirationTime - now
+        if rem > 30 then
+            local delay = rem - 30
+            if _G.FWHUD_CS_ScheduledExp ~= b.expirationTime then
+                _G.FWHUD_CS_ScheduledExp = b.expirationTime
+                _G.FWHUD_CS_TimerSeq = (_G.FWHUD_CS_TimerSeq or 0) + 1
+                local mySeq = _G.FWHUD_CS_TimerSeq
+                local timerAfter = (C_Timer and C_Timer.After) or (_G.C_Timer and _G.C_Timer.After)
+                if timerAfter then
+                    timerAfter(delay, function()
+                        if _G.FWHUD_CS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
+                            WeakAuras.ScanEvents("FWHUD_CS_THRESHOLD")
+                        end
+                    end)
+                elseif WeakAuras and WeakAuras.timer and WeakAuras.timer.ScheduleTimer then
+                    WeakAuras.timer:ScheduleTimer(function()
+                        if _G.FWHUD_CS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
+                            WeakAuras.ScanEvents("FWHUD_CS_THRESHOLD")
+                        end
+                    end, delay)
+                end
+            end
+            return false
+        elseif rem > 0 then
+            _G.FWHUD_CS_ScheduledExp = nil
+            return true
+        end
+    end
+    _G.FWHUD_CS_ScheduledExp = nil
+    _G.FWHUD_CS_TimerSeq = (_G.FWHUD_CS_TimerSeq or 0) + 1
+    return false
+end"""
+
+
+def make_cs_custom_duration() -> str:
+    """Durata e scadenza per lo swipe cooldown di Commanding Shout."""
+    return f"""function()
+    _G.FWHUD_GetPlayerBuffs = _G.FWHUD_GetPlayerBuffs or {SHARED_GET_PLAYER_BUFFS_LUA}
+    local c = _G.FWHUD_GetPlayerBuffs()
+    {CS_BUFF_LOOKUP_LUA}
+    if b then
+        return b.duration or 120, b.expirationTime
+    end
+    return 0, 0
+end"""
+
+
+def make_cs_untrigger() -> str:
+    """Untrigger Lua per Commanding Shout Active."""
+    return f"""function(event, ...)
+    _G.FWHUD_GetPlayerBuffs = _G.FWHUD_GetPlayerBuffs or {SHARED_GET_PLAYER_BUFFS_LUA}
+    local now = GetTime()
+    local c = _G.FWHUD_GetPlayerBuffs()
+    {CS_BUFF_LOOKUP_LUA}
+    if b and b.expirationTime and b.expirationTime > 0 then
+        local rem = b.expirationTime - now
+        return not (rem > 0 and rem <= 30)
+    end
+    return true
+end"""
+
+
 def build_buffs_auras() -> list[dict]:
     """
     Costruisce e restituisce le 6 aure (3 gruppi con figli Active e OFF) relative ai buff passivi e alla stance:
@@ -131,10 +362,6 @@ def build_buffs_auras() -> list[dict]:
     - 03 - Commanding Shout (Active + OFF)
     - 04 - Berserker Stance (OutOfStance)
     """
-    buff_events = "UNIT_AURA:player,PLAYER_REGEN_DISABLED,PLAYER_REGEN_ENABLED,PLAYER_ENTERING_WORLD"
-    bs_active_events = "UNIT_AURA:player,PLAYER_ENTERING_WORLD,FWHUD_BS_THRESHOLD"
-    cs_active_events = "UNIT_AURA:player,PLAYER_ENTERING_WORLD,FWHUD_CS_THRESHOLD"
-
     return [
         # =====================================================================
         # 02 - BATTLE SHOUT (Gruppo Madre a x = -222, y = 0)
@@ -170,99 +397,31 @@ def build_buffs_auras() -> list[dict]:
             "cooldownSwipe": True,
             "cooldownEdge": True,
             "cooldownTextDisabled": True,
+            "inverse": False,
             "customTextUpdate": "update",
-            "customText": """function()
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func()
-    local exp = (c and c.hasBattleShout and c.bsExpiration) or (c and c.hasBoM and c.bomExpiration) or 0
-    if exp > 0 then
-        local rem = exp - GetTime()
-        if rem > 60 then
-            return string.format("|cFFFFFF00%d:%02d|r", math.floor(rem / 60), math.floor(rem % 60))
-        elseif rem > 0 then
-            return string.format("|cFFFF4444%.0fs|r", rem)
-        end
-    end
-    return ""
-end""",
-            "subRegions": [
-                {"type": "subbackground"},
-                make_subtext("%c", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=0),
-            ],
+            "customText": make_bs_custom_text(),
             "triggers": {
                 1: {
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
                         "check": "event",
-                        "events": bs_active_events,
-                        "custom": """function(event, ...)
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local now = GetTime()
-    local c = _G.FWHUD_BuffCache_Func(true)
-    local exp = (c and c.hasBattleShout and c.bsExpiration) or (c and c.hasBoM and c.bomExpiration) or 0
-    if exp > 0 then
-        local rem = exp - now
-        if rem > 30 then
-            local delay = rem - 30
-            if _G.FWHUD_BS_ScheduledExp ~= exp then
-                _G.FWHUD_BS_ScheduledExp = exp
-                _G.FWHUD_BS_TimerSeq = (_G.FWHUD_BS_TimerSeq or 0) + 1
-                local mySeq = _G.FWHUD_BS_TimerSeq
-                local scheduleFunc = (C_Timer and C_Timer.After) or (_G.C_Timer and _G.C_Timer.After)
-                if scheduleFunc then
-                    scheduleFunc(delay, function()
-                        if _G.FWHUD_BS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
-                            WeakAuras.ScanEvents("FWHUD_BS_THRESHOLD")
-                        end
-                    end)
-                elseif WeakAuras and WeakAuras.timer and WeakAuras.timer.ScheduleTimer then
-                    WeakAuras.timer:ScheduleTimer(function()
-                        if _G.FWHUD_BS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
-                            WeakAuras.ScanEvents("FWHUD_BS_THRESHOLD")
-                        end
-                    end, delay)
-                end
-            end
-            return false
-        elseif rem > 0 then
-            _G.FWHUD_BS_ScheduledExp = nil
-            return true
-        end
-    end
-    _G.FWHUD_BS_ScheduledExp = nil
-    _G.FWHUD_BS_TimerSeq = (_G.FWHUD_BS_TimerSeq or 0) + 1
-    return false
-end""",
-                        "customDuration": """function()
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func()
-    if c and c.hasBattleShout and c.bsExpiration and c.bsExpiration > 0 then
-        return c.bsDuration or 120, c.bsExpiration
-    elseif c and c.hasBoM and c.bomExpiration and c.bomExpiration > 0 then
-        return c.bomDuration or 1800, c.bomExpiration
-    end
-    return 0, 0
-end""",
+                        "events": "UNIT_AURA,PLAYER_ENTERING_WORLD,FWHUD_BS_THRESHOLD",
+                        "custom": make_bs_trigger(),
+                        "customDuration": make_bs_custom_duration(),
                     },
                     "untrigger": {
-                        "custom": """function(event, ...)
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local now = GetTime()
-    local c = _G.FWHUD_BuffCache_Func(true)
-    local exp = (c and c.hasBattleShout and c.bsExpiration) or (c and c.hasBoM and c.bomExpiration) or 0
-    if exp > 0 then
-        local rem = exp - now
-        return not (rem > 0 and rem <= 30)
-    end
-    return true
-end"""
+                        "custom": make_bs_untrigger(),
                     },
                 },
                 "activeTriggerMode": -10,
             },
+            "subRegions": [
+                {"type": "subbackground"},
+                make_subtext("%c", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=0),
+            ],
         },
-        # 02 - OFF (Visibile SIA in combat CHE out of combat quando manca sia Battle Shout che BoM/GBoM)
+        # 02 - OFF (Architettura nativa aura2 con showOnMissing e controllo sovrapposizioni BoM/GBoM)
         {
             "id": "02 - Battle Shout - OFF",
             "uid": "FWHUD_BS_OFF",
@@ -277,35 +436,31 @@ end"""
             "auto": False,
             "desaturate": True,
             "color": [0.6, 0.6, 0.6, 0.8],
+            "triggers": {
+                1: {
+                    "trigger": {
+                        "type": "aura2",
+                        "unit": "player",
+                        "auranames": [
+                            "Battle Shout",
+                            "Urlo di Battaglia",
+                            "Greater Blessing of Might",
+                            "Blessing of Might",
+                            "Benedizione della Potenza Superiore",
+                            "Benedizione della Potenza",
+                        ],
+                        "useName": True,
+                        "debuffType": "HELPFUL",
+                        "matchesShowOn": "showOnMissing",
+                    },
+                    "untrigger": {},
+                },
+                "activeTriggerMode": -10,
+            },
             "subRegions": [
                 {"type": "subbackground"},
                 make_subtext("|cFFFF4444OFF|r", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=1),
             ],
-            "triggers": {
-                1: {
-                    "trigger": {
-                        "type": "custom",
-                        "custom_type": "status",
-                        "check": "event",
-                        "events": buff_events,
-                        "custom": """function(event, ...)
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func(true)
-    if (c and c.hasBoM) or (c and c.hasBattleShout) then return false end
-    return true
-end""",
-                    },
-                    "untrigger": {
-                        "custom": """function(event, ...)
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func(true)
-    if (c and c.hasBoM) or (c and c.hasBattleShout) then return true end
-    return false
-end"""
-                    },
-                },
-                "activeTriggerMode": -10,
-            },
         },
 
         # =====================================================================
@@ -342,99 +497,31 @@ end"""
             "cooldownSwipe": True,
             "cooldownEdge": True,
             "cooldownTextDisabled": True,
+            "inverse": False,
             "customTextUpdate": "update",
-            "customText": """function()
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func()
-    local exp = (c and c.hasCommandingShout and c.csExpiration) or 0
-    if exp > 0 then
-        local rem = exp - GetTime()
-        if rem > 60 then
-            return string.format("|cFFFFFF00%d:%02d|r", math.floor(rem / 60), math.floor(rem % 60))
-        elseif rem > 0 then
-            return string.format("|cFFFF4444%.0fs|r", rem)
-        end
-    end
-    return ""
-end""",
-            "subRegions": [
-                {"type": "subbackground"},
-                make_subtext("%c", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=0),
-            ],
+            "customText": make_cs_custom_text(),
             "triggers": {
                 1: {
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
                         "check": "event",
-                        "events": cs_active_events,
-                        "custom": """function(event, ...)
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local now = GetTime()
-    local c = _G.FWHUD_BuffCache_Func(true)
-    local exp = (c and c.hasCommandingShout and c.csExpiration) or (c and c.hasBloodPact and c.bpExpiration) or 0
-    if exp > 0 then
-        local rem = exp - now
-        if rem > 30 then
-            local delay = rem - 30
-            if _G.FWHUD_CS_ScheduledExp ~= exp then
-                _G.FWHUD_CS_ScheduledExp = exp
-                _G.FWHUD_CS_TimerSeq = (_G.FWHUD_CS_TimerSeq or 0) + 1
-                local mySeq = _G.FWHUD_CS_TimerSeq
-                local scheduleFunc = (C_Timer and C_Timer.After) or (_G.C_Timer and _G.C_Timer.After)
-                if scheduleFunc then
-                    scheduleFunc(delay, function()
-                        if _G.FWHUD_CS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
-                            WeakAuras.ScanEvents("FWHUD_CS_THRESHOLD")
-                        end
-                    end)
-                elseif WeakAuras and WeakAuras.timer and WeakAuras.timer.ScheduleTimer then
-                    WeakAuras.timer:ScheduleTimer(function()
-                        if _G.FWHUD_CS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
-                            WeakAuras.ScanEvents("FWHUD_CS_THRESHOLD")
-                        end
-                    end, delay)
-                end
-            end
-            return false
-        elseif rem > 0 then
-            _G.FWHUD_CS_ScheduledExp = nil
-            return true
-        end
-    end
-    _G.FWHUD_CS_ScheduledExp = nil
-    _G.FWHUD_CS_TimerSeq = (_G.FWHUD_CS_TimerSeq or 0) + 1
-    return false
-end""",
-                        "customDuration": """function()
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func()
-    if c and c.hasCommandingShout and c.csExpiration and c.csExpiration > 0 then
-        return c.csDuration or 120, c.csExpiration
-    elseif c and c.hasBloodPact and c.bpExpiration and c.bpExpiration > 0 then
-        return c.bpDuration or 1800, c.bpExpiration
-    end
-    return 0, 0
-end""",
+                        "events": "UNIT_AURA,PLAYER_ENTERING_WORLD,FWHUD_CS_THRESHOLD",
+                        "custom": make_cs_trigger(),
+                        "customDuration": make_cs_custom_duration(),
                     },
                     "untrigger": {
-                        "custom": """function(event, ...)
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local now = GetTime()
-    local c = _G.FWHUD_BuffCache_Func(true)
-    local exp = (c and c.hasCommandingShout and c.csExpiration) or (c and c.hasBloodPact and c.bpExpiration) or 0
-    if exp > 0 then
-        local rem = exp - now
-        return not (rem > 0 and rem <= 30)
-    end
-    return true
-end"""
+                        "custom": make_cs_untrigger(),
                     },
                 },
                 "activeTriggerMode": -10,
             },
+            "subRegions": [
+                {"type": "subbackground"},
+                make_subtext("%c", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=0),
+            ],
         },
-        # 03 - OFF (Visibile SIA in combat CHE out of combat quando manca sia Commanding Shout che Blood Pact)
+        # 03 - OFF (Architettura nativa aura2 con showOnMissing e controllo sovrapposizioni Blood Pact)
         {
             "id": "03 - Commanding Shout - OFF",
             "uid": "FWHUD_CS_OFF",
@@ -449,35 +536,29 @@ end"""
             "auto": False,
             "desaturate": True,
             "color": [0.6, 0.6, 0.6, 0.8],
+            "triggers": {
+                1: {
+                    "trigger": {
+                        "type": "aura2",
+                        "unit": "player",
+                        "auranames": [
+                            "Commanding Shout",
+                            "Urlo di Comando",
+                            "Blood Pact",
+                            "Patto di Sangue",
+                        ],
+                        "useName": True,
+                        "debuffType": "HELPFUL",
+                        "matchesShowOn": "showOnMissing",
+                    },
+                    "untrigger": {},
+                },
+                "activeTriggerMode": -10,
+            },
             "subRegions": [
                 {"type": "subbackground"},
                 make_subtext("|cFFFF4444OFF|r", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=1),
             ],
-            "triggers": {
-                1: {
-                    "trigger": {
-                        "type": "custom",
-                        "custom_type": "status",
-                        "check": "event",
-                        "events": buff_events,
-                        "custom": """function(event, ...)
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func(true)
-    if (c and c.hasCommandingShout) or (c and c.hasBloodPact) then return false end
-    return true
-end""",
-                    },
-                    "untrigger": {
-                        "custom": """function(event, ...)
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func(true)
-    if (c and c.hasCommandingShout) or (c and c.hasBloodPact) then return true end
-    return false
-end"""
-                    },
-                },
-                "activeTriggerMode": -10,
-            },
         },
 
         # =====================================================================
@@ -516,21 +597,13 @@ end"""
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
-                        "events": "UPDATE_SHAPESHIFT_FORM,PLAYER_REGEN_DISABLED,PLAYER_REGEN_ENABLED,PLAYER_ENTERING_WORLD",
-                        "custom": """function(event, ...)
-                            local inCombat = UnitAffectingCombat("player")
-                            local form = GetShapeshiftForm()
-                            return inCombat and (form ~= 3)
-                        end""",
+                        "check": "update",
+                        "custom": """function()
+    local form = GetShapeshiftForm()
+    return form ~= 3 and UnitAffectingCombat("player")
+end""",
                     },
-                    "untrigger": {
-                        "custom": """function(event, ...)
-                            local inCombat = UnitAffectingCombat("player")
-                            local form = GetShapeshiftForm()
-                            return (not inCombat) or (form == 3)
-                        end"""
-                    }
+                    "untrigger": {},
                 },
                 "activeTriggerMode": -10,
             },

@@ -36,9 +36,10 @@ def run_tests():
     assert bs_off["color"] == [0.6, 0.6, 0.6, 0.8]
     assert bs_off["auto"] is False
     assert bs_off["displayIcon"] == "Interface\\Icons\\Ability_Warrior_BattleShout"
-    assert bs_off["triggers"][1]["trigger"]["check"] == "event", "Battle Shout OFF deve usare check: event per reagire a UNIT_AURA:player senza flickering OnUpdate"
-    assert "UNIT_AURA:player" in bs_off["triggers"][1]["trigger"]["events"], "Battle Shout OFF deve registrare UNIT_AURA:player"
-    assert "custom" in bs_off["triggers"][1]["untrigger"], "Battle Shout OFF deve avere untrigger.custom definito per nascondersi istantaneamente all'applicazione del buff"
+    assert bs_off["triggers"][1]["trigger"]["type"] == "aura2", "Battle Shout OFF deve usare il trigger nativo aura2 come Molten Armor"
+    assert bs_off["triggers"][1]["trigger"]["matchesShowOn"] == "showOnMissing", "Battle Shout OFF deve usare matchesShowOn: showOnMissing"
+    bs_auras = bs_off["triggers"][1]["trigger"]["auranames"]
+    assert "Battle Shout" in bs_auras and "Greater Blessing of Might" in bs_auras, "Battle Shout OFF deve verificare Battle Shout e BoM/GBoM in auranames"
     subtext_off = bs_off["subRegions"][1]["text_text"]
     assert "OFF" in subtext_off, f"Missing OFF label in BS OFF: {subtext_off}"
 
@@ -66,15 +67,15 @@ def run_tests():
     assert cs_off["desaturate"] is True
     assert cs_off["auto"] is False
     assert cs_off["displayIcon"] == "Interface\\Icons\\Ability_Warrior_RallyingCry", f"Invalid icon for CS OFF: {cs_off.get('displayIcon')}"
-    assert cs_off["triggers"][1]["trigger"]["check"] == "event", "Commanding Shout OFF deve usare check: event per reagire a UNIT_AURA:player senza flickering OnUpdate"
-    assert "UNIT_AURA:player" in cs_off["triggers"][1]["trigger"]["events"], "Commanding Shout OFF deve registrare UNIT_AURA:player"
-    assert "custom" in cs_off["triggers"][1]["untrigger"], "Commanding Shout OFF deve avere untrigger.custom definito per nascondersi istantaneamente all'applicazione del buff"
+    assert cs_off["triggers"][1]["trigger"]["type"] == "aura2", "Commanding Shout OFF deve usare il trigger nativo aura2 come Molten Armor"
+    assert cs_off["triggers"][1]["trigger"]["matchesShowOn"] == "showOnMissing", "Commanding Shout OFF deve usare matchesShowOn: showOnMissing"
+    cs_auras = cs_off["triggers"][1]["trigger"]["auranames"]
+    assert "Commanding Shout" in cs_auras and "Blood Pact" in cs_auras, "Commanding Shout OFF deve verificare Commanding Shout e Blood Pact in auranames"
     subtext_cs_off = cs_off["subRegions"][1]["text_text"]
     assert "OFF" in subtext_cs_off, f"Missing OFF label in CS OFF: {subtext_cs_off}"
 
     # 5. Texture & Spell ID Integrity (No Cataclysm Rallying Cry or typos)
     auras_str = str(auras)
-    # Note: Ability_Warrior_RallyingCry icon is the exact graphic of Commanding Shout (bearded man shouting)
     assert "Spell_Holy_GreaterBlessingofMount" not in auras_str, "Spell_Holy_GreaterBlessingofMount non esiste in 3.3.5a"
     assert "Spell_Shadow_BloodPact" not in auras_str, "Spell_Shadow_BloodPact non esiste in 3.3.5a"
 
@@ -102,7 +103,7 @@ def run_tests():
     assert "ability_warrior_commandingshout" in SHARED_WARRIOR_BUFFS_LUA, "Manca fallback su icona texture ability_warrior_commandingshout"
     assert "ability_warrior_rallyingcry" in SHARED_WARRIOR_BUFFS_LUA, "Manca fallback su icona texture ability_warrior_rallyingcry"
 
-    print("[OK] Battle Shout, Commanding Shout e Berserker Stance validati con successo (zero flickering, icone war esclusive, untrigger completi).")
+    print("[OK] Battle Shout, Commanding Shout e Berserker Stance validati con successo (zero flickering, architettura aura2 identica a Molten Armor, icone war autentiche).")
     print("[PASS] test_buffs.py superato con successo!")
 
 if __name__ == "__main__":

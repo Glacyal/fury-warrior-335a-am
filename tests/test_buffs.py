@@ -25,7 +25,8 @@ def run_tests():
     assert bs_act["auto"] is False, "Battle Shout Active deve avere auto=False per forzare l'icona del guerriero"
     assert bs_act["displayIcon"] == "Interface\\Icons\\Ability_Warrior_BattleShout"
     assert "customIcon" not in bs_act["triggers"][1]["trigger"], "Non deve esserci customIcon che sovrascrive l'icona del guerriero con icone di paladino/altre classi"
-    assert bs_act["triggers"][1]["trigger"]["check"] == "update", "Battle Shout Active deve usare check: update per precisione timer"
+    assert bs_act["triggers"][1]["trigger"]["check"] == "event", "Battle Shout Active deve usare check: event per architettura stabile come Fire Mage"
+    assert "FWHUD_BS_THRESHOLD" in bs_act["triggers"][1]["trigger"]["events"], "Battle Shout Active deve registrare FWHUD_BS_THRESHOLD"
     assert "custom" in bs_act["triggers"][1]["untrigger"], "Battle Shout Active deve avere untrigger.custom definito per prevenire flickering"
 
     bs_off = c_map.get("02 - Battle Shout - OFF")
@@ -55,7 +56,8 @@ def run_tests():
     assert cs_act["auto"] is False, "Commanding Shout Active deve avere auto=False per forzare l'icona del guerriero"
     assert cs_act["displayIcon"] == "Interface\\Icons\\Ability_Warrior_RallyingCry", f"Invalid icon for CS Active: {cs_act.get('displayIcon')}"
     assert "customIcon" not in cs_act["triggers"][1]["trigger"], "Non deve esserci customIcon che sovrascrive l'icona del guerriero con icone di warlock/altre classi"
-    assert cs_act["triggers"][1]["trigger"]["check"] == "update", "Commanding Shout Active deve usare check: update per precisione timer"
+    assert cs_act["triggers"][1]["trigger"]["check"] == "event", "Commanding Shout Active deve usare check: event per architettura stabile come Fire Mage"
+    assert "FWHUD_CS_THRESHOLD" in cs_act["triggers"][1]["trigger"]["events"], "Commanding Shout Active deve registrare FWHUD_CS_THRESHOLD"
     assert "custom" in cs_act["triggers"][1]["untrigger"], "Commanding Shout Active deve avere untrigger.custom definito per prevenire flickering"
 
     cs_off = c_map.get("03 - Commanding Shout - OFF")

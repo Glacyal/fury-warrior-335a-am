@@ -132,6 +132,8 @@ def build_buffs_auras() -> list[dict]:
     - 04 - Berserker Stance (OutOfStance)
     """
     buff_events = "UNIT_AURA:player,PLAYER_REGEN_DISABLED,PLAYER_REGEN_ENABLED,PLAYER_ENTERING_WORLD"
+    bs_active_events = "UNIT_AURA:player,PLAYER_ENTERING_WORLD,FWHUD_BS_THRESHOLD"
+    cs_active_events = "UNIT_AURA:player,PLAYER_ENTERING_WORLD,FWHUD_CS_THRESHOLD"
 
     return [
         # =====================================================================
@@ -192,16 +194,44 @@ end""",
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "update",
-                        "events": buff_events,
-                        "custom": """function()
+                        "check": "event",
+                        "events": bs_active_events,
+                        "custom": """function(event, ...)
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func()
+    local now = GetTime()
+    local c = _G.FWHUD_BuffCache_Func(true)
     local exp = (c and c.hasBattleShout and c.bsExpiration) or (c and c.hasBoM and c.bomExpiration) or 0
     if exp > 0 then
-        local rem = exp - GetTime()
-        return rem > 0 and rem <= 30
+        local rem = exp - now
+        if rem > 30 then
+            local delay = rem - 30
+            if _G.FWHUD_BS_ScheduledExp ~= exp then
+                _G.FWHUD_BS_ScheduledExp = exp
+                _G.FWHUD_BS_TimerSeq = (_G.FWHUD_BS_TimerSeq or 0) + 1
+                local mySeq = _G.FWHUD_BS_TimerSeq
+                local scheduleFunc = (C_Timer and C_Timer.After) or (_G.C_Timer and _G.C_Timer.After)
+                if scheduleFunc then
+                    scheduleFunc(delay, function()
+                        if _G.FWHUD_BS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
+                            WeakAuras.ScanEvents("FWHUD_BS_THRESHOLD")
+                        end
+                    end)
+                elseif WeakAuras and WeakAuras.timer and WeakAuras.timer.ScheduleTimer then
+                    WeakAuras.timer:ScheduleTimer(function()
+                        if _G.FWHUD_BS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
+                            WeakAuras.ScanEvents("FWHUD_BS_THRESHOLD")
+                        end
+                    end, delay)
+                end
+            end
+            return false
+        elseif rem > 0 then
+            _G.FWHUD_BS_ScheduledExp = nil
+            return true
+        end
     end
+    _G.FWHUD_BS_ScheduledExp = nil
+    _G.FWHUD_BS_TimerSeq = (_G.FWHUD_BS_TimerSeq or 0) + 1
     return false
 end""",
                         "customDuration": """function()
@@ -216,12 +246,13 @@ end""",
 end""",
                     },
                     "untrigger": {
-                        "custom": """function()
+                        "custom": """function(event, ...)
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func()
+    local now = GetTime()
+    local c = _G.FWHUD_BuffCache_Func(true)
     local exp = (c and c.hasBattleShout and c.bsExpiration) or (c and c.hasBoM and c.bomExpiration) or 0
     if exp > 0 then
-        local rem = exp - GetTime()
+        local rem = exp - now
         return not (rem > 0 and rem <= 30)
     end
     return true
@@ -335,16 +366,44 @@ end""",
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "update",
-                        "events": buff_events,
-                        "custom": """function()
+                        "check": "event",
+                        "events": cs_active_events,
+                        "custom": """function(event, ...)
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func()
-    local exp = (c and c.hasCommandingShout and c.csExpiration) or 0
+    local now = GetTime()
+    local c = _G.FWHUD_BuffCache_Func(true)
+    local exp = (c and c.hasCommandingShout and c.csExpiration) or (c and c.hasBloodPact and c.bpExpiration) or 0
     if exp > 0 then
-        local rem = exp - GetTime()
-        return rem > 0 and rem <= 30
+        local rem = exp - now
+        if rem > 30 then
+            local delay = rem - 30
+            if _G.FWHUD_CS_ScheduledExp ~= exp then
+                _G.FWHUD_CS_ScheduledExp = exp
+                _G.FWHUD_CS_TimerSeq = (_G.FWHUD_CS_TimerSeq or 0) + 1
+                local mySeq = _G.FWHUD_CS_TimerSeq
+                local scheduleFunc = (C_Timer and C_Timer.After) or (_G.C_Timer and _G.C_Timer.After)
+                if scheduleFunc then
+                    scheduleFunc(delay, function()
+                        if _G.FWHUD_CS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
+                            WeakAuras.ScanEvents("FWHUD_CS_THRESHOLD")
+                        end
+                    end)
+                elseif WeakAuras and WeakAuras.timer and WeakAuras.timer.ScheduleTimer then
+                    WeakAuras.timer:ScheduleTimer(function()
+                        if _G.FWHUD_CS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
+                            WeakAuras.ScanEvents("FWHUD_CS_THRESHOLD")
+                        end
+                    end, delay)
+                end
+            end
+            return false
+        elseif rem > 0 then
+            _G.FWHUD_CS_ScheduledExp = nil
+            return true
+        end
     end
+    _G.FWHUD_CS_ScheduledExp = nil
+    _G.FWHUD_CS_TimerSeq = (_G.FWHUD_CS_TimerSeq or 0) + 1
     return false
 end""",
                         "customDuration": """function()
@@ -352,17 +411,20 @@ end""",
     local c = _G.FWHUD_BuffCache_Func()
     if c and c.hasCommandingShout and c.csExpiration and c.csExpiration > 0 then
         return c.csDuration or 120, c.csExpiration
+    elseif c and c.hasBloodPact and c.bpExpiration and c.bpExpiration > 0 then
+        return c.bpDuration or 1800, c.bpExpiration
     end
     return 0, 0
 end""",
                     },
                     "untrigger": {
-                        "custom": """function()
+                        "custom": """function(event, ...)
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func()
-    local exp = (c and c.hasCommandingShout and c.csExpiration) or 0
+    local now = GetTime()
+    local c = _G.FWHUD_BuffCache_Func(true)
+    local exp = (c and c.hasCommandingShout and c.csExpiration) or (c and c.hasBloodPact and c.bpExpiration) or 0
     if exp > 0 then
-        local rem = exp - GetTime()
+        local rem = exp - now
         return not (rem > 0 and rem <= 30)
     end
     return true

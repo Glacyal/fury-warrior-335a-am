@@ -112,7 +112,7 @@ SHARED_WARRIOR_BUFFS_LUA = r"""function(force)
         -- Controllo Commanding Shout (Rank 1: 469/45517, Rank 2: 47439, Rank 3: 47440)
         if spellId == 47440 or spellId == 47439 or spellId == 469 or spellId == 45517 or
            (csNameLocal and name == csNameLocal) or string.find(lowerName, "commanding shout") or string.find(lowerName, "urlo di comando") or
-           string.find(lowerIcon, "ability_warrior_commandingshout") then
+           string.find(lowerIcon, "ability_warrior_commandingshout") or string.find(lowerIcon, "ability_warrior_rallyingcry") then
             c.hasCommandingShout = true
             c.csDuration = duration or 120
             c.csExpiration = (expirationTime and expirationTime > 0) and expirationTime or (now_b + 120)
@@ -304,7 +304,7 @@ end"""
             "yOffset": 0,
             "width": 28,
             "height": 28,
-            "displayIcon": "Interface\\Icons\\Ability_Warrior_CommandingShout",
+            "displayIcon": "Interface\\Icons\\Ability_Warrior_RallyingCry",
             "auto": False,
             "color": [1, 1, 1, 1],
             "cooldown": True,
@@ -383,7 +383,7 @@ end"""
             "yOffset": 0,
             "width": 28,
             "height": 28,
-            "displayIcon": "Interface\\Icons\\Ability_Warrior_CommandingShout",
+            "displayIcon": "Interface\\Icons\\Ability_Warrior_RallyingCry",
             "auto": False,
             "desaturate": True,
             "color": [0.6, 0.6, 0.6, 0.8],

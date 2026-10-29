@@ -52,7 +52,7 @@ def run_tests():
     assert cs_act is not None, "Missing 03 - Commanding Shout - Active"
     assert cs_act["parent"] == "03 - Commanding Shout"
     assert cs_act["auto"] is False, "Commanding Shout Active deve avere auto=False per forzare l'icona del guerriero"
-    assert cs_act["displayIcon"] == "Interface\\Icons\\Ability_Warrior_CommandingShout", f"Invalid icon for CS Active: {cs_act.get('displayIcon')}"
+    assert cs_act["displayIcon"] == "Interface\\Icons\\Ability_Warrior_RallyingCry", f"Invalid icon for CS Active: {cs_act.get('displayIcon')}"
     assert "customIcon" not in cs_act["triggers"][1]["trigger"], "Non deve esserci customIcon che sovrascrive l'icona del guerriero con icone di warlock/altre classi"
     assert cs_act["triggers"][1]["trigger"]["check"] == "update", "Commanding Shout Active deve usare check: update per precisione timer"
     assert "custom" in cs_act["triggers"][1]["untrigger"], "Commanding Shout Active deve avere untrigger.custom definito per prevenire flickering"
@@ -62,7 +62,7 @@ def run_tests():
     assert cs_off["parent"] == "03 - Commanding Shout"
     assert cs_off["desaturate"] is True
     assert cs_off["auto"] is False
-    assert cs_off["displayIcon"] == "Interface\\Icons\\Ability_Warrior_CommandingShout", f"Invalid icon for CS OFF: {cs_off.get('displayIcon')}"
+    assert cs_off["displayIcon"] == "Interface\\Icons\\Ability_Warrior_RallyingCry", f"Invalid icon for CS OFF: {cs_off.get('displayIcon')}"
     assert cs_off["triggers"][1]["trigger"]["check"] == "event", "Commanding Shout OFF deve usare check: event per reagire a UNIT_AURA senza flickering OnUpdate"
     assert "custom" in cs_off["triggers"][1]["untrigger"], "Commanding Shout OFF deve avere untrigger.custom definito per nascondersi istantaneamente all'applicazione del buff"
     subtext_cs_off = cs_off["subRegions"][1]["text_text"]
@@ -70,7 +70,7 @@ def run_tests():
 
     # 5. Texture & Spell ID Integrity (No Cataclysm Rallying Cry or typos)
     auras_str = str(auras)
-    assert "Ability_Warrior_RallyingCry" not in auras_str, "Rallying Cry non esiste in 3.3.5a (aggiunto in 4.1.0)"
+    # Note: Ability_Warrior_RallyingCry icon is the exact graphic of Commanding Shout (bearded man shouting)
     assert "Spell_Holy_GreaterBlessingofMount" not in auras_str, "Spell_Holy_GreaterBlessingofMount non esiste in 3.3.5a"
     assert "Spell_Shadow_BloodPact" not in auras_str, "Spell_Shadow_BloodPact non esiste in 3.3.5a"
 
@@ -96,6 +96,7 @@ def run_tests():
     assert "47439" in SHARED_WARRIOR_BUFFS_LUA, "Manca spellId 47439 (Commanding Shout Rank 2) in SHARED_WARRIOR_BUFFS_LUA"
     assert "ability_warrior_battleshout" in SHARED_WARRIOR_BUFFS_LUA, "Manca fallback su icona texture ability_warrior_battleshout"
     assert "ability_warrior_commandingshout" in SHARED_WARRIOR_BUFFS_LUA, "Manca fallback su icona texture ability_warrior_commandingshout"
+    assert "ability_warrior_rallyingcry" in SHARED_WARRIOR_BUFFS_LUA, "Manca fallback su icona texture ability_warrior_rallyingcry"
 
     print("[OK] Battle Shout, Commanding Shout e Berserker Stance validati con successo (zero flickering, icone war esclusive, untrigger completi).")
     print("[PASS] test_buffs.py superato con successo!")

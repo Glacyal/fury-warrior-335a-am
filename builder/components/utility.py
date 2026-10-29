@@ -366,9 +366,9 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
     _G.FWHUD_GlovesSpellIds = { [54758] = true }
     _G.FWHUD_GlovesKeywords = { "hyperspeed", "accelerat", "ipersonic", "340 haste" }
 
-    _G.FWHUD_BootsEnchantIDs = { [3601] = true, [3784] = true, [3232] = true, [983] = true }
+    _G.FWHUD_BootsEnchantIDs = { [3601] = true }
     _G.FWHUD_BootsSpellIds = { [54861] = true, [54858] = true, [55016] = true }
-    _G.FWHUD_BootsKeywords = { "nitro", "boosts", "acceleratori a nitro", "swiftness", "tuskarr" }
+    _G.FWHUD_BootsKeywords = { "nitro", "acceleratori a nitro" }
 
     -- Tier 10: Ymirjar Lord's Battlegear (277, 264, 251)
     _G.FWHUD_T10_Pieces = {

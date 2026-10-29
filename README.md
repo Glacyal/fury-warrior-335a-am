@@ -73,7 +73,7 @@ Fila orizzontale inferiore a y = -45 con riposizionamento e ricentratura automat
 - **10 - Gloves warDPS**: Acceleratori Ipersonici Ingegneria (+340 Haste per 12s, 60s CD).
 - **11 - Death Wish**: Durata attiva 30s (+20% danno) e cooldown.
 - **12 - Recklessness**: Tracciamento delle 3 cariche di critico garantito e cooldown.
-- **13 - Boots warDPS**: Stivali a nitro (Nitro Boosts) o incanti velocità con stato pronto e ricarica.
+- **13 - Boots warDPS**: Acceleratori a Nitro (Nitro Boosts di Ingegneria, 180s CD On-Use) con stato pronto e ricarica. L'icona è visibile esclusivamente se le scarpe possiedono l'incanto Nitro Boosts; se le scarpe hanno incanti statici (es. *Vitalità Zannut / Tuskarr's Vitality*, *Assalto Superiore*) o nessun incanto, l'icona si nasconde automaticamente e la riga utility ricentra le restanti icone.
 - **Standard Cromatico & Formattazione Tempi (Allineato 1:1 a Fire Mage)**:
   - **Proc Attivo**: testo in giallo brillante al decimo di secondo (`|cFFFFFF00%.1fs|r`) con animazione circolare e contorno Pixel Glow dorato.
   - **ICD / Cooldown di Ricarica**: testo bianco standard (senza tag di colore e senza la lettera `s`), formattato in minuti:secondi (`%d:%02d`, es. `1:15`) se $\ge 60\text{s}$ oppure in secondi interi (`%.0f`, es. `45`, `30`, `12`) se $< 60\text{s}$, garantendo una visualizzazione sobria e pulita identica a quella nativa di WoW e di Fire Mage.

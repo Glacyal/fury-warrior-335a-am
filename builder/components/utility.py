@@ -327,7 +327,32 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         [3789] = { name = "Berserking", spellId = 59620, dur = 15, icon = "Interface\\Icons\\Spell_Nature_BloodLust", kw = "berserk" },
         [2673] = { name = "Mongoose", spellId = 28093, dur = 15, icon = "Interface\\Icons\\Spell_Nature_PosisonSpike", kw = "mongoose" },
         [3225] = { name = "Executioner", spellId = 42976, dur = 15, icon = "Interface\\Icons\\INV_Sword_48", kw = "executioner" },
+        [1900] = { name = "Crusader", spellId = 20007, dur = 15, icon = "Interface\\Icons\\Spell_Holy_BlessingOfStrength", kw = "crusader" },
+        [3869] = { name = "Blade Ward", spellId = 64440, dur = 10, icon = "Interface\\Icons\\Ability_Warrior_ShieldReflection", kw = "bladeward" },
+        [3870] = { name = "Blood Draining", spellId = 64568, dur = 20, icon = "Interface\\Icons\\Spell_Shadow_BloodBoil", kw = "blooddraining" },
         [3790] = { name = "Black Magic", spellId = 59626, dur = 10, icon = "Interface\\Icons\\Spell_Shadow_Shadowfury", kw = "blackmagic" },
+        [3273] = { name = "Deathfrost", spellId = 46578, dur = 8, icon = "Interface\\Icons\\Spell_Frost_FrostBolt02", kw = "deathfrost" },
+        [3833] = { name = "Giant Slayer", spellId = 60621, dur = 10, icon = "Interface\\Icons\\Spell_Nature_NatureTouchGrow", kw = "giantslayer" },
+        [3834] = { name = "Icebreaker", spellId = 60707, dur = 10, icon = "Interface\\Icons\\Spell_Frost_FrostNova", kw = "icebreaker" },
+        [3830] = { name = "Lifeward", spellId = 60691, dur = 10, icon = "Interface\\Icons\\Spell_Holy_Restoration", kw = "lifeward" },
+        [1898] = { name = "Unholy Weapon", spellId = 20004, dur = 10, icon = "Interface\\Icons\\Spell_Shadow_ShadowPresence", kw = "unholy" },
+        [803]  = { name = "Fiery Weapon", spellId = 13897, dur = 6, icon = "Interface\\Icons\\Spell_Fire_FireEnchantWeapon", kw = "fiery" },
+    }
+    _G.FWHUD_StaticWeaponEnchants = {
+        [3827] = true, -- Massacre (+110 Attack Power 2H)
+        [2667] = true, -- Superior Potency (+65 Attack Power 1H)
+        [1103] = true, -- Exceptional Agility (+26 Agility)
+        [2670] = true, -- Major Agility (+30 Agility 2H)
+        [3788] = true, -- Accuracy (+25 Hit & +25 Crit)
+        [3731] = true, -- Titanium Weapon Chain (+28 Hit & -50% Disarm)
+        [3832] = true, -- Greater Savagery (+85 Attack Power 2H)
+        [195]  = true, -- Titanguard (+30 Stamina)
+        [2563] = true, -- Superior Striking (+5 Damage)
+        [2567] = true, -- Mighty Intellect (+30 Int)
+        [3844] = true, -- Exceptional Spellpower (+50 SP)
+        [3854] = true, -- Mighty Spellpower (+63 SP)
+        [3855] = true, -- Greater Spellpower (+81 SP 2H)
+        [0]    = true, -- Nessun incanto
     }
     _G.FWHUD_WeaponState = _G.FWHUD_WeaponState or {
         [16] = { lastStart = 0, lastEnd = 0, isProc = false },
@@ -1032,8 +1057,8 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         local now_w = GetTime()
         _G.FWHUD_WeaponEquipCache = _G.FWHUD_WeaponEquipCache or {}
         local cache = _G.FWHUD_WeaponEquipCache[slot]
-        if cache and (now_w - cache.time < 0.25) then return cache.hasWeapon, cache.enchantID end
-        if not cache then cache = { time = 0, hasWeapon = false, enchantID = nil }; _G.FWHUD_WeaponEquipCache[slot] = cache end
+        if cache and (now_w - cache.time < 0.25) then return cache.hasProcEnchant, cache.enchantID end
+        if not cache then cache = { time = 0, hasProcEnchant = false, enchantID = nil }; _G.FWHUD_WeaponEquipCache[slot] = cache end
         cache.time = now_w
 
         local itemID = GetInventoryItemID("player", slot)
@@ -1042,17 +1067,23 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
             if link then itemID = tonumber(link:match("item:(%d+)")) end
         end
         if not itemID or itemID == 0 then
-            cache.hasWeapon = false
+            cache.hasProcEnchant = false
             cache.enchantID = nil
             return false, nil
         end
 
         local itemLink = GetInventoryItemLink("player", slot)
         local enchantID = itemLink and tonumber(itemLink:match("item:%d+:(%d+)"))
-        if enchantID and _G.FWHUD_WeaponEnchantDB[enchantID] then
-            cache.hasWeapon = true
+        if enchantID and _G.FWHUD_WeaponEnchantDB and _G.FWHUD_WeaponEnchantDB[enchantID] then
+            cache.hasProcEnchant = true
             cache.enchantID = enchantID
             return true, enchantID
+        end
+
+        if enchantID and _G.FWHUD_StaticWeaponEnchants and _G.FWHUD_StaticWeaponEnchants[enchantID] then
+            cache.hasProcEnchant = false
+            cache.enchantID = nil
+            return false, nil
         end
 
         local tt = _G.FWHUD_ScanTT
@@ -1069,24 +1100,56 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
             if text then
                 local lt = text:lower()
                 if lt:find("berserk") or lt:find("furia") or lt:find("400 attack power") or lt:find("400 potenza d'attacco") then
-                    cache.hasWeapon = true
+                    cache.hasProcEnchant = true
                     cache.enchantID = 3789
                     return true, 3789
-                elseif lt:find("mongoose") or lt:find("fulminea") or lt:find("120 agility") then
-                    cache.hasWeapon = true
+                elseif lt:find("mongoose") or lt:find("fulminea") or lt:find("120 agility") or lt:find("120 agilit") then
+                    cache.hasProcEnchant = true
                     cache.enchantID = 2673
                     return true, 2673
                 elseif lt:find("executioner") or lt:find("carnefice") then
-                    cache.hasWeapon = true
+                    cache.hasProcEnchant = true
                     cache.enchantID = 3225
                     return true, 3225
+                elseif lt:find("crusader") or lt:find("crociato") or lt:find("holy strength") or lt:find("forza sacra") then
+                    cache.hasProcEnchant = true
+                    cache.enchantID = 1900
+                    return true, 1900
+                elseif lt:find("blade ward") or lt:find("guardia delle lame") or lt:find("deviazione") then
+                    cache.hasProcEnchant = true
+                    cache.enchantID = 3869
+                    return true, 3869
+                elseif lt:find("blood draining") or lt:find("drenaggio del sangue") or lt:find("blood reserve") or lt:find("riserva di sangue") then
+                    cache.hasProcEnchant = true
+                    cache.enchantID = 3870
+                    return true, 3870
+                elseif lt:find("black magic") or lt:find("magia nera") then
+                    cache.hasProcEnchant = true
+                    cache.enchantID = 3790
+                    return true, 3790
+                elseif lt:find("deathfrost") or lt:find("gelomorte") then
+                    cache.hasProcEnchant = true
+                    cache.enchantID = 3273
+                    return true, 3273
+                elseif lt:find("giant slayer") or lt:find("cacciatore di giganti") then
+                    cache.hasProcEnchant = true
+                    cache.enchantID = 3833
+                    return true, 3833
+                elseif lt:find("icebreaker") or lt:find("spaccaghiaccio") then
+                    cache.hasProcEnchant = true
+                    cache.enchantID = 3834
+                    return true, 3834
+                elseif lt:find("lifeward") or lt:find("salvavita") then
+                    cache.hasProcEnchant = true
+                    cache.enchantID = 3830
+                    return true, 3830
                 end
             end
         end
 
-        cache.hasWeapon = true
-        cache.enchantID = 3789
-        return true, 3789
+        cache.hasProcEnchant = false
+        cache.enchantID = nil
+        return false, nil
     end
 
     _G.FWHUD_CheckWeapon = function(slot)
@@ -1196,15 +1259,49 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         if not cache then cache = { time = 0, hasEnchant = false }; _G.FWHUD_EnchantEquipCache = cache end
         cache.time = now
 
-        local hasMH = _G.FWHUD_CheckWeaponEquipped and _G.FWHUD_CheckWeaponEquipped(16)
-        local hasOH = _G.FWHUD_CheckWeaponEquipped and _G.FWHUD_CheckWeaponEquipped(17)
-        cache.hasEnchant = (hasMH or hasOH) and true or false
-        return cache.hasEnchant
+        local hasMH, eMH = false, nil
+        if _G.FWHUD_CheckWeaponEquipped then
+            hasMH, eMH = _G.FWHUD_CheckWeaponEquipped(16)
+        end
+        local hasOH, eOH = false, nil
+        if _G.FWHUD_CheckWeaponEquipped then
+            hasOH, eOH = _G.FWHUD_CheckWeaponEquipped(17)
+        end
+
+        if (hasMH and eMH) or (hasOH and eOH) then
+            cache.hasEnchant = true
+            return true
+        end
+
+        -- Fallback: controllo buff da proc di incanto arma attualmente attivi sul giocatore
+        local buffs = _G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs()
+        local bList = buffs and buffs.list or {}
+        for _, b in ipairs(bList) do
+            local sId = b.spellId
+            local name = b.name or ""
+            if sId == 59620 or sId == 59621 or name == "Berserking" or name == "Furia Berserker" or
+               sId == 28093 or name:find("Mongoose") or name:find("Fulminea") or
+               sId == 42976 or name:find("Executioner") or name:find("Carnefice") or
+               sId == 20007 or name:find("Holy Strength") or name:find("Forza Sacra") or
+               sId == 64440 or sId == 64442 or name:find("Blade Ward") or name:find("Deviazione") or
+               sId == 64568 or sId == 64569 or name:find("Blood Reserve") or name:find("Riserva di Sangue") or
+               sId == 59626 or name:find("Black Magic") or name:find("Magia Nera") then
+                cache.hasEnchant = true
+                return true
+            end
+        end
+
+        cache.hasEnchant = false
+        return false
     end
 
     _G.FWHUD_CheckEnchants = function()
         local hasEnchant = _G.FWHUD_CheckEnchantsEquipped and _G.FWHUD_CheckEnchantsEquipped()
-        local defIcon = GetInventoryItemTexture("player", 16) or "Interface\\Icons\\Spell_Nature_BloodLust"
+        local _, eMH = _G.FWHUD_CheckWeaponEquipped and _G.FWHUD_CheckWeaponEquipped(16)
+        local _, eOH = _G.FWHUD_CheckWeaponEquipped and _G.FWHUD_CheckWeaponEquipped(17)
+        local activeEID = eMH or eOH
+        local eInfo = activeEID and _G.FWHUD_WeaponEnchantDB and _G.FWHUD_WeaponEnchantDB[activeEID]
+        local defIcon = (eInfo and eInfo.icon) or GetInventoryItemTexture("player", 16) or GetInventoryItemTexture("player", 17) or "Interface\\Icons\\Spell_Nature_BloodLust"
         if not hasEnchant then
             return "NONE", 0, 0, 0, defIcon
         end
@@ -1613,6 +1710,7 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
             _G.FWHUD_SlotEquipCache = nil
             _G.FWHUD_TierEquipCache = nil
             _G.FWHUD_EnchantEquipCache = nil
+            _G.FWHUD_WeaponEquipCache = nil
             if WeakAuras and WeakAuras.ScanEvents then
                 WeakAuras.ScanEvents("FWHUD_ROW_UPDATE")
             end

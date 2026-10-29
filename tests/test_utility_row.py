@@ -135,6 +135,12 @@ def run_tests():
     assert "FWHUD_CheckRing" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione FWHUD_CheckRing"
     assert "FWHUD_CheckEnchants" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione FWHUD_CheckEnchants"
     assert "FWHUD_CheckEnchantsEquipped" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione FWHUD_CheckEnchantsEquipped"
+    assert "FWHUD_StaticWeaponEnchants" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca tabella FWHUD_StaticWeaponEnchants"
+    assert "3827" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Massacre (3827) in FWHUD_StaticWeaponEnchants"
+    assert "3731" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Titanium Weapon Chain (3731) in FWHUD_StaticWeaponEnchants"
+    assert "1900" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Crusader (1900) in FWHUD_WeaponEnchantDB"
+    assert "3869" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Blade Ward (3869) in FWHUD_WeaponEnchantDB"
+    assert "3870" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Blood Draining (3870) in FWHUD_WeaponEnchantDB"
     assert "FWHUD_UpdateUtilityRowPositions" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione di riposizionamento dinamico"
 
     print("[OK] Tutti i 10 elementi della riga utility verificati con 'check': 'update'.")

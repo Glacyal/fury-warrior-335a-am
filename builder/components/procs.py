@@ -79,7 +79,7 @@ def build_procs_auras() -> list[dict]:
                 "activeTriggerMode": -10,
             },
         },
-        # 2. Victory Rush (Proc Victorious - 32216 / durata 20s)
+        # 2. Victory Rush (Proc utilizzabile 20s post-kill - 34428)
         {
             "id": "Victory Rush",
             "uid": "FWHUD_PROC_VICTORY_RUSH",
@@ -103,14 +103,57 @@ def build_procs_auras() -> list[dict]:
             "triggers": {
                 1: {
                     "trigger": {
-                        "type": "aura2",
-                        "unit": "player",
-                        "auranames": ["Victorious", "Vittorioso", "Victory Rush", "32216", "34428"],
-                        "useName": True,
-                        "debuffType": "HELPFUL",
-                        "matchesShowOn": "showOnActive",
+                        "type": "custom",
+                        "custom_type": "status",
+                        "check": "update",
+                        "custom": """function()
+    _G.FWHUD_VRState = _G.FWHUD_VRState or { lastStart = 0, lastEnd = 0, isUsable = false }
+    if not _G.FWHUD_CheckVictoryRush then
+        _G.FWHUD_CheckVictoryRush = function()
+            local now = GetTime()
+            local vr = _G.FWHUD_VRState
+            local usable = IsUsableSpell(34428)
+            if not usable and GetSpellInfo then
+                usable = IsUsableSpell(GetSpellInfo(34428) or "Victory Rush")
+            end
+            if usable then
+                if not vr.isUsable or now > vr.lastEnd then
+                    vr.lastStart = now
+                    vr.lastEnd = now + 20.0
+                    vr.isUsable = true
+                end
+            else
+                vr.isUsable = false
+                vr.lastEnd = 0
+            end
+            if vr.isUsable and vr.lastEnd > now then
+                return true, vr.lastEnd - now, 20.0
+            end
+            return false, 0, 0
+        end
+    end
+    local isUsable = _G.FWHUD_CheckVictoryRush()
+    return isUsable
+end""",
+                        "customDuration": """function()
+    if not _G.FWHUD_CheckVictoryRush then return 0, 0 end
+    local isUsable, rem, dur = _G.FWHUD_CheckVictoryRush()
+    if isUsable and rem > 0 then
+        return dur, GetTime() + rem
+    end
+    return 0, 0
+end""",
+                        "customIcon": """function()
+    return select(3, GetSpellInfo(34428)) or "Interface\\Icons\\Ability_Warrior_VictoryRush"
+end""",
                     },
-                    "untrigger": {}
+                    "untrigger": {
+                        "custom": """function()
+    if not _G.FWHUD_CheckVictoryRush then return true end
+    local isUsable = _G.FWHUD_CheckVictoryRush()
+    return not isUsable
+end"""
+                    }
                 },
                 "activeTriggerMode": -10,
             },

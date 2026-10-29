@@ -66,6 +66,37 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         [15] = { lastStart = 0, lastEnd = 0, isProc = false, lastItemID = 0 },
     }
 
+    _G.FWHUD_VRState = _G.FWHUD_VRState or {
+        lastStart = 0,
+        lastEnd = 0,
+        isUsable = false,
+    }
+
+    _G.FWHUD_CheckVictoryRush = _G.FWHUD_CheckVictoryRush or function()
+        local now = GetTime()
+        local vr = _G.FWHUD_VRState
+        if not vr then return false, 0, 0 end
+        local usable = IsUsableSpell(34428)
+        if not usable and GetSpellInfo then
+            usable = IsUsableSpell(GetSpellInfo(34428) or "Victory Rush")
+        end
+        if usable then
+            if not vr.isUsable or now > vr.lastEnd then
+                vr.lastStart = now
+                vr.lastEnd = now + 20.0
+                vr.isUsable = true
+            end
+        else
+            vr.isUsable = false
+            vr.lastEnd = 0
+        end
+        if vr.isUsable and vr.lastEnd > now then
+            return true, vr.lastEnd - now, 20.0
+        end
+        return false, 0, 0
+    end
+
+
     _G.FWHUD_TrinketDB = {
         -- ====================================================================
         -- PHYSICAL / MELEE DPS TRINKETS (WotLK 3.3.5a)
@@ -1407,16 +1438,45 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         f:RegisterEvent("BAG_UPDATE_COOLDOWN")
         f:RegisterEvent("UNIT_AURA")
         f:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+        f:RegisterEvent("SPELL_UPDATE_USABLE")
+        f:RegisterEvent("ACTIONBAR_UPDATE_USABLE")
+        f:RegisterEvent("UNIT_SPELLCAST_SUCCEEDED")
         f.pendingUpdates = 0
 
         local playerGUID = nil
         f:SetScript("OnEvent", function(self, event, ...)
+            if event == "UNIT_SPELLCAST_SUCCEEDED" then
+                local unit, sName, sRank, lId, sId = ...
+                if unit == "player" and (sId == 34428 or sName == "Victory Rush" or sName == "Attacco della Vittoria") then
+                    local vr = _G.FWHUD_VRState
+                    if vr then
+                        vr.isUsable = false
+                        vr.lastEnd = 0
+                    end
+                end
+                return
+            end
             if event == "COMBAT_LOG_EVENT_UNFILTERED" then
                 local timestamp, subEvent, sourceGUID, sourceName, sourceFlags, destGUID, destName, destFlags, spellId, spellName = ...
                 if not playerGUID then playerGUID = UnitGUID("player") end
                 local isPlayer = (destGUID == playerGUID or sourceGUID == playerGUID)
                 if isPlayer then
                     local now = GetTime()
+                    if subEvent == "PARTY_KILL" and sourceGUID == playerGUID then
+                        local vr = _G.FWHUD_VRState
+                        if vr then
+                            vr.lastStart = now
+                            vr.lastEnd = now + 20.0
+                            vr.isUsable = true
+                        end
+                    end
+                    if (subEvent == "SPELL_CAST_SUCCESS") and sourceGUID == playerGUID and (spellId == 34428 or spellName == "Victory Rush" or spellName == "Attacco della Vittoria") then
+                        local vr = _G.FWHUD_VRState
+                        if vr then
+                            vr.isUsable = false
+                            vr.lastEnd = 0
+                        end
+                    end
                     if subEvent == "SPELL_CAST_SUCCESS" or subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_REFRESH" then
                         -- Check Trinkets Proc (slot 13 & 14)
                         for _, s in ipairs({ 13, 14 }) do

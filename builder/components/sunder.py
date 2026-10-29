@@ -90,7 +90,7 @@ end""",
                 # 1. Timer / Status alla base (%c1): timer esatto (es. 27s) o 'OFF' in rosso quando mancante
                 make_subtext("%c1", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=10, y_offset=0),
                 # 2. Cariche al centro (%c2): cariche centrate (x1, x2, x3, x4, x5 o EA)
-                make_subtext("%c2", justify="CENTER", anchor_point="CENTER", font_size=14, y_offset=0),
+                make_subtext("%c2", justify="CENTER", anchor_point="INNER_TOP", font_size=12, y_offset=-1),
             ],
             "triggers": {
                 1: {

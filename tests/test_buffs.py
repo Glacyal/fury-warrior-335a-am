@@ -62,6 +62,7 @@ def run_tests():
     assert "GetShapeshiftForm()" in trig_lua
     assert "form ~= 3" in trig_lua
     assert "UnitAffectingCombat(\"player\")" in trig_lua
+    assert stance_warn["subRegions"][1]["text_fontSize"] == 8, f"Expected font_size 8 for STANCE, got {stance_warn['subRegions'][1].get('text_fontSize')}"
 
     # 6. Check Raid Substitutes in SHARED_WARRIOR_BUFFS_LUA
     assert "hasBoM" in SHARED_WARRIOR_BUFFS_LUA, "Manca controllo BoM in SHARED_WARRIOR_BUFFS_LUA"

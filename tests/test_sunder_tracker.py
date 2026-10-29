@@ -44,12 +44,12 @@ def run_tests():
     assert sub1.get("text_anchorPoint") == "INNER_BOTTOM", f"subRegion[1] deve essere INNER_BOTTOM, trovato {sub1.get('text_anchorPoint')}"
     assert sub1.get("text_fontSize") == 10, f"subRegion[1] font_size deve essere 10, trovato {sub1.get('text_fontSize')}"
 
-    # Subregion 2: stacks at CENTER (%c2)
+    # Subregion 2: stacks at INNER_TOP (%c2)
     sub2 = subregs[2]
     assert sub2.get("type") == "subtext", "subRegion[2] deve essere subtext"
     assert sub2.get("text_text") == "%c2", f"subRegion[2] text deve essere %c2, trovato {sub2.get('text_text')}"
-    assert sub2.get("text_anchorPoint") == "CENTER", f"subRegion[2] deve essere CENTER, trovato {sub2.get('text_anchorPoint')}"
-    assert sub2.get("text_fontSize") == 14, f"subRegion[2] font_size deve essere 14, trovato {sub2.get('text_fontSize')}"
+    assert sub2.get("text_anchorPoint") == "INNER_TOP", f"subRegion[2] deve essere INNER_TOP, trovato {sub2.get('text_anchorPoint')}"
+    assert sub2.get("text_fontSize") == 12, f"subRegion[2] font_size deve essere 12, trovato {sub2.get('text_fontSize')}"
 
     print("[OK] Componente Sunder Armor Tracker verificato con successo (solo OFF, timer alla base, cariche al centro).")
     print("[PASS] test_sunder_tracker.py superato con successo!")

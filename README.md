@@ -33,7 +33,7 @@ Barra orizzontale superiore (y = 52) con riposizionamento dinamico centrato, ris
 ### 2. Zero Clutter & Intelligenza Overlap di Raid
 - **02 - Battle Shout**: Gruppo genitore con architettura Active/OFF (identica a Fire Mage): mostra l'icona con swipe e timer numerico se in scadenza (<= 30s); se mancano sia Battle Shout che BoM/GBoM del Paladino mostra l'avviso "OFF" desaturato sia in combattimento che fuori combattimento; è completamente nascosto se attivo e sano (> 30s) o coperto da Paladino.
 - **03 - Commanding Shout**: Gruppo genitore con architettura Active/OFF (identica a Fire Mage): se mancano sia Commanding Shout che Blood Pact dell'Imp del Warlock mostra l'avviso "OFF" desaturato sia in combattimento che fuori combattimento; mostra l'icona con swipe e timer se in scadenza (<= 30s); è completamente nascosto se attivo e sano (> 30s) o coperto dal Warlock.
-- **04 - Berserker Stance**: Allerta immediata ad alta visibilità se durante il combattimento il guerriero si trova fuori dalla Berserker Stance.
+- **04 - Berserker Stance**: Allerta immediata ad alta visibilità se durante il combattimento il guerriero si trova fuori dalla Berserker Stance (con scritta compatta 'STANCE', font 8).
 - **Caricamento Specifico su [Rampage]**: Il talento passivo *Rampage* (Tab 2, Posizione 24 -> ID WeakAuras 64) è utilizzato come condizione di caricamento esclusiva dell'intero pacchetto: la suite si carica solo se il guerriero è specializzato Fury con Rampage attivo, e non occupa spazio visivo superfluo a schermo.
 
 ### 3. Riga Utility Adattiva (`05` - `13`, da 3 a 11 Icone a y = -45)
@@ -110,10 +110,10 @@ Pannello compatto (88x60px a x = -190, y = -45) con aggiornamento throttled a 10
 - **Hit & Exp**: Verifica visiva istantanea del cap 8% Special Hit (con aura Draenei Heroic Presence +1%) e soft cap 26 Expertise.
 
 ### 9. Sunder Armor Tracker (19 - Sunder Armor Tracker)
-Colonna destra (x = 169, y = 45):
-- **Cariche centrate** da 1 a 5 cariche (x1..x5, font 14) al centro dell'icona, con evidenziazione in verde brillante al raggiungimento del cap di 5 cariche (x5).
-- **Timer di scadenza numerico** (es. 27s, font 10) ancorato alla base dell'icona.
-- **Riconoscimento Expose Armor** del Ladro (EA centrato in ciano) per evitare di sovrascrivere il debuff.
+A destra della Rotational Bar (x = 160, y = -7):
+- **Cariche in alto al centro**: da 1 a 5 cariche (x1..x5, font 12) ancorate in alto (`INNER_TOP`), lasciando libero lo spazio inferiore per il timer ed evitando qualsiasi sovrapposizione visiva, con evidenziazione in verde brillante al raggiungimento del cap di 5 cariche (x5).
+- **Timer di scadenza numerico** (es. 27s, font 10) ancorato alla base dell'icona (`INNER_BOTTOM`).
+- **Riconoscimento Expose Armor** del Ladro (EA in alto in ciano) per evitare di sovrascrivere il debuff.
 - **Allerta 'OFF'**: se il debuff manca sul bersaglio, mostra esclusivamente la scritta rossa OFF alla base dell'icona.
 
 ---

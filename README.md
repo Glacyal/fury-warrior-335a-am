@@ -100,7 +100,7 @@ Barra sincronizzata (278x20px a y = 8) per lanci di Slam non-proc e cannellature
 
 ### 7. Avviso Testuale ad Alta Visibilità (`17 - Alerts warDPS`)
 Avviso singolo centrato compatto posizionato appena sopra la riga dei proc (y = 78):
-- `SLAM READY!` in giallo brillante (`|cFFFFFF00`) con notifica sonora acustica "Doppio Fendente d'Aria" (`DoubleWhoosh.ogg` su canale Master) quando Bloodsurge procca, indicando all'istante la disponibilità di Slam istantaneo senza alcun clutter o distrazione visiva.
+- `SLAM READY!` in giallo brillante (`|cFFFFFF00`) con notifica sonora acustica "Tamburi di Guerra" (`Drums.ogg` su canale Master) quando Bloodsurge procca, indicando all'istante la disponibilità di Slam istantaneo senza alcun clutter o distrazione visiva.
 
 ### 8. Pannello Statistiche in Tempo Reale (`18 - Stats Panel warDPS`)
 Pannello compatto (88x60px a x = -190, y = -45) con aggiornamento throttled a 10 Hz e 5 righe dinamiche:

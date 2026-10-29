@@ -35,7 +35,8 @@ def run_tests():
     assert bs_off["color"] == [0.6, 0.6, 0.6, 0.8]
     assert bs_off["auto"] is False
     assert bs_off["displayIcon"] == "Interface\\Icons\\Ability_Warrior_BattleShout"
-    assert bs_off["triggers"][1]["trigger"]["check"] == "event", "Battle Shout OFF deve usare check: event per reagire a UNIT_AURA senza flickering OnUpdate"
+    assert bs_off["triggers"][1]["trigger"]["check"] == "event", "Battle Shout OFF deve usare check: event per reagire a UNIT_AURA:player senza flickering OnUpdate"
+    assert "UNIT_AURA:player" in bs_off["triggers"][1]["trigger"]["events"], "Battle Shout OFF deve registrare UNIT_AURA:player"
     assert "custom" in bs_off["triggers"][1]["untrigger"], "Battle Shout OFF deve avere untrigger.custom definito per nascondersi istantaneamente all'applicazione del buff"
     subtext_off = bs_off["subRegions"][1]["text_text"]
     assert "OFF" in subtext_off, f"Missing OFF label in BS OFF: {subtext_off}"
@@ -63,7 +64,8 @@ def run_tests():
     assert cs_off["desaturate"] is True
     assert cs_off["auto"] is False
     assert cs_off["displayIcon"] == "Interface\\Icons\\Ability_Warrior_RallyingCry", f"Invalid icon for CS OFF: {cs_off.get('displayIcon')}"
-    assert cs_off["triggers"][1]["trigger"]["check"] == "event", "Commanding Shout OFF deve usare check: event per reagire a UNIT_AURA senza flickering OnUpdate"
+    assert cs_off["triggers"][1]["trigger"]["check"] == "event", "Commanding Shout OFF deve usare check: event per reagire a UNIT_AURA:player senza flickering OnUpdate"
+    assert "UNIT_AURA:player" in cs_off["triggers"][1]["trigger"]["events"], "Commanding Shout OFF deve registrare UNIT_AURA:player"
     assert "custom" in cs_off["triggers"][1]["untrigger"], "Commanding Shout OFF deve avere untrigger.custom definito per nascondersi istantaneamente all'applicazione del buff"
     subtext_cs_off = cs_off["subRegions"][1]["text_text"]
     assert "OFF" in subtext_cs_off, f"Missing OFF label in CS OFF: {subtext_cs_off}"

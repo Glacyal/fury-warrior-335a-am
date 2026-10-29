@@ -131,7 +131,7 @@ def build_buffs_auras() -> list[dict]:
     - 03 - Commanding Shout (Active + OFF)
     - 04 - Berserker Stance (OutOfStance)
     """
-    buff_events = "UNIT_AURA,PLAYER_REGEN_DISABLED,PLAYER_REGEN_ENABLED,PLAYER_ENTERING_WORLD"
+    buff_events = "UNIT_AURA:player,PLAYER_REGEN_DISABLED,PLAYER_REGEN_ENABLED,PLAYER_ENTERING_WORLD"
 
     return [
         # =====================================================================

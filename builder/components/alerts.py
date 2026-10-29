@@ -3,7 +3,7 @@ Modulo Componente: 17 - Alerts
 ==============================
 Gestisce gli avvisi testuali contestuali centrali (a y = 78, appena sopra Procs):
 1. Alert - Bloodsurge: Scritta singola centrata quando il buff Bloodsurge è attivo
-   (|cFFFFFF00SLAM READY!|r) accompagnata da notifica sonora (Doppio Fendente d'Aria).
+   (|cFFFFFF00SLAM READY!|r) accompagnata da notifica sonora (Tamburi di Guerra - Drums).
 """
 
 
@@ -11,7 +11,7 @@ def build_alerts_auras() -> list[dict]:
     """
     Costruisce e restituisce l'aura del gruppo Alerts:
     - 17 - Alerts warDPS (Group)
-    - Alert - Bloodsurge (Text: SLAM READY! con suono DoubleWhoosh)
+    - Alert - Bloodsurge (Text: SLAM READY! con suono Drums)
     """
     return [
         {
@@ -26,7 +26,7 @@ def build_alerts_auras() -> list[dict]:
                 "Alert - Bloodsurge",
             ],
         },
-        # 1. Alert - Bloodsurge (Solo SLAM READY! con suono Doppio Fendente d'Aria)
+        # 1. Alert - Bloodsurge (Solo SLAM READY! con suono Tamburi di Guerra Drums)
         {
             "id": "Alert - Bloodsurge",
             "uid": "FWHUD_ALERT_BLOODSURGE",
@@ -46,8 +46,8 @@ def build_alerts_auras() -> list[dict]:
                 "init": {"do_custom": False},
                 "start": {
                     "do_sound": True,
-                    "sound": "Interface\\AddOns\\WeakAuras\\Media\\Sounds\\DoubleWhoosh.ogg",
-                    "sound_path": "Interface\\AddOns\\WeakAuras\\Media\\Sounds\\DoubleWhoosh.ogg",
+                    "sound": "Interface\\AddOns\\WeakAuras\\Media\\Sounds\\Drums.ogg",
+                    "sound_path": "Interface\\AddOns\\WeakAuras\\Media\\Sounds\\Drums.ogg",
                     "sound_channel": "Master",
                 },
                 "finish": {"do_sound": False},

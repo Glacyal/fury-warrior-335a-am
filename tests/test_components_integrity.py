@@ -76,7 +76,7 @@ def run_tests():
     actions = alert_bs.get("actions", {})
     start_act = actions.get("start", {})
     assert start_act.get("do_sound") is True, "Alert - Bloodsurge start action missing do_sound=True"
-    assert "DoubleWhoosh.ogg" in start_act.get("sound", ""), "Alert - Bloodsurge sound is not DoubleWhoosh.ogg"
+    assert "Drums.ogg" in start_act.get("sound", ""), "Alert - Bloodsurge sound is not Drums.ogg"
     assert start_act.get("sound_channel") == "Master", "Alert - Bloodsurge sound channel is not Master"
 
     print(f"[OK] Validati {len(tree['c'])} nodi e 20 moduli di primo livello.")

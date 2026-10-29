@@ -23,12 +23,13 @@ Visualizza e interagisci con l'HUD direttamente dal browser senza installare nul
 Tutti i componenti del pacchetto sono organizzati con una numerazione sequenziale rigorosa da **01** a **19**:
 
 ### 1. Gruppo Dinamico Procs Rotazionali (`01 - Procs warDPS`)
-Barra orizzontale superiore (y = 52) con riposizionamento dinamico centrato, riservata **esclusivamente ai proc di combattimento attivi**:
+Barra orizzontale superiore (y = 69) con riposizionamento dinamico centrato, riservata **esclusivamente ai proc di combattimento attivi e debuff chiave**:
 1. **Bloodsurge**: Slam istantaneo con pixel glow dorato e conto alla rovescia di 5 secondi.
-2. **Victory Rush**: Proc *Victorious* (Spell 34428 / Buff 32216) con conto alla rovescia di 20 secondi e pixel glow verde.
-3. **Flurry**: +25% attack speed (3 cariche) dopo un critico in mischia.
-4. **Wrecking Crew / Enrage**: +10% danno fisico per 12s da critico.
-5. **Execute Usable**: Icona attiva con bordo luminoso ed etichetta `EXEC` quando il boss scende sotto il 20% di salute.
+2. **Victory Rush**: Proc *Victorious* (Spell 34428) post-uccisione nemico con conto alla rovescia di 20 secondi e pixel glow dorato.
+3. **Rend**: Debuff sanguinamento applicato dal guerriero sul bersaglio corrente con durata di 15 secondi, timer al decimo e swipe radiale.
+4. **Flurry**: +25% attack speed (3 cariche) dopo un critico in mischia.
+5. **Wrecking Crew / Enrage**: +10% danno fisico per 12s da critico.
+6. **Execute Usable**: Icona attiva con bordo luminoso ed etichetta `EXEC` quando il boss scende sotto il 20% di salute (attiva solo se il bersaglio è ostile e vivo).
 
 ### 2. Zero Clutter & Intelligenza Overlap di Raid
 - **02 - Battle Shout**: Gruppo genitore con architettura Active/OFF a zero sfarfallio (icone guerriero esclusive `Ability_Warrior_BattleShout` con `auto: False`): mostra l'icona con swipe e timer numerico se in scadenza (<= 30s); se mancano sia Battle Shout che BoM/GBoM del Paladino mostra l'avviso "OFF" desaturato pilotato da eventi `UNIT_AURA` con untrigger immediato; è completamente nascosto se attivo e sano (> 30s) o coperto da Paladino.
@@ -36,7 +37,7 @@ Barra orizzontale superiore (y = 52) con riposizionamento dinamico centrato, ris
 - **04 - Berserker Stance**: Allerta immediata ad alta visibilità se durante il combattimento il guerriero si trova fuori dalla Berserker Stance (con scritta compatta 'STANCE', font 8).
 - **Caricamento Specifico su [Rampage]**: Il talento passivo *Rampage* (Tab 2, Posizione 24 -> ID WeakAuras 64) è utilizzato come condizione di caricamento esclusiva dell'intero pacchetto: la suite si carica solo se il guerriero è specializzato Fury con Rampage attivo, e non occupa spazio visivo superfluo a schermo.
 
-### 3. Riga Utility Adattiva (`05` - `13`, da 3 a 11 Icone a y = -45)
+### 3. Riga Utility Adattiva (`05` - `13`, fino a 10 Icone a y = -45)
 Fila orizzontale inferiore a y = -45 con riposizionamento e ricentratura automatica naturale (espansione e contrazione dinamica identica a fire-mage-335a-am, con proporzioni geometriche auto-calibrate per rimanere contenuta entro i 278px della Rage Bar):
 - **05 - Trinket 1 warDPS & 06 - Trinket 2 warDPS**: Riconoscimento automatico slot 13 & 14 (suffisso `warDPS` anti-collisione). Catalogo esaustivo di **tutti i monili da mischia DPS e Tank 3.3.5a con ICD reali verificati online**:
   - *Deathbringer's Will*: proc 30s, ICD reale **105s** (trasformazioni Vrykul, Taunka, Iron Dwarf con icone dinamiche).

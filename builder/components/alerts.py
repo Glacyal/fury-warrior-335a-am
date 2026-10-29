@@ -2,19 +2,16 @@
 Modulo Componente: 17 - Alerts
 ==============================
 Gestisce gli avvisi testuali contestuali centrali (a y = 105):
-1. Alert - Bloodsurge: Scritta a due righe quando il buff Bloodsurge è attivo
-   (|cFFFF2200BLOODSURGE!|r\\n|cFFFFFF00SLAM READY!|r).
-2. Alert - Execute Phase: Avviso immediato quando il target scende sotto il 20% di salute
-   (|cFFFF0000EXECUTE PHASE (< 20%)!|r).
+1. Alert - Bloodsurge: Scritta singola centrata quando il buff Bloodsurge è attivo
+   (|cFFFFFF00SLAM READY!|r).
 """
 
 
 def build_alerts_auras() -> list[dict]:
     """
-    Costruisce e restituisce le aure del gruppo Alerts:
-    - 17 - Alerts (Group)
-    - Alert - Bloodsurge (Text)
-    - Alert - Execute Phase (Text)
+    Costruisce e restituisce l'aura del gruppo Alerts:
+    - 17 - Alerts warDPS (Group)
+    - Alert - Bloodsurge (Text: SLAM READY!)
     """
     return [
         {
@@ -27,21 +24,20 @@ def build_alerts_auras() -> list[dict]:
             "yOffset": 105,
             "controlledChildren": [
                 "Alert - Bloodsurge",
-                "Alert - Execute Phase",
             ],
         },
-        # 1. Alert - Bloodsurge
+        # 1. Alert - Bloodsurge (Solo SLAM READY!)
         {
             "id": "Alert - Bloodsurge",
             "uid": "FWHUD_ALERT_BLOODSURGE",
             "parent": "17 - Alerts warDPS",
             "regionType": "text",
             "internalVersion": 52,
-            "displayText": "|cFFFF2200BLOODSURGE!|r\\n|cFFFFFF00SLAM READY!|r",
+            "displayText": "|cFFFFFF00SLAM READY!|r",
             "fontSize": 20,
             "outline": "OUTLINE",
             "justify": "CENTER",
-            "color": [1, 1, 1, 1],
+            "color": [1, 1, 0, 1],
             "selfPoint": "CENTER",
             "anchorPoint": "CENTER",
             "xOffset": 0,
@@ -61,37 +57,4 @@ def build_alerts_auras() -> list[dict]:
                 "activeTriggerMode": -10,
             },
         },
-        # 2. Alert - Execute Phase (< 20% HP)
-        {
-            "id": "Alert - Execute Phase",
-            "uid": "FWHUD_ALERT_EXECUTE",
-            "parent": "17 - Alerts warDPS",
-            "regionType": "text",
-            "internalVersion": 52,
-            "displayText": "|cFFFF0000EXECUTE PHASE (< 20%)!|r",
-            "fontSize": 18,
-            "outline": "OUTLINE",
-            "justify": "CENTER",
-            "color": [1, 0.2, 0.2, 1],
-            "selfPoint": "CENTER",
-            "anchorPoint": "CENTER",
-            "xOffset": 0,
-            "yOffset": -28,
-            "triggers": {
-                1: {
-                    "trigger": {
-                        "type": "unit",
-                        "event": "Health",
-                        "unit": "target",
-                        "percenthealth": "20",
-                        "percenthealth_operator": "<=",
-                        "use_percenthealth": True,
-                        "use_unit": True,
-                    },
-                    "untrigger": {}
-                },
-                "activeTriggerMode": -10,
-            },
-        },
     ]
-

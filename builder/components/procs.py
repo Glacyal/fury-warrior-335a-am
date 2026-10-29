@@ -17,9 +17,9 @@ from builder.core.helpers import make_subtext, make_glow_action
 
 def build_procs_auras() -> list[dict]:
     """
-    Costruisce e restituisce le 6 aure del gruppo dinamico Procs:
+    Costruisce e restituisce le 7 aure del gruppo dinamico Procs:
     - 01 - Procs warDPS (Dynamic Group)
-    - Bloodsurge, Victory Rush, Flurry, Wrecking Crew, Execute Usable.
+    - Bloodsurge, Victory Rush, Flurry, Wrecking Crew, Rend, Execute Usable.
     """
     return [
         {
@@ -38,6 +38,7 @@ def build_procs_auras() -> list[dict]:
                 "Victory Rush",
                 "Flurry",
                 "Wrecking Crew",
+                "Rend",
                 "Execute Usable",
             ],
         },
@@ -223,7 +224,52 @@ end"""
                 "activeTriggerMode": -10,
             },
         },
-        # 5. Execute Usable (Target <= 20% HP)
+        # 5. Rend (Debuff su target - 47465 / 15s)
+        {
+            "id": "Rend",
+            "uid": "FWHUD_PROC_REND",
+            "parent": "01 - Procs warDPS",
+            "regionType": "icon",
+            "internalVersion": 52,
+            "width": 34,
+            "height": 34,
+            "displayIcon": "Interface\\Icons\\Ability_Gouge",
+            "auto": True,
+            "color": [1, 1, 1, 1],
+            "cooldown": True,
+            "cooldownSwipe": True,
+            "subRegions": [
+                make_subtext("%p", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=12, y_offset=0),
+            ],
+            "triggers": {
+                1: {
+                    "trigger": {
+                        "type": "aura2",
+                        "unit": "target",
+                        "auranames": [
+                            "Rend",
+                            "Squarcio",
+                            "47465",
+                            "25208",
+                            "11574",
+                            "11573",
+                            "11572",
+                            "6548",
+                            "6547",
+                            "6546",
+                            "772",
+                        ],
+                        "useName": True,
+                        "debuffType": "HARMFUL",
+                        "ownOnly": True,
+                        "matchesShowOn": "showOnActive",
+                    },
+                    "untrigger": {},
+                },
+                "activeTriggerMode": -10,
+            },
+        },
+        # 6. Execute Usable (Target <= 20% HP)
         {
             "id": "Execute Usable",
             "uid": "FWHUD_PROC_EXECUTE",

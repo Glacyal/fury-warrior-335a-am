@@ -269,7 +269,7 @@ end"""
                 "activeTriggerMode": -10,
             },
         },
-        # 6. Execute Usable (Target <= 20% HP)
+        # 6. Execute Usable (Target <= 20% HP e Bersaglio VIVO)
         {
             "id": "Execute Usable",
             "uid": "FWHUD_PROC_EXECUTE",
@@ -292,15 +292,31 @@ end"""
             "triggers": {
                 1: {
                     "trigger": {
-                        "type": "unit",
-                        "event": "Health",
-                        "unit": "target",
-                        "percenthealth": "20",
-                        "percenthealth_operator": "<=",
-                        "use_percenthealth": True,
-                        "use_unit": True,
+                        "type": "custom",
+                        "custom_type": "status",
+                        "check": "update",
+                        "custom": """function()
+    if not UnitExists("target") or UnitIsDeadOrGhost("target") or not UnitCanAttack("player", "target") then
+        return false
+    end
+    local maxHp = UnitHealthMax("target") or 0
+    if maxHp <= 0 then return false end
+    local hp = UnitHealth("target") or 0
+    if hp <= 0 then return false end
+    return (hp / maxHp) <= 0.20
+end""",
                     },
-                    "untrigger": {}
+                    "untrigger": {
+                        "custom": """function()
+    if not UnitExists("target") or UnitIsDeadOrGhost("target") or not UnitCanAttack("player", "target") then
+        return true
+    end
+    local maxHp = UnitHealthMax("target") or 0
+    if maxHp <= 0 then return true end
+    local hp = UnitHealth("target") or 0
+    return (hp <= 0) or ((hp / maxHp) > 0.20)
+end"""
+                    }
                 },
                 "activeTriggerMode": -10,
             },

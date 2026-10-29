@@ -1,7 +1,7 @@
 """
 Modulo Componente: 17 - Alerts
 ==============================
-Gestisce gli avvisi testuali contestuali centrali (a y = 105):
+Gestisce gli avvisi testuali contestuali centrali (a y = 78, appena sopra Procs):
 1. Alert - Bloodsurge: Scritta singola centrata quando il buff Bloodsurge è attivo
    (|cFFFFFF00SLAM READY!|r).
 """
@@ -21,7 +21,7 @@ def build_alerts_auras() -> list[dict]:
             "regionType": "group",
             "internalVersion": 52,
             "xOffset": 0,
-            "yOffset": 105,
+            "yOffset": 78,
             "controlledChildren": [
                 "Alert - Bloodsurge",
             ],

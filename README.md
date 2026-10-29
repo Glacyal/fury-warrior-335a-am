@@ -93,10 +93,9 @@ Posizionata visivamente a centro schermo subito sopra la barra della rabbia (278
 ### 6. Castbar Centrale (`16 - Castbar warDPS`)
 Barra sincronizzata (278x20px a y = 8) per lanci di Slam non-proc e cannellature, con icona incantesimo a sinistra, nome al centro e tempo a destra.
 
-### 7. Avvisi Testuali ad Alta Visibilità (`17 - Alerts warDPS`)
-Avvisi a caratteri cubitali a centro schermo (y = 105):
-- `BLOODSURGE! / SLAM READY!` in giallo/arancione quando Bloodsurge si attiva.
-- `EXECUTE PHASE (< 20%)!` in rosso fuoco quando il target scende sotto il 20% di salute.
+### 7. Avviso Testuale ad Alta Visibilità (`17 - Alerts warDPS`)
+Avviso singolo centrato compatto posizionato appena sopra la riga dei proc (y = 78):
+- `SLAM READY!` in giallo brillante (`|cFFFFFF00`) quando Bloodsurge procca, indicando all'istante la disponibilità di Slam istantaneo senza alcun clutter o distrazione visiva.
 
 ### 8. Pannello Statistiche in Tempo Reale (`18 - Stats Panel warDPS`)
 Pannello compatto (88x60px a x = -190, y = -45) con aggiornamento throttled a 10 Hz e 5 righe dinamiche:

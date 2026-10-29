@@ -70,6 +70,15 @@ def run_tests():
     assert root_load.get("talent", {}).get("single") == 64, "Root load talent != 64 (Rampage)"
     assert root_load.get("talent", {}).get("multi", {}).get(64) is True, "Root load talent multi[64] is not True"
 
+    # Verify Alert - Bloodsurge sound configuration
+    alert_bs = children_map.get("Alert - Bloodsurge")
+    assert alert_bs, "Missing 'Alert - Bloodsurge' in children"
+    actions = alert_bs.get("actions", {})
+    start_act = actions.get("start", {})
+    assert start_act.get("do_sound") is True, "Alert - Bloodsurge start action missing do_sound=True"
+    assert "DoubleWhoosh.ogg" in start_act.get("sound", ""), "Alert - Bloodsurge sound is not DoubleWhoosh.ogg"
+    assert start_act.get("sound_channel") == "Master", "Alert - Bloodsurge sound channel is not Master"
+
     print(f"[OK] Validati {len(tree['c'])} nodi e 20 moduli di primo livello.")
     print("[PASS] test_components_integrity.py superato con successo!")
 

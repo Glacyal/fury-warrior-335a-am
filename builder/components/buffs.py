@@ -36,16 +36,26 @@ SHARED_WARRIOR_BUFFS_LUA = r"""function()
         hasBoM = false,
         bomDuration = 0,
         bomExpiration = 0,
+        bomIcon = nil,
         hasBloodPact = false,
         bpDuration = 0,
         bpExpiration = 0,
+        bpIcon = nil,
         hasBattleShout = false,
         bsDuration = 0,
         bsExpiration = 0,
+        bsIcon = nil,
         hasCommandingShout = false,
         csDuration = 0,
         csExpiration = 0,
+        csIcon = nil,
     }
+
+    local bsNameLocal = select(1, GetSpellInfo(47436))
+    local csNameLocal = select(1, GetSpellInfo(47440))
+    local bomNameLocal1 = select(1, GetSpellInfo(48934))
+    local bomNameLocal2 = select(1, GetSpellInfo(19740))
+    local bpNameLocal = select(1, GetSpellInfo(47982))
 
     for i = 1, 40 do
         local name, rank, icon, count, debuffType, duration, expirationTime, unitCaster, isStealable, shouldConsolidate, spellId = UnitBuff("player", i)
@@ -70,35 +80,42 @@ SHARED_WARRIOR_BUFFS_LUA = r"""function()
         -- Controllo Blessing of Might / Greater Blessing of Might (Paladino: non stacka con Battle Shout)
         if spellId == 48934 or spellId == 48932 or spellId == 25782 or spellId == 25916 or
            spellId == 27140 or spellId == 19740 or spellId == 19834 or spellId == 19835 or
+           (bomNameLocal1 and name == bomNameLocal1) or (bomNameLocal2 and name == bomNameLocal2) or
            name == "Greater Blessing of Might" or name == "Blessing of Might" or
            name == "Benedizione della Potenza Superiore" or name == "Benedizione della Potenza" then
             c.hasBoM = true
             c.bomDuration = duration or 1800
             c.bomExpiration = (expirationTime and expirationTime > 0) and expirationTime or (now_b + 1800)
+            c.bomIcon = icon or select(3, GetSpellInfo(48934)) or select(3, GetSpellInfo(19740))
         end
 
         -- Controllo Blood Pact (Warlock Imp: non stacka con Commanding Shout)
         if spellId == 47982 or spellId == 47981 or spellId == 27268 or spellId == 11767 or
-           spellId == 11766 or spellId == 6307 or name == "Blood Pact" or name == "Patto di Sangue" then
+           spellId == 11766 or spellId == 6307 or (bpNameLocal and name == bpNameLocal) or
+           name == "Blood Pact" or name == "Patto di Sangue" then
             c.hasBloodPact = true
             c.bpDuration = duration or 1800
             c.bpExpiration = (expirationTime and expirationTime > 0) and expirationTime or (now_b + 1800)
+            c.bpIcon = icon or select(3, GetSpellInfo(47982))
         end
 
         -- Controllo Battle Shout
         if spellId == 47436 or spellId == 25289 or spellId == 11551 or spellId == 11550 or
            spellId == 11549 or spellId == 6192 or spellId == 5242 or spellId == 2048 or spellId == 6673 or
-           name == "Battle Shout" or name == "Urlo di Battaglia" then
+           (bsNameLocal and name == bsNameLocal) or name == "Battle Shout" or name == "Urlo di Battaglia" then
             c.hasBattleShout = true
             c.bsDuration = duration or 120
             c.bsExpiration = (expirationTime and expirationTime > 0) and expirationTime or (now_b + 120)
+            c.bsIcon = icon or select(3, GetSpellInfo(47436))
         end
 
-        -- Controllo Commanding Shout
-        if spellId == 47440 or spellId == 469 or name == "Commanding Shout" or name == "Urlo di Comando" then
+        -- Controllo Commanding Shout (Rank 1: 469/45517, Rank 2: 47439, Rank 3: 47440)
+        if spellId == 47440 or spellId == 47439 or spellId == 469 or spellId == 45517 or
+           (csNameLocal and name == csNameLocal) or name == "Commanding Shout" or name == "Urlo di Comando" then
             c.hasCommandingShout = true
             c.csDuration = duration or 120
             c.csExpiration = (expirationTime and expirationTime > 0) and expirationTime or (now_b + 120)
+            c.csIcon = icon or select(3, GetSpellInfo(47440))
         end
     end
 
@@ -114,7 +131,7 @@ def build_buffs_auras() -> list[dict]:
     - 03 - Commanding Shout (Active + OFF)
     - 04 - Berserker Stance (OutOfStance)
     """
-    buff_events = "UNIT_AURA,PLAYER_REGEN_DISABLED,PLAYER_REGEN_ENABLED,PLAYER_ENTERING_WORLD,FWHUD_BS_THRESHOLD,FWHUD_CS_THRESHOLD"
+    buff_events = "UNIT_AURA,PLAYER_REGEN_DISABLED,PLAYER_REGEN_ENABLED,PLAYER_ENTERING_WORLD"
 
     return [
         # =====================================================================
@@ -175,44 +192,17 @@ end""",
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": buff_events,
-                        "custom": """function(event, ...)
+                        "custom": """function()
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
     local c = _G.FWHUD_BuffCache_Func()
     local now = GetTime()
-    local exp = 0
-    if c and c.hasBattleShout and c.bsExpiration and c.bsExpiration > 0 then
-        exp = c.bsExpiration
-    elseif c and c.hasBoM and c.bomExpiration and c.bomExpiration > 0 then
-        exp = c.bomExpiration
-    end
+    local exp = (c and c.hasBattleShout and c.bsExpiration) or (c and c.hasBoM and c.bomExpiration) or 0
     if exp > 0 then
         local rem = exp - now
-        local threshold = 30
-        if rem > threshold then
-            local delay = rem - threshold
-            if _G.FWHUD_BS_ScheduledExp ~= exp then
-                _G.FWHUD_BS_ScheduledExp = exp
-                _G.FWHUD_BS_TimerSeq = (_G.FWHUD_BS_TimerSeq or 0) + 1
-                local mySeq = _G.FWHUD_BS_TimerSeq
-                local timerAfter = (C_Timer and C_Timer.After) or (_G.C_Timer and _G.C_Timer.After)
-                if timerAfter then
-                    timerAfter(delay, function()
-                        if _G.FWHUD_BS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
-                            WeakAuras.ScanEvents("FWHUD_BS_THRESHOLD")
-                        end
-                    end)
-                end
-            end
-            return false
-        elseif rem > 0 then
-            _G.FWHUD_BS_ScheduledExp = nil
-            return true
-        end
+        return rem > 0 and rem <= 30
     end
-    _G.FWHUD_BS_ScheduledExp = nil
-    _G.FWHUD_BS_TimerSeq = (_G.FWHUD_BS_TimerSeq or 0) + 1
     return false
 end""",
                         "customDuration": """function()
@@ -229,24 +219,12 @@ end""",
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
     local c = _G.FWHUD_BuffCache_Func()
     if c and c.hasBoM and not c.hasBattleShout then
-        return "Interface\\Icons\\Spell_Holy_GreaterBlessingofMount"
+        return c.bomIcon or select(3, GetSpellInfo(48934)) or select(3, GetSpellInfo(19740)) or "Interface\\Icons\\Spell_Holy_GreaterBlessingofKings"
     end
-    return "Interface\\Icons\\Ability_Warrior_BattleShout"
+    return c.bsIcon or select(3, GetSpellInfo(47436)) or "Interface\\Icons\\Ability_Warrior_BattleShout"
 end""",
                     },
-                    "untrigger": {
-                        "custom": """function(event, ...)
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func()
-    local now = GetTime()
-    local exp = (c and c.hasBattleShout and c.bsExpiration) or (c and c.hasBoM and c.bomExpiration) or 0
-    if exp > 0 then
-        local rem = exp - now
-        return not (rem > 0 and rem <= 30)
-    end
-    return true
-end"""
-                    }
+                    "untrigger": {},
                 },
                 "activeTriggerMode": -10,
             },
@@ -275,23 +253,16 @@ end"""
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": buff_events,
-                        "custom": """function(event, ...)
+                        "custom": """function()
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
     local c = _G.FWHUD_BuffCache_Func()
     if (c and c.hasBoM) or (c and c.hasBattleShout) then return false end
     return true
 end""",
                     },
-                    "untrigger": {
-                        "custom": """function(event, ...)
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func()
-    if (c and c.hasBoM) or (c and c.hasBattleShout) then return true end
-    return false
-end"""
-                    }
+                    "untrigger": {},
                 },
                 "activeTriggerMode": -10,
             },
@@ -324,7 +295,7 @@ end"""
             "yOffset": 0,
             "width": 28,
             "height": 28,
-            "displayIcon": "Interface\\Icons\\Ability_Warrior_RallyingCry",
+            "displayIcon": "Interface\\Icons\\Ability_Warrior_CommandingShout",
             "auto": True,
             "color": [1, 1, 1, 1],
             "cooldown": True,
@@ -335,7 +306,7 @@ end"""
             "customText": """function()
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
     local c = _G.FWHUD_BuffCache_Func()
-    local exp = (c and c.hasCommandingShout and c.csExpiration) or (c and c.hasBloodPact and c.bpExpiration) or 0
+    local exp = (c and c.hasCommandingShout and c.csExpiration) or 0
     if exp > 0 then
         local rem = exp - GetTime()
         if rem > 60 then
@@ -355,44 +326,17 @@ end""",
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": buff_events,
-                        "custom": """function(event, ...)
+                        "custom": """function()
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
     local c = _G.FWHUD_BuffCache_Func()
     local now = GetTime()
-    local exp = 0
-    if c and c.hasCommandingShout and c.csExpiration and c.csExpiration > 0 then
-        exp = c.csExpiration
-    elseif c and c.hasBloodPact and c.bpExpiration and c.bpExpiration > 0 then
-        exp = c.bpExpiration
-    end
+    local exp = (c and c.hasCommandingShout and c.csExpiration) or 0
     if exp > 0 then
         local rem = exp - now
-        local threshold = 30
-        if rem > threshold then
-            local delay = rem - threshold
-            if _G.FWHUD_CS_ScheduledExp ~= exp then
-                _G.FWHUD_CS_ScheduledExp = exp
-                _G.FWHUD_CS_TimerSeq = (_G.FWHUD_CS_TimerSeq or 0) + 1
-                local mySeq = _G.FWHUD_CS_TimerSeq
-                local timerAfter = (C_Timer and C_Timer.After) or (_G.C_Timer and _G.C_Timer.After)
-                if timerAfter then
-                    timerAfter(delay, function()
-                        if _G.FWHUD_CS_TimerSeq == mySeq and WeakAuras and WeakAuras.ScanEvents then
-                            WeakAuras.ScanEvents("FWHUD_CS_THRESHOLD")
-                        end
-                    end)
-                end
-            end
-            return false
-        elseif rem > 0 then
-            _G.FWHUD_CS_ScheduledExp = nil
-            return true
-        end
+        return rem > 0 and rem <= 30
     end
-    _G.FWHUD_CS_ScheduledExp = nil
-    _G.FWHUD_CS_TimerSeq = (_G.FWHUD_CS_TimerSeq or 0) + 1
     return false
 end""",
                         "customDuration": """function()
@@ -400,8 +344,6 @@ end""",
     local c = _G.FWHUD_BuffCache_Func()
     if c and c.hasCommandingShout and c.csExpiration and c.csExpiration > 0 then
         return c.csDuration or 120, c.csExpiration
-    elseif c and c.hasBloodPact and c.bpExpiration and c.bpExpiration > 0 then
-        return c.bpDuration or 1800, c.bpExpiration
     end
     return 0, 0
 end""",
@@ -409,24 +351,12 @@ end""",
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
     local c = _G.FWHUD_BuffCache_Func()
     if c and c.hasBloodPact and not c.hasCommandingShout then
-        return "Interface\\Icons\\Spell_Shadow_BloodPact"
+        return c.bpIcon or select(3, GetSpellInfo(47982)) or "Interface\\Icons\\Spell_Shadow_BloodBoil"
     end
-    return "Interface\\Icons\\Ability_Warrior_RallyingCry"
+    return c.csIcon or select(3, GetSpellInfo(47440)) or "Interface\\Icons\\Ability_Warrior_CommandingShout"
 end""",
                     },
-                    "untrigger": {
-                        "custom": """function(event, ...)
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func()
-    local now = GetTime()
-    local exp = (c and c.hasCommandingShout and c.csExpiration) or (c and c.hasBloodPact and c.bpExpiration) or 0
-    if exp > 0 then
-        local rem = exp - now
-        return not (rem > 0 and rem <= 30)
-    end
-    return true
-end"""
-                    }
+                    "untrigger": {},
                 },
                 "activeTriggerMode": -10,
             },
@@ -442,7 +372,7 @@ end"""
             "yOffset": 0,
             "width": 28,
             "height": 28,
-            "displayIcon": "Interface\\Icons\\Ability_Warrior_RallyingCry",
+            "displayIcon": "Interface\\Icons\\Ability_Warrior_CommandingShout",
             "auto": False,
             "desaturate": True,
             "color": [0.6, 0.6, 0.6, 0.8],
@@ -455,23 +385,16 @@ end"""
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": buff_events,
-                        "custom": """function(event, ...)
+                        "custom": """function()
     _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
     local c = _G.FWHUD_BuffCache_Func()
     if (c and c.hasCommandingShout) or (c and c.hasBloodPact) then return false end
     return true
 end""",
                     },
-                    "untrigger": {
-                        "custom": """function(event, ...)
-    _G.FWHUD_BuffCache_Func = _G.FWHUD_BuffCache_Func or """ + SHARED_WARRIOR_BUFFS_LUA + """
-    local c = _G.FWHUD_BuffCache_Func()
-    if (c and c.hasCommandingShout) or (c and c.hasBloodPact) then return true end
-    return false
-end"""
-                    }
+                    "untrigger": {},
                 },
                 "activeTriggerMode": -10,
             },

@@ -1660,9 +1660,9 @@ def make_ring_custom_text() -> str:
             if rem >= 60 then
                 local m = math.floor(rem / 60)
                 local s = math.floor(rem % 60)
-                return string.format("|cFFFF4444%d:%02d|r", m, s)
+                return string.format("%d:%02d", m, s)
             else
-                return string.format("|cFFFF4444%.0fs|r", rem)
+                return string.format("%.0f", rem)
             end
         end
         return ""
@@ -1805,9 +1805,9 @@ def make_slot_custom_text(slot: int) -> str:
             if rem >= 60 then
                 local m = math.floor(rem / 60)
                 local s = math.floor(rem % 60)
-                return string.format("|cFFFF4444%d:%02d|r", m, s)
+                return string.format("%d:%02d", m, s)
             else
-                return string.format("|cFFFF4444%.0fs|r", rem)
+                return string.format("%.0f", rem)
             end
         end
         return ""

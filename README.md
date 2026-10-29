@@ -73,6 +73,10 @@ Fila orizzontale inferiore a y = -45 con riposizionamento e ricentratura automat
 - **11 - Death Wish**: Durata attiva 30s (+20% danno) e cooldown.
 - **12 - Recklessness**: Tracciamento delle 3 cariche di critico garantito e cooldown.
 - **13 - Boots warDPS**: Stivali a nitro (Nitro Boosts) o incanti velocità con stato pronto e ricarica.
+- **Standard Cromatico & Formattazione Tempi (Allineato 1:1 a Fire Mage)**:
+  - **Proc Attivo**: testo in giallo brillante al decimo di secondo (`|cFFFFFF00%.1fs|r`) con animazione circolare e contorno Pixel Glow dorato.
+  - **ICD / Cooldown di Ricarica**: testo bianco standard (senza tag di colore e senza la lettera `s`), formattato in minuti:secondi (`%d:%02d`, es. `1:15`) se $\ge 60\text{s}$ oppure in secondi interi (`%.0f`, es. `45`, `30`, `12`) se $< 60\text{s}$, garantendo una visualizzazione sobria e pulita identica a quella nativa di WoW e di Fire Mage.
+  - **Stato Pronto (Ready)**: testo vuoto `""` e icona statica a colori naturali pronta per il prossimo proc.
 
 ### 4. Barra della Rabbia Dinamica (`14 - Rage Bar`)
 Barra orizzontale di precisione (278x14px a y = -20) con lettura numerica (%p) e cambio cromatico a 3 stadi:

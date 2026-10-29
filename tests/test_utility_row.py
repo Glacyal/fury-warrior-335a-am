@@ -109,7 +109,7 @@ def run_tests():
     for slot in (13, 14):
         txt_code = make_slot_custom_text(slot)
         assert "|cFFFFFF00%.1fs|r" in txt_code, f"Manca formato giallo per proc attivo in slot {slot}"
-        assert "|cFFFF4444" in txt_code, f"Manca formato rosso per ICD/cooldown rimanente in slot {slot}"
+        assert 'string.format("%.0f", rem)' in txt_code, f"Manca formato bianco standard per ICD/cooldown in slot {slot}"
         assert "LCG.PixelGlow_Start" in txt_code, f"Manca PixelGlow_Start su proc attivo in slot {slot}"
         assert "LCG.PixelGlow_Stop" in txt_code, f"Manca PixelGlow_Stop su fine proc in slot {slot}"
 
@@ -120,7 +120,7 @@ def run_tests():
     # Verify Ring customText format
     ring_txt = make_ring_custom_text()
     assert "|cFFFFFF00%.1fs|r" in ring_txt, "Manca formato giallo per proc attivo anello"
-    assert "|cFFFF4444" in ring_txt, "Manca formato rosso per ICD/cooldown anello"
+    assert 'string.format("%.0f", rem)' in ring_txt, "Manca formato bianco standard per ICD/cooldown anello"
 
     # Verify Tier Sets and Enchants detection in Lua bootstrap
     assert "FWHUD_T10_Pieces" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca tabella pezzi Tier 10"

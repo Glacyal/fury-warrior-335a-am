@@ -2,7 +2,7 @@
 Modulo Componente: 19 - Sunder Armor Tracker
 ============================================
 Gestisce il monitoraggio del debuff Sunder Armor / Expose Armor sul bersaglio corrente:
-- Posizione: xOffset = 169, yOffset = 45 (sul lato destro rispetto alla barra centrale).
+- Posizione: xOffset = 160, yOffset = -7 (sul lato destro rispetto alla barra centrale).
 - Traccia:
   * Conteggio cariche (da 1 a 5 cariche, stack count %s).
   * Conto alla rovescia di scadenza (%p o timer formattato).
@@ -31,9 +31,9 @@ def build_sunder_auras() -> list[dict]:
             "internalVersion": 52,
             "width": 32,
             "height": 32,
-            "xOffset": 169,
-            "yOffset": 45,
-            "displayIcon": "Interface\\Icons\\Ability_Warrior_Sunder",
+            "xOffset": 160,
+            "yOffset": -7,
+            "displayIcon": "Interface\\Icons\\ability_warrior_sunder",
             "auto": False,
             "color": [1, 1, 1, 1],
             "cooldown": True,
@@ -97,7 +97,7 @@ end""",
                     "trigger": {
                         "type": "custom",
                         "custom_type": "status",
-                        "check": "event",
+                        "check": "update",
                         "events": sunder_events,
                         "custom": """function(event, ...)
     if not UnitExists("target") or UnitIsFriend("player", "target") or UnitIsDead("target") then
@@ -150,13 +150,13 @@ end""",
             local name, _, icon, _, _, _, _, _, _, _, spellId = UnitDebuff("target", i)
             if not name then break end
             if spellId == 8647 or spellId == 48669 or name == "Expose Armor" or name == "Armatura Esclusa" then
-                return "Interface\\Icons\\Ability_Warrior_Riposte"
+                return icon or (GetSpellInfo and select(3, GetSpellInfo(8647))) or "Interface\\Icons\\Ability_Warrior_Riposte"
             elseif spellId == 47467 or spellId == 7386 or spellId == 11597 or name == "Sunder Armor" or name == "Fendente d'Armatura" then
-                return icon or "Interface\\Icons\\Ability_Warrior_Sunder"
+                return icon or (GetSpellInfo and select(3, GetSpellInfo(7386))) or "Interface\\Icons\\ability_warrior_sunder"
             end
         end
     end
-    return "Interface\\Icons\\Ability_Warrior_Sunder"
+    return (GetSpellInfo and select(3, GetSpellInfo(7386))) or (GetSpellInfo and select(3, GetSpellInfo(47467))) or "Interface\\Icons\\ability_warrior_sunder"
 end""",
                     },
                     "untrigger": {

@@ -11,8 +11,8 @@ def run_tests():
 
     sunder = auras[0]
     assert sunder["id"] == "19 - Sunder Armor Tracker"
-    assert sunder["xOffset"] == 169
-    assert sunder["yOffset"] == 45
+    assert sunder["xOffset"] == 160
+    assert sunder["yOffset"] == -7
     assert sunder["width"] == 32
     assert sunder["height"] == 32
 

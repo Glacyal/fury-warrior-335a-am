@@ -44,8 +44,8 @@ def run_tests():
     # Check 19 - Sunder Armor Tracker
     sunder = c_map.get("19 - Sunder Armor Tracker")
     assert sunder is not None, "Missing 19 - Sunder Armor Tracker"
-    assert sunder["xOffset"] == 169, f"Invalid Sunder Tracker xOffset: {sunder.get('xOffset')}"
-    assert sunder["yOffset"] == 45, f"Invalid Sunder Tracker yOffset: {sunder.get('yOffset')}"
+    assert sunder["xOffset"] == 160, f"Invalid Sunder Tracker xOffset: {sunder.get('xOffset')}"
+    assert sunder["yOffset"] == -7, f"Invalid Sunder Tracker yOffset: {sunder.get('yOffset')}"
 
     print("[OK] Tutte le dimensioni geometriche e coordinate a schermo sono verificate al millimetro.")
     print("[PASS] test_tree_layout.py superato con successo!")

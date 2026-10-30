@@ -106,7 +106,7 @@ Avviso singolo centrato compatto posizionato appena sopra la riga dei proc (y = 
 Pannello compatto (88x60px a x = -190, y = -45) con aggiornamento throttled a 10 Hz e 5 righe dinamiche:
 - **AP**: Attack power totale con buff e moltiplicatori (Battle Shout, GBoM, Berserking MH/OH, Ashen Band, DBW, STS, T10 2P).
 - **Crit**: Critico in mischia con debuff Heart of the Crusader / Master Poisoner / Totem of Wrath (+3%) sul bersaglio.
-- **Haste**: Melee Haste dinamica calcolata con moltiplicatori raid: Windfury Totem / Improved Icy Talons (+20%), Swift Retribution / Improved Moonkin (+3%), Bloodlust (+30%), Flurry (+25%), Berserking Troll (+20%) e Power Infusion (+20%).
+- **Haste**: Melee Haste dinamica calcolata con moltiplicatori raid: Windfury Totem / Improved Icy Talons (+20%), Swift Retribution / Improved Moonkin (+3%), Bloodlust (+30%), Flurry (+25%) e Berserking Troll (+20%).
 - **ArP**: Percentuale e rating, con dicitura **CAP in verde** al raggiungimento del cap di 1400.
 - **Hit & Exp**: Verifica visiva istantanea del cap 8% Special Hit (con aura Draenei Heroic Presence +1%) e soft cap 26 Expertise.
 

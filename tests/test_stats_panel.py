@@ -36,6 +36,8 @@ def run_tests():
     assert "Swift Retribution" in lua_code, "Manca Swift Retribution in customText"
     assert "Flurry" in lua_code, "Manca Flurry in customText"
     assert "Bloodlust" in lua_code, "Manca Bloodlust in customText"
+    assert "Power Infusion" not in lua_code, "Power Infusion non deve influire sulla Melee Haste del Warrior"
+    assert "10060" not in lua_code, "Spell ID 10060 (Power Infusion) non deve influire sulla Melee Haste del Warrior"
 
     # ArP and Hit/Exp checks
     assert "GetCombatRating(25)" in lua_code, "Manca Combat Rating 25 (ArP) in customText"

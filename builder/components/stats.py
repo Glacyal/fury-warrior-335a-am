@@ -6,7 +6,7 @@ Gestisce il pannello delle statistiche in tempo reale (88x60px a x = -190, y = -
   1. Attack Power (AP base + posBuff + negBuff)
   2. Melee Crit (con GetCritChance() + debuff sul bersaglio Heart of the Crusader / Master Poisoner / Totem of Wrath +3%)
   3. Melee Haste (GetCombatRatingBonus(18) + moltiplicatori raid: Windfury Totem / Improved Icy Talons +20%,
-     Swift Retribution / Improved Moonkin Form +3%, Bloodlust/Heroism +30%, Flurry +25%, Berserking Troll +20%, PI +20%)
+     Swift Retribution / Improved Moonkin Form +3%, Bloodlust/Heroism +30%, Flurry +25%, Berserking Troll +20%)
   4. Armor Penetration (ArP rating e %, con evidenziazione verde al raggiungimento dell'Hard Cap di 1400)
   5. Melee Hit (soglia cap 8%, aura Draenei Heroic Presence +1%) ed Expertise (soft cap 26)
 
@@ -60,7 +60,6 @@ def make_stats_custom_text() -> str:
     local has3Haste = false
     local hasFlurry = false
     local hasTrollBerserk = false
-    local hasPI = false
     local hasHeroicPresence = false
 
     for i = 1, 40 do
@@ -92,10 +91,6 @@ def make_stats_custom_text() -> str:
         -- Berserking Razziale Troll (+20% Haste - Spell ID 26297 per distinguere dall'incanto arma 59620)
         elseif not hasTrollBerserk and (spellId == 26297 or (name == "Berserking" and count == 0 and spellId ~= 59620)) then
             hasTrollBerserk = true
-            hasteMult = hasteMult * 1.20
-        -- Power Infusion (+20% Haste Prete)
-        elseif not hasPI and (spellId == 10060 or name == "Power Infusion" or name == "Infusione di Potere") then
-            hasPI = true
             hasteMult = hasteMult * 1.20
         end
 

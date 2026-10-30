@@ -141,7 +141,8 @@ def run_tests():
     assert "1900" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Crusader (1900) in FWHUD_WeaponEnchantDB"
     assert "3869" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Blade Ward (3869) in FWHUD_WeaponEnchantDB"
     assert "3870" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca Blood Draining (3870) in FWHUD_WeaponEnchantDB"
-    assert "FWHUD_BootsEnchantIDs" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca tabella FWHUD_BootsEnchantIDs"
+    assert "FWHUD_BootsEnchantIDs" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA
+    assert "3606" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca ID 3606 (Nitro Boosts) in FWHUD_BootsEnchantIDs"
     assert "tuskarr" not in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA.lower(), "Tuskarr non deve essere presente: solo Nitro Boosts puo triggerare su slot 8"
     assert "swiftness" not in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA.lower(), "Swiftness non deve essere presente: solo Nitro Boosts puo triggerare su slot 8"
     assert "FWHUD_UpdateUtilityRowPositions" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione di riposizionamento dinamico"

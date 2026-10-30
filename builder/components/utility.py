@@ -366,9 +366,21 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
     _G.FWHUD_GlovesSpellIds = { [54758] = true }
     _G.FWHUD_GlovesKeywords = { "hyperspeed", "accelerat", "ipersonic", "340 haste" }
 
-    _G.FWHUD_BootsEnchantIDs = { [3601] = true }
-    _G.FWHUD_BootsSpellIds = { [54861] = true, [54858] = true, [55016] = true }
-    _G.FWHUD_BootsKeywords = { "nitro", "acceleratori a nitro" }
+    _G.FWHUD_BootsEnchantIDs = {
+        [3606] = true, -- Nitro Boosts (Engineering +24 Crit & Active Speed in WotLK 3.3.5a)
+        [3601] = true, -- Alternate tinker ID
+        [55016] = true, -- Crafting spell
+        [54861] = true, -- Buff spell
+        [55004] = true, -- Trigger spell
+        [54858] = true, -- Item tinker spell
+    }
+    _G.FWHUD_BootsSpellIds = {
+        [54861] = true,
+        [55016] = true,
+        [55004] = true,
+        [54858] = true,
+    }
+    _G.FWHUD_BootsKeywords = { "nitro", "acceleratori a nitro", "acceleratori di nitro" }
 
     -- Tier 10: Ymirjar Lord's Battlegear (277, 264, 251)
     _G.FWHUD_T10_Pieces = {
@@ -439,20 +451,35 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
             if not tt then
                 tt = CreateFrame("GameTooltip", "FWHUD_ScanTT", UIParent, "GameTooltipTemplate")
                 tt:SetOwner(UIParent, "ANCHOR_NONE")
+                for i = 1, 30 do
+                    if not _G["FWHUD_ScanTTTextLeft"..i] then
+                        local l = tt:CreateFontString("FWHUD_ScanTTTextLeft"..i, "ARTWORK", "GameTooltipText")
+                        local r = tt:CreateFontString("FWHUD_ScanTTTextRight"..i, "ARTWORK", "GameTooltipText")
+                        tt:AddFontStrings(l, r)
+                    end
+                end
                 _G.FWHUD_ScanTT = tt
             end
             tt:ClearLines()
             tt:SetInventoryItem("player", s)
-            for j = 1, tt:NumLines() do
+            for j = 1, (tt:NumLines() or 0) do
                 local line = _G["FWHUD_ScanTTTextLeft"..j]
                 local text = line and line:GetText()
                 if text then
                     local lt = text:lower()
-                    local ltClean = lt:gsub("[%s%p%c]", "")
                     for _, kw in ipairs(keywords) do
-                        local kwClean = kw:lower():gsub("[%s%p%c]", "")
-                        if lt:find(kw, 1, true) or ltClean:find(kwClean, 1, true) then
-                            return true
+                        if lt:find(kw, 1, true) then return true end
+                    end
+                end
+            end
+            local regions = { tt:GetRegions() }
+            for _, r in ipairs(regions) do
+                if r and r.GetObjectType and r:GetObjectType() == "FontString" and r.GetText then
+                    local text = r:GetText()
+                    if text then
+                        local lt = text:lower()
+                        for _, kw in ipairs(keywords) do
+                            if lt:find(kw, 1, true) then return true end
                         end
                     end
                 end
@@ -479,14 +506,28 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
             return false
         end
 
-        -- Slot 8 (Boots): Nitro Boosts / Speed
+        -- Slot 8 (Boots): Nitro Boosts (Engineering)
         if s == 8 then
             local buffs = _G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs()
-            if buffs and (buffs.bySpellId[54861] or buffs.bySpellId[54858] or buffs.bySpellId[55016]) then
+            if buffs then
+                if (_G.FWHUD_BootsSpellIds and (buffs.bySpellId[54861] or buffs.bySpellId[54858] or buffs.bySpellId[55016] or buffs.bySpellId[55004])) then
+                    cache.isEquipped = true
+                    return true
+                end
+                for _, b in ipairs(buffs.list or {}) do
+                    local bName = b.name and b.name:lower() or ""
+                    if (b.spellId and _G.FWHUD_BootsSpellIds and _G.FWHUD_BootsSpellIds[b.spellId]) or bName:find("nitro", 1, true) then
+                        cache.isEquipped = true
+                        return true
+                    end
+                end
+            end
+            if enchantID and _G.FWHUD_BootsEnchantIDs and _G.FWHUD_BootsEnchantIDs[enchantID] then
                 cache.isEquipped = true
                 return true
             end
-            if enchantID and _G.FWHUD_BootsEnchantIDs[enchantID] then
+            local itemStart, itemDur = GetInventoryItemCooldown("player", 8)
+            if itemDur and itemDur >= 60 then
                 cache.isEquipped = true
                 return true
             end
@@ -644,7 +685,9 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                     isMatch = true
                 end
             elseif slot == 8 then
-                if b.spellId and (b.spellId == 54861 or b.spellId == 54858 or b.spellId == 55016) then
+                local bName = b.name and b.name:lower() or ""
+                if (b.spellId and (b.spellId == 54861 or b.spellId == 54858 or b.spellId == 55016 or b.spellId == 55004)) or
+                   bName:find("nitro", 1, true) then
                     isMatch = true
                 end
             else

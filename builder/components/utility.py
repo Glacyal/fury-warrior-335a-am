@@ -223,8 +223,8 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         [50344] = { keywords = { "unidentifiableorgan", "organ", "organo" }, spellIds = { [71537] = true, [71578] = true }, icd = 0, dur = 10 },
 
         -- Sindragosa's Flawless Fang (Normal 50361, Heroic 50364 - ICC 25 Sindragosa) - On-Use Resistances
-        [50361] = { keywords = { "sindragosa", "fang", "zanna", "aegis", "dalaran" }, spellIds = { [71635] = true }, icd = 60, dur = 10, onUse = true },
-        [50364] = { keywords = { "sindragosa", "fang", "zanna", "aegis", "dalaran" }, spellIds = { [71638] = true }, icd = 60, dur = 10, onUse = true },
+        [50361] = { keywords = { "sindragosa", "fang", "zanna", "aegis", "aegisofdalaran", "egidadidalaran" }, spellIds = { [71635] = true }, icd = 60, dur = 10, onUse = true },
+        [50364] = { keywords = { "sindragosa", "fang", "zanna", "aegis", "aegisofdalaran", "egidadidalaran" }, spellIds = { [71638] = true }, icd = 60, dur = 10, onUse = true },
 
         -- Glyph of Indomitability (47735 - 50 Emblem of Triumph) - On-Use Dodge
         [47735] = { keywords = { "indomitability", "glyph", "glifo", "indomitable", "indomito" }, spellIds = { [67713] = true }, icd = 120, dur = 20, onUse = true },
@@ -299,9 +299,9 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         -- Tank Procs & On-Use
         "juggernaut", "vitality", "vigore",
         "satrina", "impeding", "scarab", "scarabeo",
-        "skeleton", "hardened", "skin", "indurita", "chiave",
+        "skeleton", "hardened", "hardenedskin", "pelleindurita", "chiave",
         "organ", "organo",
-        "fang", "zanna", "aegis", "dalaran",
+        "fang", "zanna", "aegis", "aegisofdalaran", "egidadidalaran",
         "indomitable", "indomito", "glyph", "glifo",
         "blackheart", "cuorenero", "parrying",
         "gossamer", "tessitura",
@@ -703,7 +703,7 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                                 if cName:find(kwClean, 1, true) then isMatch = true break end
                             end
                         end
-                        if not isMatch then
+                        if not isMatch and not entry then
                             local otherSlot = (slot == 13 and 14 or 13)
                             local otherID = GetInventoryItemID and GetInventoryItemID("player", otherSlot)
                             local otherEntry = otherID and _G.FWHUD_TrinketDB and _G.FWHUD_TrinketDB[otherID]

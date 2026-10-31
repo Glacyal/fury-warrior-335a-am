@@ -363,6 +363,7 @@ def build_rotational_auras() -> list[dict]:
             "xOffset": 0,
             "yOffset": 0,
             "texture": TEXTURE_STATUSBAR,
+            "blendMode": "ADD",
             "color": [1.0, 0.84, 0.0, 0.40],
             "customTextUpdate": "update",
             "customText": """function()
@@ -372,6 +373,7 @@ def build_rotational_auras() -> list[dict]:
                 local glowKey = "FWHUD_ROTCENTER_GLOW"
                 local reg = aura_env and aura_env.region
                 local tex = reg and (reg.texture or (reg.SetVertexColor and reg))
+                if tex and tex.SetBlendMode then tex:SetBlendMode("ADD") end
 
                 if isHS then
                     if aura_env and aura_env.lastQueuedState ~= "HS" then
@@ -404,6 +406,7 @@ def build_rotational_auras() -> list[dict]:
                         local glowKey = "FWHUD_ROTCENTER_GLOW"
                         local reg = aura_env and aura_env.region
                         local tex = reg and (reg.texture or (reg.SetVertexColor and reg))
+                        if tex and tex.SetBlendMode then tex:SetBlendMode("ADD") end
                         if isHS then
                             if aura_env then aura_env.lastQueuedState = "HS" end
                             if tex and tex.SetVertexColor then tex:SetVertexColor(1.0, 0.84, 0.0, 0.40) end

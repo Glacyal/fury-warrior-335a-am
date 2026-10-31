@@ -30,6 +30,7 @@ def run_tests():
     hsq = auras[4]
     assert hsq["id"] == "Rotational Bar - HS Queued"
     assert hsq["width"] == 278 and hsq["height"] == 7
+    assert hsq.get("blendMode") == "ADD", "blendMode deve essere ADD (Glow)"
 
     # Verify Task 51: Chromatic illumination without text overlays
     assert "[HS QUEUED]" not in hsq.get("customText", ""), "Testo [HS QUEUED] presente in customText"

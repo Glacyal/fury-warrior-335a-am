@@ -69,6 +69,7 @@ fury-warrior-335a-am/
     ├── test_string_sync.py          # Verifica sincronizzazione stringa WA e simulatore
     ├── test_stats_panel.py          # Verifica calcolo statistiche guerriero (AP, Crit, ArP, Hit/Exp)
     ├── test_utility_row.py          # Verifica riga utility da 3 a 9 elementi
+    ├── test_procs.py                # Verifica 01 - Procs warDPS e Weapon Desync Alert (Task 50)
     ├── test_rotational.py           # Verifica Dual Swing Timer e Heroic Strike Queued
     └── test_sunder_tracker.py       # Verifica debuff Sunder Armor e Expose Armor
 ```

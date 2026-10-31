@@ -28,21 +28,23 @@ Tutti i componenti del pacchetto sono organizzati con una numerazione sequenzial
 ### 1. Barra Rotazionale & Dual Swing Timer (`15 - Rotational Bar`)
 Posizionata visivamente a centro schermo subito sopra la barra della rabbia, gestisce il monitoraggio del ritmo di attacco e della priorità in combattimento:
 - **Doppio Swing Timer Speculare con Timing Numerico Live**:
-  - **Mezza Barra Sinistra (MH)**: Avanzamento dello swing per la Mano Primaria con etichetta MH e conto alla rovescia numerico live.
-  - **Mezza Barra Destra (OH)**: Avanzamento dello swing per la Mano Secondaria con etichetta OH e conto alla rovescia numerico live.
-- **Rilevamento ed Evidenziazione Differenziata HS vs Cleave Queued**:
-  - Quando **Heroic Strike** è in coda: La barra si illumina con bordo dorato e mostra la scritta centrale `[HS QUEUED]`.
-  - Quando **Cleave** è in coda: La barra si illumina con bordo verde smeraldo e mostra la scritta centrale `[CLEAVE QUEUED]`.
-  - Consente di distinguere istantaneamente la coda per bersaglio singolo rispetto all'AoE, garantendo che il colpo elimini i colpi di striscio (*glancing blow*) sulla mano primaria e rimuova la penalità del 27% miss sull'arma secondaria.
+  - **Mezza Barra Sinistra (MH)**: Avanzamento dello swing per la Mano Primaria con etichetta MH e conto alla rovescia numerico live al decimo di secondo.
+  - **Mezza Barra Destra (OH)**: Avanzamento dello swing per la Mano Secondaria con etichetta OH e conto alla rovescia numerico live al decimo di secondo.
+- **Illuminazione Cromatica Additiva Dinamica ("Glow" ADD) per HS e Cleave**:
+  - Quando **Heroic Strike** è in coda: L'intera barra rotazionale (278x7px) si retroillumina in oro caldo con Pixel Glow dorato (`[1.0, 0.84, 0.0, 1.0]`).
+  - Quando **Cleave** è in coda: L'intera barra si retroillumina in verde smeraldo con Pixel Glow smeraldo (`[0.1, 0.95, 0.2, 1.0]`).
+  - **Zero Sovrapposizione Testuale**: Le vecchie scritte centrali sono state rimosse per preservare la totale visibilità e leggibilità dei timer numerici MH/OH al centro della barra.
+  - Consente di verificare istantaneamente se l'accodamento è attivo per rimuovere la penalità del 27% miss sulla Mano Secondaria e garantire l'8% hit cap.
 
 ### 2. Gruppo Dinamico Procs (`01 - Procs warDPS`)
-Posizionato nella parte superiore dell'HUD, gestisce fino a 6 icone con riposizionamento orizzontale automatico, riservato ai proc attivi e debuff chiave:
+Posizionato nella parte superiore dell'HUD ($y = 52$), gestisce fino a 7 icone (34x34px) con riposizionamento orizzontale automatico e centrato, riservato rigorosamente ai proc attivi, debuff chiave e allarmi critici di combattimento:
 1. **Bloodsurge**: Slam istantaneo con animazione luminosa dorata e conto alla rovescia di 5 secondi.
 2. **Victory Rush**: Proc *Victorious* post-uccisione nemico con conto alla rovescia di 20 secondi e animazione dorata.
-3. **Rend**: Debuff sanguinamento applicato sul bersaglio corrente con durata di 15 secondi, timer al decimo e swipe circolare.
-4. **Flurry**: +25% attack speed (3 cariche) dopo un colpo critico in mischia.
-5. **Wrecking Crew / Enrage**: +10% danno fisico per 12s da critico.
+3. **Flurry**: +25% attack speed (3 cariche) dopo un colpo critico in mischia.
+4. **Wrecking Crew / Enrage**: +10% danno fisico per 12s da critico.
+5. **Rend**: Debuff sanguinamento applicato sul bersaglio corrente con durata di 15 secondi, timer al decimo e swipe circolare.
 6. **Execute Usable**: Icona attiva con bordo luminoso ed etichetta `EXEC` quando il bersaglio scende sotto il 20% di salute.
+7. **Weapon Desync Alert (`SYNC`)**: Icona allerta (`Ability_DualWield`, 34x34px) posizionata immediatamente a destra di *Execute Usable*. Si attiva con **Pixel Glow rosso lampeggiante** ed etichetta rossa `SYNC` quando le due armi a 2 mani si sincronizzano pericolosamente ($|\Delta t| < 0.30\text{s}$), avvisando il giocatore di premere la macro di desync. È totalmente invisibile (Zero-Clutter) quando le armi sono desincronizzate.
 
 ### 3. Schermo Pulito ("Zero Clutter")
 - **02 - Battle Shout & 03 - Commanding Shout**: Rimangono nascosti durante il combattimento se hanno più di 30 secondi residui o se l'effetto è già coperto dai buff di raid equivalenti (*Blessing of Might* del Paladino per Battle Shout, *Blood Pact* dell'Imp del Warlock per Commanding Shout); mostrano l'icona con swipe e timer numerico solo se in scadenza, oppure un avviso "OFF" desaturato se il buff manca completamente.
@@ -85,6 +87,32 @@ Icona dinamica posizionata a destra della barra rotazionale:
 
 ---
 
+## ⚔️ Macro di Desincronizzazione Armi (Weapon Desync Macro)
+
+### Perché è Fondamentale nel Fury Warrior 3.3.5a
+In *Wrath of the Lich King 3.3.5a*, la rotazione del Fury Warrior (Titan's Grip) si basa sull'accodamento costante di **Heroic Strike** (o *Cleave*). Quando Heroic Strike è in coda sul colpo della Mano Primaria (MH), il motore di gioco **rimuove la penalità del 27% miss per dual-wielding anche dalla Mano Secondaria (OH)**, portando il miss rate dell'OH all'**8%** (hit cap giallo per le abilità speciali).
+
+* **Il Problema della Sincronizzazione ($|\Delta t| < 0.30\text{s}$)**: Se le armi MH e OH colpiscono contemporaneamente o entro la stessa finestra di batching del server (300 ms), l'OH non riesce a generare la rabbia necessaria prima che il colpo MH consumi l'accodamento di Heroic Strike. Questo porta a *Rage Starvation*, perdita dell'hit cap sull'OH e a un drastico calo del DPS.
+* **L'Obiettivo (Regola del 50%)**: Le due armi devono colpire con un'alternanza sfalsata di circa **metà swing timer** ($\Delta t \approx 1.1\text{s} - 1.4\text{s}$ con armi da 3.6s base accelerate da Flurry/Haste a ~2.4s):
+  $$\text{MH (consuma HS)} \longrightarrow \text{OH (genera 35-45 Rage a 8% cap)} \longrightarrow \text{MH} \longrightarrow \text{OH}$$
+
+### Come Risolverlo: La Macro In-Game
+Non appena a schermo compare l'icona rossa lampeggiante **`SYNC`** (alla destra di *Execute Usable*), premi questa macro per resettare istantaneamente il timer dell'auto-attack e sfasare i colpi senza perdere il bersaglio:
+
+```lua
+/cleartarget
+/targetlasttarget
+/startattack
+```
+
+#### Nomi Consigliati per la Macro:
+1. **`!Desync`** *(Scelta Consigliata)*: Il prefisso `!` la posiziona automaticamente in cima all'elenco delle macro nel client di WoW, rendendola immediata da trovare e assegnare all'action bar o a un tasto rapido (es. `Mousewheel Up`, `Tilde ~` o un tasto laterale del mouse).
+2. **`DW_Desync`**: Nome tecnico, esplicito e ordinato per chi organizza le macro per tipologia di meccanica (Dual Wield).
+3. **`SyncFix`**: Breve e intuitivo, descrive esattamente l'azione di ripristino dell'alternanza di swing.
+4. **`WDesync`**: Ultracompatto, ideale per non occupare spazio visivo sulle barre d'azione.
+
+---
+
 ## ⚙️ Struttura Modulare del Progetto (`builder/`)
 
 Il codice sorgente separa la compilazione della stringa dalla definizione di ciascun componente dell'interfaccia:
@@ -115,7 +143,8 @@ Fury Warrior 3.3.5a AM/
 │   ├── test_buffs.py                # Test gestione Shout e Berserker Stance
 │   ├── test_components_integrity.py # Verifica integrità strutturale e numerazione 01-19
 │   ├── test_lua.py                  # Controllo sintassi dei blocchi Lua inclusi
-│   ├── test_rotational.py           # Test barra rotazionale, swing timer MH/OH e coda HS/Cleave
+│   ├── test_procs.py                # Test 01 - Procs warDPS e Task 50 (Weapon Desync Alert)
+│   ├── test_rotational.py           # Test barra rotazionale, swing timer MH/OH e illuminazione cromatica HS/Cleave
 │   ├── test_stats_panel.py          # Verifica formule e moltiplicatori del pannello statistiche
 │   ├── test_string_sync.py          # Verifica corrispondenza tra builder e IMPORT_STRING.txt
 │   ├── test_sunder_tracker.py       # Test Sunder Armor, conteggio cariche e allerta OFF
@@ -141,16 +170,16 @@ Fury Warrior 3.3.5a AM/
 
 | Client / Piattaforma | Versione WeakAuras | Compatibilità | Note |
 | :--- | :--- | :---: | :--- |
-| **WotLK 3.3.5a (Build 12340)** | **WeakAuras 4.0.0** | ✅ **100% Nativa** | Sviluppata e collaudata su WeakAuras 4.0.0 (`internalVersion: 52`). Importazione rapida e priva di blocchi (~82 KB). |
+| **WotLK 3.3.5a (Build 12340)** | **WeakAuras 4.0.0** | ✅ **100% Nativa** | Sviluppata e collaudata su WeakAuras 4.0.0 (`internalVersion: 52`). Importazione rapida e priva di blocchi (~61.5 KB / ~82 KB espansa). |
 
 ---
 
 ## 🧪 Validazione & Test Suite
 
-Il progetto include una suite di 9 test automatici eseguibili sia in parallelo per una verifica rapida, sia in modalità standard:
+Il progetto include una suite di 10 test automatici deterministici eseguibili in parallelo multi-core:
 
 ```bash
-# Esecuzione parallela multi-core della suite completa (9/9 PASS)
+# Esecuzione parallela multi-core della suite completa (10/10 PASS)
 python tests/run_parallel_tests.py
 
 # Esecuzione standard tramite unittest

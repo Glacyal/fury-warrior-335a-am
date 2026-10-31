@@ -56,15 +56,25 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         return c
     end
 
-    if _G.FWHUD_CoreInitDone then return end
+    local CURRENT_BUILD_VER = 47
+    if _G.FWHUD_CoreInitDone and _G.FWHUD_BUILD_VER == CURRENT_BUILD_VER then return end
+    _G.FWHUD_BUILD_VER = CURRENT_BUILD_VER
+    _G.FWHUD_SlotCache = {}
+    _G.FWHUD_BuffCache = nil
 
-    _G.FWHUD_ICD = _G.FWHUD_ICD or {
-        [8]  = { lastStart = 0, lastEnd = 0, isProc = false, lastItemID = 0 },
-        [10] = { lastStart = 0, lastEnd = 0, isProc = false, lastItemID = 0 },
-        [13] = { lastStart = 0, lastEnd = 0, isProc = false, lastItemID = 0 },
-        [14] = { lastStart = 0, lastEnd = 0, isProc = false, lastItemID = 0 },
-        [15] = { lastStart = 0, lastEnd = 0, isProc = false, lastItemID = 0 },
-    }
+    if _G.FWHUD_ICD then
+        for _, state in pairs(_G.FWHUD_ICD) do
+            if state then state.isProc = false end
+        end
+    else
+        _G.FWHUD_ICD = {
+            [8]  = { lastStart = 0, lastEnd = 0, isProc = false, lastItemID = 0 },
+            [10] = { lastStart = 0, lastEnd = 0, isProc = false, lastItemID = 0 },
+            [13] = { lastStart = 0, lastEnd = 0, isProc = false, lastItemID = 0 },
+            [14] = { lastStart = 0, lastEnd = 0, isProc = false, lastItemID = 0 },
+            [15] = { lastStart = 0, lastEnd = 0, isProc = false, lastItemID = 0 },
+        }
+    end
 
     _G.FWHUD_VRState = _G.FWHUD_VRState or {
         lastStart = 0,
@@ -279,37 +289,7 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         [44064] = { keywords = { "battlemaster" }, spellIds = { [59754] = true }, icd = 180, dur = 15, onUse = true },
     }
 
-    _G.FWHUD_AllMeleeKeywords = {
-        -- DPS Procs
-        "taunka", "vrykul", "irondwarf", "deathbringer", "spezzassedio", "nanodiferro", "volonta",
-        "twilight", "sharpened", "crepuscolare", "precision",
-        "paragon", "choice", "verdict", "scelta", "verdetto",
-        "fanged", "skull", "whispering", "teschio", "sussurrante",
-        "scorpion", "needle", "scorpione", "nowisthetime", "oraeilmomento",
-        "runestone", "mjolnir", "pietrarunica",
-        "comet", "trail", "cometa",
-        "greatness", "nobilt", "grandezza",
-        "grimtoll", "toll", "rintocco",
-        "mirror", "truth", "specchio", "reflection", "torment", "riflesso", "tormento",
-        "banner", "victory", "stendardo",
-        "meteorite", "whetstone", "cote",
-        "haldor", "wrathstone", "supremacy", "incisor", "loatheb",
-        "herkuml", "darkmatter", "materiaoscura", "bloodoftheoldgod",
-        "pyrite", "pirite", "chromium", "coaster", "balebrew", "brightbrew",
-        -- Tank Procs & On-Use
-        "juggernaut", "vitality", "vigore",
-        "satrina", "impeding", "scarab", "scarabeo",
-        "skeleton", "hardened", "hardenedskin", "pelleindurita", "chiave",
-        "organ", "organo",
-        "fang", "zanna", "aegis", "aegisofdalaran", "egidadidalaran",
-        "indomitable", "indomito", "glyph", "glifo",
-        "blackheart", "cuorenero", "parrying",
-        "gossamer", "tessitura",
-        "lavanthor", "cuorediferro", "heartofiron",
-        "rottingthumb", "thumb", "pollice",
-        "onyxia", "bloodtalisman", "sigilloreale", "royalseal",
-        "monarchcrab", "granchio", "brawler", "pantheon"
-    }
+    _G.FWHUD_AllMeleeKeywords = nil
 
     _G.FWHUD_RingDB = {
         -- Ashen Band of Endless Vengeance (Exalted Melee DPS - 277)
@@ -703,31 +683,10 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                                 if cName:find(kwClean, 1, true) then isMatch = true break end
                             end
                         end
-                        if not isMatch and not entry then
-                            local otherSlot = (slot == 13 and 14 or 13)
-                            local otherID = GetInventoryItemID and GetInventoryItemID("player", otherSlot)
-                            local otherEntry = otherID and _G.FWHUD_TrinketDB and _G.FWHUD_TrinketDB[otherID]
-                            local isOther = false
-                            if otherEntry then
-                                if b.spellId and otherEntry.spellIds and otherEntry.spellIds[b.spellId] then
-                                    isOther = true
-                                elseif otherEntry.keywords then
-                                    for _, kw in ipairs(otherEntry.keywords) do
-                                        local kwClean = kw:lower():gsub("[%s%p%c]", "")
-                                        if cName:find(kwClean, 1, true) then isOther = true break end
-                                    end
-                                end
-                            end
-                            if not isOther and _G.FWHUD_AllMeleeKeywords then
-                                for _, kw in ipairs(_G.FWHUD_AllMeleeKeywords) do
-                                    local kwClean = kw:lower():gsub("[%s%p%c]", "")
-                                    if cName:find(kwClean, 1, true) then isMatch = true break end
-                                end
-                            end
-                        end
                     end
                 end
-                if not isMatch and b.icon and baseIcon and b.icon == baseIcon then
+                local equippedTexture = GetInventoryItemTexture("player", slot)
+                if not isMatch and equippedTexture and b.icon and b.icon == equippedTexture then
                     isMatch = true
                 end
             end
@@ -1700,14 +1659,6 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                                         end
                                     end
                                 end
-                            elseif spellName and _G.FWHUD_AllMeleeKeywords then
-                                local snClean = spellName:lower():gsub("[%s%p%c]", "")
-                                for _, kw in ipairs(_G.FWHUD_AllMeleeKeywords) do
-                                    if snClean:find(kw:lower():gsub("[%s%p%c]", ""), 1, true) then
-                                        isTMatch = true
-                                        break
-                                    end
-                                end
                             end
                             if isTMatch then
                                 local sICD = _G.FWHUD_ICD and _G.FWHUD_ICD[s]
@@ -1780,7 +1731,7 @@ end"""
 def make_ring_custom_text() -> str:
     """Testo descrittivo del proc dell'anello (%c), con pixel glow su proc attivo e timer ICD."""
     return """function()
-    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if _G.FWHUD_UpdateUtilityRowPositions then
         _G.FWHUD_UpdateUtilityRowPositions()
     end
@@ -1826,7 +1777,7 @@ end"""
 def make_ring_custom_icon() -> str:
     """Icona dinamica dell'anello equipaggiato o del proc attivo."""
     return """function()
-    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if _G.FWHUD_CheckRing then
         local state, rem, dur, icon = _G.FWHUD_CheckRing()
         if icon then return icon end
@@ -1838,7 +1789,7 @@ end"""
 def make_ring_trigger_custom() -> str:
     """Trigger custom per verificare se un anello con proc è equipaggiato."""
     return """function(event, ...)
-    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if not _G.FWHUD_CheckRingEquipped then return false end
     return _G.FWHUD_CheckRingEquipped()
 end"""
@@ -1855,7 +1806,7 @@ end"""
 def make_weapon_custom_text(slot: int) -> str:
     """Testo descrittivo dell'incanto arma (%c) per slot 16 (MH) o 17 (OH), con pixel glow su proc attivo."""
     return f"""function()
-    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if _G.FWHUD_UpdateUtilityRowPositions then
         _G.FWHUD_UpdateUtilityRowPositions()
     end
@@ -1892,7 +1843,7 @@ end"""
 def make_weapon_custom_icon(slot: int) -> str:
     """Icona dinamica dell'arma equipaggiata o dell'incanto attivo."""
     return f"""function()
-    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if _G.FWHUD_CheckWeapon then
         local state, rem, dur, icon = _G.FWHUD_CheckWeapon({slot})
         if icon then return icon end
@@ -1904,7 +1855,7 @@ end"""
 def make_weapon_trigger_custom(slot: int) -> str:
     """Trigger custom per verificare se l'arma nello slot 16 o 17 è equipaggiata con incanto."""
     return f"""function(event, ...)
-    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if not _G.FWHUD_CheckWeaponEquipped then return false end
     local hasW = _G.FWHUD_CheckWeaponEquipped({slot})
     return hasW == true
@@ -1922,8 +1873,8 @@ end"""
 
 def make_slot_custom_text(slot: int) -> str:
     """Testo descrittivo del monile/mantello/guanti/scarpe (%c), con pixel glow su proc attivo e riposizionamento dinamico."""
-    bootstrap = f"""    _G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
-    if not _G.FWHUD_CoreInitDone then _G.FWHUD_InitCore() end""" if slot == 13 else """    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end"""
+    bootstrap = f"""    _G.FWHUD_InitCore = {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
+    if not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47 then _G.FWHUD_InitCore() end"""
     return f"""function()
 {bootstrap}
     if _G.FWHUD_UpdateUtilityRowPositions then
@@ -1984,8 +1935,8 @@ end"""
 
 def make_slot_trigger_custom(slot: int) -> str:
     """Trigger custom per verificare se lo slot è equipaggiato."""
-    bootstrap = f"""    _G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
-    if not _G.FWHUD_CoreInitDone then _G.FWHUD_InitCore() end""" if slot == 13 else """    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end"""
+    bootstrap = f"""    _G.FWHUD_InitCore = {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
+    if not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47 then _G.FWHUD_InitCore() end"""
     return f"""function(event, ...)
 {bootstrap}
     if not _G.FWHUD_CheckSlotEquipped then return false end
@@ -2004,7 +1955,7 @@ end"""
 def make_tierset_custom_text() -> str:
     """Testo descrittivo del Tier Set (%c) con cariche/durata e pixel glow su proc."""
     return """function()
-    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if _G.FWHUD_UpdateUtilityRowPositions then
         _G.FWHUD_UpdateUtilityRowPositions()
     end
@@ -2060,7 +2011,7 @@ end"""
 def make_tierset_trigger_custom() -> str:
     """Trigger custom per verificare se almeno un pezzo Tier Set è attivo."""
     return """function(event, ...)
-    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if not _G.FWHUD_CheckTierSetEquipped then return false end
     return _G.FWHUD_CheckTierSetEquipped()
 end"""
@@ -2076,7 +2027,7 @@ end"""
 def make_enchants_custom_text() -> str:
     """Testo descrittivo incanti arma unificati: timer FIFO in basso (%c1), cariche (x2) in alto (%c2), con pixel glow."""
     return """function()
-    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if _G.FWHUD_UpdateUtilityRowPositions then
         _G.FWHUD_UpdateUtilityRowPositions()
     end
@@ -2122,7 +2073,7 @@ end"""
 def make_enchants_custom_icon() -> str:
     """Icona dinamica dell'incanto attivo (Berserking, Mongoose, Executioner) o dell'arma principale."""
     return """function()
-    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if _G.FWHUD_CheckEnchants then
         local state, rem, dur, count, icon = _G.FWHUD_CheckEnchants()
         if icon then return icon end
@@ -2133,7 +2084,7 @@ end"""
 
 def make_enchants_trigger_custom() -> str:
     return """function(event, ...)
-    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if not _G.FWHUD_CheckEnchantsEquipped then return false end
     return _G.FWHUD_CheckEnchantsEquipped()
 end"""
@@ -2149,7 +2100,7 @@ end"""
 def make_warrior_spell_custom_text(spell_id: int, buff_id: int, glow_key: str) -> str:
     """Testo descrittivo del cooldown guerriero (%c), con pixel glow su proc attivo e timer cooldown."""
     return f"""function()
-    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if _G.FWHUD_UpdateUtilityRowPositions then
         _G.FWHUD_UpdateUtilityRowPositions()
     end
@@ -2210,7 +2161,7 @@ end"""
 
 def make_warrior_spell_trigger_custom(spell_id: int) -> str:
     return """function(event, ...)
-    if not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     return true
 end"""
 

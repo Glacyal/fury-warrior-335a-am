@@ -75,7 +75,7 @@ def build_wa_tree() -> dict:
             "actions": {
                 "init": {
                     "do_custom": True,
-                    "custom": f"_G.FWHUD_InitCore = _G.FWHUD_InitCore or {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}\nif not _G.FWHUD_CoreInitDone and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end",
+                    "custom": f"_G.FWHUD_InitCore = {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}\n_G.FWHUD_InitCore()",
                 },
                 "start": {},
                 "finish": {},

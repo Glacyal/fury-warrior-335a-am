@@ -8,18 +8,21 @@ Gestisce la barra orizzontale dinamica superiore dei proc di combattimento (y = 
   2. Victory Rush (Proc Victorious con countdown durata 20s e glow)
   3. Flurry (+25% Attack Speed per 3 colpi dopo un critico)
   4. Wrecking Crew / Enrage (+10% danno fisico per 12s)
-  5. Execute Usable (Target <= 20% HP con bordo luminoso)
+  5. Rend (Debuff 15s Bleed su target)
+  6. Execute Usable (Target <= 20% HP con bordo luminoso)
+  7. Weapon Desync Alert (Allarme rosso lampeggiante SYNC se armi sincronizzate < 0.30s)
 Tutti gli effetti di equipaggiamento (Tier Sets T7-T10, Incanti arma/anello, Monili)
 sono gestiti nella riga inferiore Utility a y = -45, identicamente a fire-mage-335a-am.
 """
 from builder.core.helpers import make_subtext, make_glow_action
+from builder.components.rotational import SHARED_SWING_TIMER_LUA
 
 
 def build_procs_auras() -> list[dict]:
     """
-    Costruisce e restituisce le 7 aure del gruppo dinamico Procs:
+    Costruisce e restituisce le 8 aure del gruppo dinamico Procs:
     - 01 - Procs warDPS (Dynamic Group)
-    - Bloodsurge, Victory Rush, Flurry, Wrecking Crew, Rend, Execute Usable.
+    - Bloodsurge, Victory Rush, Flurry, Wrecking Crew, Rend, Execute Usable, Weapon Desync Alert.
     """
     return [
         {
@@ -40,6 +43,7 @@ def build_procs_auras() -> list[dict]:
                 "Wrecking Crew",
                 "Rend",
                 "Execute Usable",
+                "Weapon Desync Alert",
             ],
         },
         # 1. Bloodsurge (Buff 46916 - Slam istantaneo)
@@ -315,6 +319,77 @@ end""",
     if maxHp <= 0 then return true end
     local hp = UnitHealth("target") or 0
     return (hp <= 0) or ((hp / maxHp) > 0.20)
+end"""
+                    }
+                },
+                "activeTriggerMode": -10,
+            },
+        },
+        # 7. Weapon Desync Alert (Armi Sincronizzate < 0.30s - Avviso Rosso SYNC)
+        {
+            "id": "Weapon Desync Alert",
+            "uid": "FWHUD_PROC_DESYNC",
+            "parent": "01 - Procs warDPS",
+            "regionType": "icon",
+            "internalVersion": 52,
+            "width": 34,
+            "height": 34,
+            "displayIcon": "Interface\\Icons\\Ability_DualWield",
+            "auto": False,
+            "color": [1, 1, 1, 1],
+            "desaturate": False,
+            "actions": {
+                "init": {
+                    "do_custom": True,
+                    "custom": SHARED_SWING_TIMER_LUA,
+                },
+                "start": make_glow_action(color=[1.0, 0.2, 0.2, 1.0]),
+                "finish": {"do_glow": True, "glow_action": "hide"},
+            },
+            "subRegions": [
+                make_subtext("SYNC", justify="CENTER", anchor_point="INNER_BOTTOM", font_size=11, y_offset=1, extra_props={"text_color": [1.0, 0.2, 0.2, 1.0]}),
+            ],
+            "triggers": {
+                1: {
+                    "trigger": {
+                        "type": "custom",
+                        "custom_type": "status",
+                        "check": "update",
+                        "custom": """function()
+    if not UnitAffectingCombat("player") then return false end
+    if not UnitExists("target") or UnitIsDeadOrGhost("target") or not UnitCanAttack("player", "target") then return false end
+    local _, ohSpeed = UnitAttackSpeed("player")
+    if not ohSpeed or ohSpeed <= 0 then return false end
+    if not _G.FWHUD_GetSwing then return false end
+    local sw = _G.FWHUD_GetSwing()
+    if not sw or not sw.mhStart or sw.mhStart == 0 or not sw.ohStart or sw.ohStart == 0 then return false end
+    local now = GetTime()
+    local mhDur = sw.mhDur or 3.0
+    local ohDur = sw.ohDur or ohSpeed
+    local mhRem = (sw.mhStart + mhDur) - now
+    local ohRem = (sw.ohStart + ohDur) - now
+    if mhRem < 0 or ohRem < 0 then return false end
+    local delta = math.abs(mhRem - ohRem)
+    return delta < 0.30
+end""",
+                    },
+                    "untrigger": {
+                        "custom": """function()
+    if not UnitAffectingCombat("player") then return true end
+    if not UnitExists("target") or UnitIsDeadOrGhost("target") or not UnitCanAttack("player", "target") then return true end
+    local _, ohSpeed = UnitAttackSpeed("player")
+    if not ohSpeed or ohSpeed <= 0 then return true end
+    if not _G.FWHUD_GetSwing then return true end
+    local sw = _G.FWHUD_GetSwing()
+    if not sw or not sw.mhStart or sw.mhStart == 0 or not sw.ohStart or sw.ohStart == 0 then return true end
+    local now = GetTime()
+    local mhDur = sw.mhDur or 3.0
+    local ohDur = sw.ohDur or ohSpeed
+    local mhRem = (sw.mhStart + mhDur) - now
+    local ohRem = (sw.ohStart + ohDur) - now
+    if mhRem < 0 or ohRem < 0 then return true end
+    local delta = math.abs(mhRem - ohRem)
+    return delta >= 0.30
 end"""
                     }
                 },

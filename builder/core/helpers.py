@@ -49,13 +49,13 @@ def make_subtext(
     return res
 
 
-def make_glow_action() -> dict:
-    """Restituisce la configurazione standard per l'azione di Glow tipo Pixel Glow dorato."""
+def make_glow_action(color: list[float] = None) -> dict:
+    """Restituisce la configurazione standard per l'azione di Glow tipo Pixel Glow."""
     return {
         "do_glow": True,
         "glow_action": "show",
         "glow_type": "Pixel",
-        "glow_color": [1.0, 0.84, 0.0, 1.0],
+        "glow_color": color if color is not None else [1.0, 0.84, 0.0, 1.0],
         "glow_lines": 8,
         "glow_frequency": 0.25,
         "glow_length": 10,

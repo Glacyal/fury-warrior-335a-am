@@ -30,6 +30,7 @@ TEST_SCRIPTS = [
     "test_stats_panel.py",
     "test_utility_row.py",
     "test_rotational.py",
+    "test_procs.py",
     "test_sunder_tracker.py",
     "test_buffs.py",
 ]

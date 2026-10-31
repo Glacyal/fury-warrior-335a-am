@@ -410,7 +410,6 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         -- Slot 13 & 14 (Trinkets): visible only if an item is equipped
         if s == 13 or s == 14 then
             local eq = (itemID ~= nil and itemID > 0)
-            if itemID == nil then eq = true end
             cache.isEquipped = eq
             return eq
         end

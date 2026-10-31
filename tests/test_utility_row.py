@@ -153,6 +153,7 @@ def run_tests():
     assert "tuskarr" not in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA.lower(), "Tuskarr non deve essere presente: solo Nitro Boosts puo triggerare su slot 8"
     assert "swiftness" not in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA.lower(), "Swiftness non deve essere presente: solo Nitro Boosts puo triggerare su slot 8"
     assert "FWHUD_UpdateUtilityRowPositions" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca funzione di riposizionamento dinamico"
+    assert "itemID == nil then eq = true" not in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Non deve esserci fallback eq=true quando il monile e disequipaggiato"
 
     print("[OK] Tutti i 10 elementi della riga utility verificati con 'check': 'update'.")
     print("[OK] Catalogo monili WotLK 3.3.5a completo con ICD e spell ID corretti (DBW, STS, Choice, Skull, ecc.).")

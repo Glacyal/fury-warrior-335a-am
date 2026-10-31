@@ -31,9 +31,11 @@ SHARED_SWING_TIMER_LUA = r"""_G.FWHUD_GetSwing = function()
         f = CreateFrame("Frame", "FWHUD_SwingFrame")
         _G.FWHUD_SwingFrame = f
 
+        local playerGUID = nil
         local function handleCLEU(...)
             local ts, ev, srcGUID = select(1, ...), select(2, ...), select(3, ...)
-            if srcGUID ~= UnitGUID("player") then return end
+            if not playerGUID then playerGUID = UnitGUID("player") end
+            if srcGUID ~= playerGUID then return end
 
             local now = GetTime()
             local mhSpeed, ohSpeed = UnitAttackSpeed("player")

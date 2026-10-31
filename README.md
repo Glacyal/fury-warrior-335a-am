@@ -93,8 +93,8 @@ Icona dinamica posizionata a destra della barra rotazionale:
 In *Wrath of the Lich King 3.3.5a*, la rotazione del Fury Warrior (Titan's Grip) si basa sull'accodamento costante di **Heroic Strike** (o *Cleave*). Quando Heroic Strike è in coda sul colpo della Mano Primaria (MH), il motore di gioco **rimuove la penalità del 27% miss per dual-wielding anche dalla Mano Secondaria (OH)**, portando il miss rate dell'OH all'**8%** (hit cap giallo per le abilità speciali).
 
 * **Il Problema della Sincronizzazione ($|\Delta t| < 0.30\text{s}$)**: Se le armi MH e OH colpiscono contemporaneamente o entro la stessa finestra di batching del server (300 ms), l'OH non riesce a generare la rabbia necessaria prima che il colpo MH consumi l'accodamento di Heroic Strike. Questo porta a *Rage Starvation*, perdita dell'hit cap sull'OH e a un drastico calo del DPS.
-* **L'Obiettivo (Regola del 50%)**: Le due armi devono colpire con un'alternanza sfalsata di circa **metà swing timer** ($\Delta t \approx 1.1\text{s} - 1.4\text{s}$ con armi da 3.6s base accelerate da Flurry/Haste a ~2.4s):
-  $$\text{MH (consuma HS)} \longrightarrow \text{OH (genera 35-45 Rage a 8% cap)} \longrightarrow \text{MH} \longrightarrow \text{OH}$$
+* **L'Obiettivo (Regola del 50%)**: Le due armi devono colpire con un'alternanza sfalsata di circa **metà swing timer** ($\Delta t \approx 1.1\text{s} - 1.4\text{s}$ con armi da 3.6s base accelerate da Flurry/Haste a circa 2.4s):
+  > **`MH`** *(consuma HS)* ➔ **`OH`** *(genera 35-45 Rage all'8% hit cap)* ➔ **`MH`** *(consuma HS)* ➔ **`OH`** *(genera Rage)*
 
 ### Come Risolverlo: La Macro In-Game
 Non appena a schermo compare l'icona rossa lampeggiante **`SYNC`** (alla destra di *Execute Usable*), premi questa macro per resettare istantaneamente il timer dell'auto-attack e sfasare i colpi senza perdere il bersaglio:

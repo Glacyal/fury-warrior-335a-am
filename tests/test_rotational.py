@@ -31,6 +31,15 @@ def run_tests():
     assert hsq["id"] == "Rotational Bar - HS Queued"
     assert hsq["width"] == 278 and hsq["height"] == 7
 
+    # Verify Task 51: Chromatic illumination without text overlays
+    assert "[HS QUEUED]" not in hsq.get("customText", ""), "Testo [HS QUEUED] presente in customText"
+    assert "[CLEAVE QUEUED]" not in hsq.get("customText", ""), "Testo [CLEAVE QUEUED] presente in customText"
+    assert 'return ""' in hsq.get("customText", ""), "customText deve restituire stringa vuota per non coprire i numeri"
+    assert "SetVertexColor" in hsq.get("customText", ""), "Manca SetVertexColor per illuminazione cromatica"
+    assert "PixelGlow_Start" in hsq.get("customText", ""), "Manca PixelGlow_Start per glow cromatico"
+    assert "FWHUD_ROTCENTER_GLOW" in hsq.get("customText", ""), "Manca glowKey in customText"
+    assert "PixelGlow_Stop" in hsq["actions"]["finish"]["custom"], "Manca PixelGlow_Stop in actions.finish" 
+
     # Verify swing timing subregions and triggers
     mh_subtexts = [sub.get("text_text") for sub in mh.get("subRegions", [])]
     assert "MH" in mh_subtexts, "Manca etichetta MH in subRegions"

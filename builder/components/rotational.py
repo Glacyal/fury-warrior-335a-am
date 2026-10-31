@@ -7,9 +7,9 @@ Gestisce la barra orizzontale centrale composita a y = -7 (278x7px):
 3. Mezza Barra Destra (137x5px a x = +70.5): Swing Timer Mano Secondaria (OH) con timing %c (es. 1.2s).
 4. Indicatore Heroic Strike / Cleave Queued:
    - Rileva in tempo reale se Heroic Strike (47450) o Cleave (47520) è accodato tramite IsCurrentSpell().
-   - Applica Pixel Glow dorato istantaneo su tutta la barra e testo centrale |cFFFFD700[HS QUEUED]|r.
+   - Illuminazione cromatica dinamica su tutta la barra (278x7px) e Pixel Glow dedicato (Oro per Heroic Strike, Verde Smeraldo per Cleave), senza testi sovrapposti ai timer di swing.
 """
-from builder.core.helpers import make_subtext, make_glow_action
+from builder.core.helpers import make_subtext
 from builder.core.constants import TEXTURE_STATUSBAR, TEXTURE_WHITE8X8
 
 
@@ -351,7 +351,7 @@ def build_rotational_auras() -> list[dict]:
                 make_subtext("OH", justify="RIGHT", anchor_point="INNER_RIGHT", font_size=9, y_offset=0, extra_props={"text_xOffset": -3, "text_color": [1.0, 0.65, 0.2, 1.0]}),
             ],
         },
-        # HS Queued Indicator (Border / Glow / Dynamic Text overlay [HS QUEUED] vs [CLEAVE QUEUED])
+        # HS Queued Indicator (Dynamic Chromatic Illumination - Gold for HS, Emerald Green for Cleave)
         {
             "id": "Rotational Bar - HS Queued",
             "uid": "FWHUD_ROTCENTER_HSQ",
@@ -363,24 +363,71 @@ def build_rotational_auras() -> list[dict]:
             "xOffset": 0,
             "yOffset": 0,
             "texture": TEXTURE_STATUSBAR,
-            "color": [1.0, 0.84, 0.0, 0.35],
+            "color": [1.0, 0.84, 0.0, 0.40],
             "customTextUpdate": "update",
             "customText": """function()
                 local isHS = IsCurrentSpell and (IsCurrentSpell(47450) or IsCurrentSpell("Heroic Strike") or IsCurrentSpell("Colpo Eroico"))
                 local isCleave = IsCurrentSpell and (IsCurrentSpell(47520) or IsCurrentSpell("Cleave") or IsCurrentSpell("Fendente"))
+                local LCG = LibStub and LibStub("LibCustomGlow-1.0", true)
+                local glowKey = "FWHUD_ROTCENTER_GLOW"
+                local reg = aura_env and aura_env.region
+                local tex = reg and (reg.texture or (reg.SetVertexColor and reg))
+
                 if isHS then
-                    return "|cFFFFD700[HS QUEUED]|r"
+                    if aura_env and aura_env.lastQueuedState ~= "HS" then
+                        aura_env.lastQueuedState = "HS"
+                        if tex and tex.SetVertexColor then tex:SetVertexColor(1.0, 0.84, 0.0, 0.40) end
+                        if LCG and reg then LCG.PixelGlow_Start(reg, {1.0, 0.84, 0.0, 1.0}, 8, 0.25, 10, 2, 0, 0, false, glowKey) end
+                    end
                 elseif isCleave then
-                    return "|cFF00FF00[CLEAVE QUEUED]|r"
+                    if aura_env and aura_env.lastQueuedState ~= "CLEAVE" then
+                        aura_env.lastQueuedState = "CLEAVE"
+                        if tex and tex.SetVertexColor then tex:SetVertexColor(0.1, 0.95, 0.2, 0.40) end
+                        if LCG and reg then LCG.PixelGlow_Start(reg, {0.1, 0.95, 0.2, 1.0}, 8, 0.25, 10, 2, 0, 0, false, glowKey) end
+                    end
+                else
+                    if aura_env and aura_env.lastQueuedState ~= "NONE" then
+                        aura_env.lastQueuedState = "NONE"
+                        if LCG and reg then LCG.PixelGlow_Stop(reg, glowKey) end
+                    end
                 end
                 return ""
             end""",
             "actions": {
-                "start": make_glow_action(),
-                "finish": {"do_glow": True, "glow_action": "hide"},
+                "start": {
+                    "do_custom": True,
+                    "custom": """function()
+                        if aura_env then aura_env.lastQueuedState = nil end
+                        local isHS = IsCurrentSpell and (IsCurrentSpell(47450) or IsCurrentSpell("Heroic Strike") or IsCurrentSpell("Colpo Eroico"))
+                        local isCleave = IsCurrentSpell and (IsCurrentSpell(47520) or IsCurrentSpell("Cleave") or IsCurrentSpell("Fendente"))
+                        local LCG = LibStub and LibStub("LibCustomGlow-1.0", true)
+                        local glowKey = "FWHUD_ROTCENTER_GLOW"
+                        local reg = aura_env and aura_env.region
+                        local tex = reg and (reg.texture or (reg.SetVertexColor and reg))
+                        if isHS then
+                            if aura_env then aura_env.lastQueuedState = "HS" end
+                            if tex and tex.SetVertexColor then tex:SetVertexColor(1.0, 0.84, 0.0, 0.40) end
+                            if LCG and reg then LCG.PixelGlow_Start(reg, {1.0, 0.84, 0.0, 1.0}, 8, 0.25, 10, 2, 0, 0, false, glowKey) end
+                        elseif isCleave then
+                            if aura_env then aura_env.lastQueuedState = "CLEAVE" end
+                            if tex and tex.SetVertexColor then tex:SetVertexColor(0.1, 0.95, 0.2, 0.40) end
+                            if LCG and reg then LCG.PixelGlow_Start(reg, {0.1, 0.95, 0.2, 1.0}, 8, 0.25, 10, 2, 0, 0, false, glowKey) end
+                        end
+                    end""",
+                },
+                "finish": {
+                    "do_custom": True,
+                    "custom": """function()
+                        if aura_env then aura_env.lastQueuedState = nil end
+                        local LCG = LibStub and LibStub("LibCustomGlow-1.0", true)
+                        if LCG and aura_env and aura_env.region then
+                            LCG.PixelGlow_Stop(aura_env.region, "FWHUD_ROTCENTER_GLOW")
+                        end
+                    end""",
+                },
             },
             "subRegions": [
-                make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=10, y_offset=0),
+                make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=10, y_offset=0, extra_props={"text_color": [0, 0, 0, 0]}),
             ],
             "triggers": {
                 1: {

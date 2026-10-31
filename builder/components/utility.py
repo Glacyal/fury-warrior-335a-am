@@ -1873,10 +1873,8 @@ end"""
 
 def make_slot_custom_text(slot: int) -> str:
     """Testo descrittivo del monile/mantello/guanti/scarpe (%c), con pixel glow su proc attivo e riposizionamento dinamico."""
-    bootstrap = f"""    _G.FWHUD_InitCore = {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
-    if not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47 then _G.FWHUD_InitCore() end""" if slot == 13 else """    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end"""
     return f"""function()
-{bootstrap}
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
     if _G.FWHUD_UpdateUtilityRowPositions then
         _G.FWHUD_UpdateUtilityRowPositions()
     end
@@ -1935,8 +1933,10 @@ end"""
 
 def make_slot_trigger_custom(slot: int) -> str:
     """Trigger custom per verificare se lo slot è equipaggiato."""
+    bootstrap = f"""    _G.FWHUD_InitCore = {SHARED_WARRIOR_CORE_BOOTSTRAP_LUA}
+    if not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47 then _G.FWHUD_InitCore() end""" if slot == 13 else """    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end"""
     return f"""function(event, ...)
-    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+{bootstrap}
     if not _G.FWHUD_CheckSlotEquipped then return false end
     return _G.FWHUD_CheckSlotEquipped({slot})
 end"""

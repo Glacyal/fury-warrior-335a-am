@@ -1,7 +1,7 @@
 # Class Warrior (Fury) — WeakAuras Suite
 
 [![WoW Version](https://img.shields.io/badge/World%20of%20Warcraft-3.3.5a%20(12340)-orange.svg)](https://github.com/Glacyal/fury-warrior-335a-am)
-[![WeakAuras](https://img.shields.io/badge/WeakAuras-4.0.0-blue.svg)](https://github.com/Glacyal/fury-warrior-335a-am)
+[![WeakAuras](https://img.shields.io/badge/WeakAuras-5.21.8%2B%20%7C%204.0.0-blue.svg)](https://github.com/Glacyal/fury-warrior-335a-am)
 [![Class](https://img.shields.io/badge/Class-Warrior%20(Fury%20TG)-red.svg)](https://github.com/Glacyal/fury-warrior-335a-am)
 [![GitHub Pages](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen.svg)](https://glacyal.github.io/fury-warrior-335a-am/)
 [![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-gray.svg?logo=paypal&logoColor=white&labelColor=0079c1)](https://www.paypal.me/AMantmar)
@@ -149,17 +149,18 @@ Fury Warrior 3.3.5a AM/
 │   ├── test_sunder_tracker.py       # Test Sunder Armor, conteggio cariche e allerta OFF
 │   ├── test_tree_layout.py          # Verifica gerarchia e ordinamento dell'albero
 │   └── test_utility_row.py          # Test esaustivo su ICD, incanti arma x1/x2 e riga utility
-├── generate.py                      # Script di compilazione della stringa finale
-├── IMPORT_STRING.txt                # Stringa WeakAuras pronta per l'importazione
+├── generate.py                      # Compilatore Python dell'albero WA (genera v5.21.8 e legacy)
+├── IMPORT_STRING_v5.21.8.txt        # Stringa nativa per WeakAuras 5.21.8+ (internalVersion 90, zero warning)
+├── IMPORT_STRING.txt                # Stringa retrocompatibile per WeakAuras legacy
 └── scripts/
-    └── sync_docs.py                 # Sincronizzazione automatica di IMPORT_STRING.txt in docs/index.html
+    └── sync_docs.py                 # Sincronizzazione automatica di IMPORT_STRING_v5.21.8.txt in docs/index.html
 ```
 
 ---
 
 ## 🚀 Installazione in Gioco (3 Passaggi)
 
-1. **Copia la Stringa**: Apri il file **[`IMPORT_STRING.txt`](IMPORT_STRING.txt)** e copia l'intero contenuto (`Ctrl+A`, poi `Ctrl+C`).
+1. **Copia la Stringa**: Apri il file **[`IMPORT_STRING_v5.21.8.txt`](IMPORT_STRING_v5.21.8.txt)** (scelta raccomandata per WeakAuras 5.21.8+) oppure **[`IMPORT_STRING.txt`](IMPORT_STRING.txt)** (per client con WeakAuras legacy come 4.0.0) e copia l'intero contenuto (`Ctrl+A`, poi `Ctrl+C`).
 2. **Apri WeakAuras**: In gioco, digita il comando `/wa` nella chat.
 3. **Importa**: Clicca su **Import** in alto a sinistra, incolla il testo con `Ctrl+V` e conferma l'importazione.
 
@@ -169,7 +170,8 @@ Fury Warrior 3.3.5a AM/
 
 | Client / Piattaforma | Versione WeakAuras | Compatibilità | Note |
 | :--- | :--- | :---: | :--- |
-| **WotLK 3.3.5a (Build 12340)** | **WeakAuras 4.0.0** | ✅ **100% Nativa** | Sviluppata e collaudata su WeakAuras 4.0.0 (`internalVersion: 52`). Importazione rapida e priva di blocchi (~61.5 KB / ~82 KB espansa). |
+| **WotLK 3.3.5a (Build 12340)** | **WeakAuras 5.21.8+** | ✅ **100% Nativa (Zero Warning)** | Pienamente conforme al sandbox moderno WA5 (`internalVersion: 90`): frame anonimi con `rawset(_G, ...)`, safe accessor `WeakAuras.GetRegion(id)`, zero warning su sovrascrittura frame globali o deprecazioni. |
+| **WotLK 3.3.5a (Build 12340)** | **WeakAuras 4.0.0** | ✅ **100% Retrocompatibile** | Struttura subRegion con chiavi duali (`anchor_point` e `anchorPoint`, coordinate speculari) e fallback automatico `WeakAuras.regions` su engine legacy (`internalVersion: 52`). |
 
 ---
 

@@ -11,8 +11,8 @@ La suite è distribuita come **WeakAura autonoma** in formato compresso `!WA:1!`
 | Proprietà | Dettaglio |
 | :--- | :--- |
 | **Piattaforma Target** | World of Warcraft 3.3.5a (WotLK Build 12340) |
-| **Engine WeakAuras** | WeakAuras 4.0.0 (`internalVersion = 52`, header `!WA:1!`). |
-| **File di Distribuzione** | [`IMPORT_STRING.txt`](file:///d:/0Progetti/fury-warrior-335a-am/IMPORT_STRING.txt) |
+| **Engine WeakAuras** | WeakAuras 5.21.8+ nativo (`internalVersion = 90`) e 4.0.0 retrocompatibile (`internalVersion = 52`, header `!WA:1!`). |
+| **File di Distribuzione** | [`IMPORT_STRING_v5.21.8.txt`](file:///d:/0Progetti/fury-warrior-335a-am/IMPORT_STRING_v5.21.8.txt) (raccomandato) e [`IMPORT_STRING.txt`](file:///d:/0Progetti/fury-warrior-335a-am/IMPORT_STRING.txt) |
 | **Simulatore Web** | [`docs/index.html`](file:///d:/0Progetti/fury-warrior-335a-am/docs/index.html) |
 | **Live Demo Online** | [GitHub Pages Live Showcase](https://glacyal.github.io/fury-warrior-335a-am/) |
 | **Controllo Versione** | Git su GitHub: [Glacyal/fury-warrior-335a-am](https://github.com/Glacyal/fury-warrior-335a-am) |
@@ -23,8 +23,9 @@ La suite è distribuita come **WeakAura autonoma** in formato compresso `!WA:1!`
 
 ```text
 fury-warrior-335a-am/
-├── IMPORT_STRING.txt                # Stringa WeakAuras pronta all'uso per il comando /wa
-├── generate.py                      # Compilatore Python dell'albero WA
+├── IMPORT_STRING_v5.21.8.txt        # Stringa WeakAuras nativa 5.21.8+ (internalVersion 90, zero warning)
+├── IMPORT_STRING.txt                # Stringa WeakAuras pronta all'uso per il comando /wa (retrocompatibile)
+├── generate.py                      # Compilatore Python dell'albero WA (target v5.21.8 & v4.0.0)
 ├── README.md                        # Documentazione utente, guida installazione e compatibilità
 ├── HANDOFF.md                       # Specifiche tecniche per sviluppatori e manutentori
 │

@@ -437,7 +437,7 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                         tt:AddFontStrings(l, r)
                     end
                 end
-                _G.FWHUD_ScanTT = tt
+                rawset(_G, "FWHUD_ScanTT", tt)
             end
             tt:ClearLines()
             tt:SetInventoryItem("player", s)
@@ -775,7 +775,7 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         if not tt then
             tt = CreateFrame("GameTooltip", "FWHUD_ScanTT", UIParent, "GameTooltipTemplate")
             tt:SetOwner(UIParent, "ANCHOR_NONE")
-            _G.FWHUD_ScanTT = tt
+            rawset(_G, "FWHUD_ScanTT", tt)
         end
         for _, s in ipairs({ 11, 12 }) do
             local id = GetInventoryItemID("player", s)
@@ -1091,7 +1091,7 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         if not tt then
             tt = CreateFrame("GameTooltip", "FWHUD_ScanTT", UIParent, "GameTooltipTemplate")
             tt:SetOwner(UIParent, "ANCHOR_NONE")
-            _G.FWHUD_ScanTT = tt
+            rawset(_G, "FWHUD_ScanTT", tt)
         end
         tt:ClearLines()
         tt:SetInventoryItem("player", slot)
@@ -1456,9 +1456,21 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         if not force and (now - lastRowUpdate < 0.15) then return end
         lastRowUpdate = now
 
-        if not WeakAuras or not WeakAuras.regions then return end
-        local groupObj = WeakAuras.regions["Class Warrior (Fury)"]
-        local group = groupObj and (groupObj.region or (groupObj.GetPoint and groupObj))
+        local function getRegion(id)
+            if not WeakAuras then return end
+            if WeakAuras.GetRegion then
+                local obj = WeakAuras.GetRegion(id)
+                if obj then
+                    return obj.region or (obj.GetPoint and obj)
+                end
+            end
+            if WeakAuras.regions then
+                local regObj = WeakAuras.regions[id]
+                return regObj and (regObj.region or (regObj.GetPoint and regObj))
+            end
+        end
+
+        local group = getRegion("Class Warrior (Fury)")
         if not group then return end
 
         local hasT1 = _G.FWHUD_CheckSlotEquipped and _G.FWHUD_CheckSlotEquipped(13)
@@ -1510,8 +1522,7 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
 
         for i, id in ipairs(activeOrder) do
             local targetX = math.floor(((i - (N + 1) / 2) * step) + 0.5)
-            local regObj = WeakAuras.regions[id]
-            local r = regObj and (regObj.region or (regObj.GetPoint and regObj))
+            local r = getRegion(id)
             if r and r.ClearAllPoints and r.SetPoint then
                 r:ClearAllPoints()
                 r:SetPoint("CENTER", group, "CENTER", targetX, -45)
@@ -1526,8 +1537,8 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
     -- Frame reattivo unificato per aggiornamenti equipaggiamento, cooldown e buff
     local f = _G.FWHUD_CoreFrame
     if not f then
-        f = CreateFrame("Frame", "FWHUD_CoreFrame")
-        _G.FWHUD_CoreFrame = f
+        f = CreateFrame("Frame")
+        rawset(_G, "FWHUD_CoreFrame", f)
         f:RegisterEvent("PLAYER_ENTERING_WORLD")
         f:RegisterEvent("PLAYER_EQUIPMENT_CHANGED")
         f:RegisterEvent("UNIT_INVENTORY_CHANGED")
@@ -2178,7 +2189,7 @@ def build_utility_auras() -> list[dict]:
     - 12 - Recklessness (Icon, Spell 1719)
     - 13 - Boots warDPS (Icon, Slot 8)
     """
-    events_list = "PLAYER_EQUIPMENT_CHANGED,UNIT_INVENTORY_CHANGED,PLAYER_ENTERING_WORLD,ZONE_CHANGED_NEW_AREA,UNIT_AURA,SPELL_UPDATE_COOLDOWN,ACTIONBAR_UPDATE_COOLDOWN,BAG_UPDATE_COOLDOWN,COMBAT_LOG_EVENT_UNFILTERED,FWHUD_ROW_UPDATE"
+    events_list = "PLAYER_EQUIPMENT_CHANGED,UNIT_INVENTORY_CHANGED,PLAYER_ENTERING_WORLD,ZONE_CHANGED_NEW_AREA,UNIT_AURA,SPELL_UPDATE_COOLDOWN,ACTIONBAR_UPDATE_COOLDOWN,BAG_UPDATE_COOLDOWN,FWHUD_ROW_UPDATE"
 
     return [
         # 05 - Trinket 1 warDPS (Slot 13)

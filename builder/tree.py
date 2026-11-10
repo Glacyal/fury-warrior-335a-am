@@ -19,28 +19,35 @@ from builder.components import (
 )
 
 
-def build_wa_tree() -> dict:
+def build_wa_tree(target_version: str = "5.21.8") -> dict:
     """
-    Costruisce e restituisce l'albero gerarchico completo per WeakAuras 4.0.0 (internalVersion 52).
+    Costruisce e restituisce l'albero gerarchico completo per WeakAuras.
+    Supporta:
+    - target_version='5.21.8': WeakAuras 5.21.8+ nativo (internalVersion 90) [PREDETERMINATO]
+    - target_version='4.0.0': WeakAuras 4.0.0 legacy (internalVersion 52)
+    
     Assembla modularmente gli 8 componenti:
-    1. 01 - Procs (Dynamic Group con Bloodsurge, Victory Rush, Flurry, Wrecking Crew, Execute)
+    1. 01 - Procs (Dynamic Group con Bloodsurge, Victory Rush, Flurry, Wrecking Crew, Rend, Execute, Weapon Desync Alert)
     2. 02 - Battle Shout, 03 - Commanding Shout, 04 - Berserker Stance
-    3. 05-13 - Utility Row (Trinket 1, Trinket 2, Cloak, Tier Set, Enchants, Gloves, Death Wish, Recklessness, Boots)
+    3. 05-13 - Utility Row (Trinket 1, Trinket 2, Ring, Cloak, Tier Set, Enchants, Gloves, Death Wish, Recklessness, Boots)
     4. 14 - Rage Bar, 16 - Castbar
     5. 15 - Rotational Bar (Dual Swing Timer & Heroic Strike Queued)
     6. 17 - Alerts (Bloodsurge & Execute Phase)
     7. 18 - Stats Panel (AP, Crit, ArP con Cap, Hit/Exp)
     8. 19 - Sunder Armor Tracker (1-5 cariche su boss)
     """
+    internal_ver = 90 if target_version == "5.21.8" else 52
+    w_ver = "5.21.8" if target_version == "5.21.8" else "4.0.0"
+
     data = {
         "m": "d",
         "v": 2000,
-        "w": "4.0.0",
+        "w": w_ver,
         "d": {
             "id": "Class Warrior (Fury)",
             "uid": "FWHUD_ROOT",
             "regionType": "group",
-            "internalVersion": 52,
+            "internalVersion": internal_ver,
             "scale": 1.2,
             "xOffset": 0,
             "yOffset": -190,
@@ -94,8 +101,9 @@ def build_wa_tree() -> dict:
     data["c"].extend(build_stats_auras())
     data["c"].extend(build_sunder_auras())
 
-    # Applicazione uniforme delle condizioni di caricamento (Warrior + Rampage)
+    # Applicazione uniforme delle condizioni di caricamento e versione interna
     for item in data["c"]:
         item["load"] = copy.deepcopy(FURY_WARRIOR_LOAD)
+        item["internalVersion"] = internal_ver
 
     return data

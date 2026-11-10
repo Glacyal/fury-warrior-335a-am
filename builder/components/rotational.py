@@ -28,8 +28,8 @@ SHARED_SWING_TIMER_LUA = r"""_G.FWHUD_GetSwing = function()
 
     local f = _G.FWHUD_SwingFrame
     if not f then
-        f = CreateFrame("Frame", "FWHUD_SwingFrame")
-        _G.FWHUD_SwingFrame = f
+        f = CreateFrame("Frame")
+        rawset(_G, "FWHUD_SwingFrame", f)
 
         local playerGUID = nil
         local function handleCLEU(...)

@@ -10,7 +10,7 @@ def run_tests():
     root = tree["d"]
     assert root["id"] == "Class Warrior (Fury)", f"Invalid root id: {root.get('id')}"
     assert root["uid"] == "FWHUD_ROOT", f"Invalid root uid: {root.get('uid')}"
-    assert root["internalVersion"] == 52, f"Invalid internalVersion: {root.get('internalVersion')}"
+    assert root["internalVersion"] in (52, 90), f"Invalid internalVersion: {root.get('internalVersion')}"
 
     expected_children = [
         "01 - Procs warDPS",
@@ -52,7 +52,18 @@ def run_tests():
         assert uid not in uids, f"Duplicate UID detected: {uid}"
         uids.add(uid)
         assert uid.startswith("FWHUD_"), f"UID {uid} does not start with 'FWHUD_'"
-        assert item.get("internalVersion") == 52, f"Item {cid} internalVersion != 52"
+        assert item.get("internalVersion") in (52, 90), f"Item {cid} internalVersion not in (52, 90)"
+
+        # Check subRegions dual-key structure for subtext
+        for sr in item.get("subRegions", []):
+            if sr.get("type") == "subtext":
+                assert "anchor_point" in sr, f"Item {cid} missing anchor_point"
+                assert "anchorPoint" in sr, f"Item {cid} missing anchorPoint"
+                assert "text_anchorPoint" in sr, f"Item {cid} missing text_anchorPoint"
+                assert "anchorXOffset" in sr, f"Item {cid} missing anchorXOffset"
+                assert "anchorYOffset" in sr, f"Item {cid} missing anchorYOffset"
+                assert "text_anchorXOffset" in sr, f"Item {cid} missing text_anchorXOffset"
+                assert "text_anchorYOffset" in sr, f"Item {cid} missing text_anchorYOffset"
 
         # Check load conditions (Warrior Class + Rampage Talent ID 64)
         load = item.get("load", {})
@@ -78,6 +89,12 @@ def run_tests():
     assert start_act.get("do_sound") is True, "Alert - Bloodsurge start action missing do_sound=True"
     assert "Drums.ogg" in start_act.get("sound", ""), "Alert - Bloodsurge sound is not Drums.ogg"
     assert start_act.get("sound_channel") == "Master", "Alert - Bloodsurge sound channel is not Master"
+
+    # Verify legacy version generation
+    tree_legacy = build_wa_tree(target_version="4.0.0")
+    assert tree_legacy["d"]["internalVersion"] == 52, "Legacy root internalVersion != 52"
+    assert tree_legacy["w"] == "4.0.0", "Legacy tree w != 4.0.0"
+    assert tree_legacy["c"][0]["internalVersion"] == 52, "Legacy child internalVersion != 52"
 
     print(f"[OK] Validati {len(tree['c'])} nodi e 20 moduli di primo livello.")
     print("[PASS] test_components_integrity.py superato con successo!")

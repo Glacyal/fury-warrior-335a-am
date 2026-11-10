@@ -2,11 +2,13 @@ import re
 import os
 
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-import_path = os.path.join(root_dir, "IMPORT_STRING.txt")
+v5_path = os.path.join(root_dir, "IMPORT_STRING_v5.21.8.txt")
+legacy_path = os.path.join(root_dir, "IMPORT_STRING.txt")
+import_path = v5_path if os.path.exists(v5_path) else legacy_path
 docs_path = os.path.join(root_dir, "docs", "index.html")
 
 if not os.path.exists(import_path):
-    print("Warning: IMPORT_STRING.txt not found.")
+    print("Warning: Import string file not found.")
     exit(1)
 
 with open(import_path, "r", encoding="utf-8") as f:

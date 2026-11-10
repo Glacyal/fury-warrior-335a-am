@@ -1,7 +1,7 @@
 # Class Warrior (Fury) — WeakAuras Suite
 
 [![WoW Version](https://img.shields.io/badge/World%20of%20Warcraft-3.3.5a%20(12340)-orange.svg)](https://github.com/Glacyal/fury-warrior-335a-am)
-[![WeakAuras](https://img.shields.io/badge/WeakAuras-5.21.8%2B%20%7C%204.0.0-blue.svg)](https://github.com/Glacyal/fury-warrior-335a-am)
+[![WeakAuras](https://img.shields.io/badge/WeakAuras-5.21.8+-blue.svg)](https://github.com/Glacyal/fury-warrior-335a-am)
 [![Class](https://img.shields.io/badge/Class-Warrior%20(Fury%20TG)-red.svg)](https://github.com/Glacyal/fury-warrior-335a-am)
 [![GitHub Pages](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-brightgreen.svg)](https://glacyal.github.io/fury-warrior-335a-am/)
 [![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-gray.svg?logo=paypal&logoColor=white&labelColor=0079c1)](https://www.paypal.me/AMantmar)
@@ -136,7 +136,8 @@ Fury Warrior 3.3.5a AM/
 │   │   └── sunder.py                # 19 - Sunder Armor Tracker (tracciamento cariche e Expose Armor)
 │   └── tree.py                      # Albero complessivo del gruppo (20 nodi principali, 38 sotto-aure)
 ├── docs/
-│   └── index.html                   # Simulatore web interattivo
+│   ├── index.html                   # Simulatore web interattivo (tracciato in Git)
+│   └── *.md                         # Documentazione interna (RULES, ARCHITECTURE, PRD, DECISIONS, ecc. - esclusa da Git)
 ├── tests/                           # Suite di test automatici
 │   ├── run_parallel_tests.py        # Esecutore parallelo multi-core
 │   ├── test_buffs.py                # Test gestione Shout e Berserker Stance
@@ -145,22 +146,23 @@ Fury Warrior 3.3.5a AM/
 │   ├── test_procs.py                # Test 01 - Procs warDPS e Task 50 (Weapon Desync Alert)
 │   ├── test_rotational.py           # Test barra rotazionale, swing timer MH/OH e illuminazione cromatica HS/Cleave
 │   ├── test_stats_panel.py          # Verifica formule e moltiplicatori del pannello statistiche
-│   ├── test_string_sync.py          # Verifica corrispondenza tra builder e IMPORT_STRING.txt
+│   ├── test_string_sync.py          # Verifica corrispondenza tra builder e IMPORT_STRING_v5.21.8.txt
 │   ├── test_sunder_tracker.py       # Test Sunder Armor, conteggio cariche e allerta OFF
 │   ├── test_tree_layout.py          # Verifica gerarchia e ordinamento dell'albero
 │   └── test_utility_row.py          # Test esaustivo su ICD, incanti arma x1/x2 e riga utility
-├── generate.py                      # Compilatore Python dell'albero WA (genera v5.21.8 e legacy)
-├── IMPORT_STRING_v5.21.8.txt        # Stringa nativa per WeakAuras 5.21.8+ (internalVersion 90, zero warning)
-├── IMPORT_STRING.txt                # Stringa retrocompatibile per WeakAuras legacy
+├── generate.py                      # Script di compilazione della stringa WeakAuras 5.21.8+
+├── IMPORT_STRING_v5.21.8.txt        # Stringa WeakAuras 5.21.8+ nativa (Zero Warning, internalVersion: 90)
 └── scripts/
-    └── sync_docs.py                 # Sincronizzazione automatica di IMPORT_STRING_v5.21.8.txt in docs/index.html
+    └── sync_docs.py                 # Sincronizzazione automatica della stringa v5 in docs/index.html
 ```
 
 ---
 
 ## 🚀 Installazione in Gioco (3 Passaggi)
 
-1. **Copia la Stringa**: Apri il file **[`IMPORT_STRING_v5.21.8.txt`](IMPORT_STRING_v5.21.8.txt)** (scelta raccomandata per WeakAuras 5.21.8+) oppure **[`IMPORT_STRING.txt`](IMPORT_STRING.txt)** (per client con WeakAuras legacy come 4.0.0) e copia l'intero contenuto (`Ctrl+A`, poi `Ctrl+C`).
+1. **Copia la Stringa di Importazione**:
+   - Apri **[`IMPORT_STRING_v5.21.8.txt`](IMPORT_STRING_v5.21.8.txt)** (0 warning, 0 triangolini gialli, nativa `internalVersion: 90`).
+   - Copia l'intero contenuto (`Ctrl+A`, poi `Ctrl+C`).
 2. **Apri WeakAuras**: In gioco, digita il comando `/wa` nella chat.
 3. **Importa**: Clicca su **Import** in alto a sinistra, incolla il testo con `Ctrl+V` e conferma l'importazione.
 
@@ -168,10 +170,9 @@ Fury Warrior 3.3.5a AM/
 
 ## 📌 Compatibilità Addon & Client
 
-| Client / Piattaforma | Versione WeakAuras | Compatibilità | Note |
-| :--- | :--- | :---: | :--- |
-| **WotLK 3.3.5a (Build 12340)** | **WeakAuras 5.21.8+** | ✅ **100% Nativa (Zero Warning)** | Pienamente conforme al sandbox moderno WA5 (`internalVersion: 90`): frame anonimi con `rawset(_G, ...)`, safe accessor `WeakAuras.GetRegion(id)`, zero warning su sovrascrittura frame globali o deprecazioni. |
-| **WotLK 3.3.5a (Build 12340)** | **WeakAuras 4.0.0** | ✅ **100% Retrocompatibile** | Struttura subRegion con chiavi duali (`anchor_point` e `anchorPoint`, coordinate speculari) e fallback automatico `WeakAuras.regions` su engine legacy (`internalVersion: 52`). |
+| Client / Piattaforma | Versione WeakAuras | File Stringa | Compatibilità | Note |
+| :--- | :--- | :--- | :---: | :--- |
+| **WotLK 3.3.5a (Build 12340)** | **WeakAuras 5.21.8+** | `IMPORT_STRING_v5.21.8.txt` | 🏆 **100% Nativa (0 Warning)** | Ottimizzata per motore WA5: usa `WeakAuras.GetRegion(id)`, sandbox protetto con `rawset`, frame C-level anonimi, filtri CLEU selettivi, `internalVersion: 90`. Zero triangolini e zero warning chat. |
 
 ---
 
@@ -180,14 +181,17 @@ Fury Warrior 3.3.5a AM/
 Il progetto include una suite di 10 test automatici deterministici eseguibili in parallelo multi-core:
 
 ```bash
-# Esecuzione parallela multi-core della suite completa (10/10 PASS)
+# Esecuzione parallela multi-core della suite completa (10 test in ~0.4s)
 python tests/run_parallel_tests.py
 
 # Esecuzione standard tramite unittest
 python -m unittest discover tests
 
-# Ricompilazione della stringa di importazione
+# Ricompilazione della stringa di importazione nativa WA 5.21.8+
 python generate.py
+
+# Sincronizzazione automatica con il simulatore web
+python scripts/sync_docs.py
 ```
 
 ---

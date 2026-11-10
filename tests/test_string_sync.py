@@ -11,7 +11,6 @@ def run_tests():
     from builder.tree import build_wa_tree
 
     v5_path = os.path.join(root_dir, "IMPORT_STRING_v5.21.8.txt")
-    legacy_path = os.path.join(root_dir, "IMPORT_STRING.txt")
     docs_path = os.path.join(root_dir, "docs", "index.html")
 
     assert os.path.exists(v5_path), "File IMPORT_STRING_v5.21.8.txt non trovato!"

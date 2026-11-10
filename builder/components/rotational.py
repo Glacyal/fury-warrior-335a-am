@@ -400,35 +400,31 @@ def build_rotational_auras() -> list[dict]:
             "actions": {
                 "start": {
                     "do_custom": True,
-                    "custom": """function()
-                        if aura_env then aura_env.lastQueuedState = nil end
-                        local isHS = IsCurrentSpell and (IsCurrentSpell(47450) or IsCurrentSpell("Heroic Strike") or IsCurrentSpell("Colpo Eroico"))
-                        local isCleave = IsCurrentSpell and (IsCurrentSpell(47520) or IsCurrentSpell("Cleave") or IsCurrentSpell("Fendente"))
-                        local LCG = LibStub and LibStub("LibCustomGlow-1.0", true)
-                        local glowKey = "FWHUD_ROTCENTER_GLOW"
-                        local reg = aura_env and aura_env.region
-                        local tex = reg and (reg.texture or (reg.SetVertexColor and reg))
-                        if tex and tex.SetBlendMode then tex:SetBlendMode("ADD") end
-                        if isHS then
-                            if aura_env then aura_env.lastQueuedState = "HS" end
-                            if tex and tex.SetVertexColor then tex:SetVertexColor(1.0, 0.84, 0.0, 0.40) end
-                            if LCG and reg then LCG.PixelGlow_Start(reg, {1.0, 0.84, 0.0, 1.0}, 8, 0.25, 10, 2, 0, 0, false, glowKey) end
-                        elseif isCleave then
-                            if aura_env then aura_env.lastQueuedState = "CLEAVE" end
-                            if tex and tex.SetVertexColor then tex:SetVertexColor(0.1, 0.95, 0.2, 0.40) end
-                            if LCG and reg then LCG.PixelGlow_Start(reg, {0.1, 0.95, 0.2, 1.0}, 8, 0.25, 10, 2, 0, 0, false, glowKey) end
-                        end
-                    end""",
+                    "custom": """if aura_env then aura_env.lastQueuedState = nil end
+local isHS = IsCurrentSpell and (IsCurrentSpell(47450) or IsCurrentSpell("Heroic Strike") or IsCurrentSpell("Colpo Eroico"))
+local isCleave = IsCurrentSpell and (IsCurrentSpell(47520) or IsCurrentSpell("Cleave") or IsCurrentSpell("Fendente"))
+local LCG = LibStub and LibStub("LibCustomGlow-1.0", true)
+local glowKey = "FWHUD_ROTCENTER_GLOW"
+local reg = aura_env and aura_env.region
+local tex = reg and (reg.texture or (reg.SetVertexColor and reg))
+if tex and tex.SetBlendMode then tex:SetBlendMode("ADD") end
+if isHS then
+    if aura_env then aura_env.lastQueuedState = "HS" end
+    if tex and tex.SetVertexColor then tex:SetVertexColor(1.0, 0.84, 0.0, 0.40) end
+    if LCG and reg then LCG.PixelGlow_Start(reg, {1.0, 0.84, 0.0, 1.0}, 8, 0.25, 10, 2, 0, 0, false, glowKey) end
+elseif isCleave then
+    if aura_env then aura_env.lastQueuedState = "CLEAVE" end
+    if tex and tex.SetVertexColor then tex:SetVertexColor(0.1, 0.95, 0.2, 0.40) end
+    if LCG and reg then LCG.PixelGlow_Start(reg, {0.1, 0.95, 0.2, 1.0}, 8, 0.25, 10, 2, 0, 0, false, glowKey) end
+end""",
                 },
                 "finish": {
                     "do_custom": True,
-                    "custom": """function()
-                        if aura_env then aura_env.lastQueuedState = nil end
-                        local LCG = LibStub and LibStub("LibCustomGlow-1.0", true)
-                        if LCG and aura_env and aura_env.region then
-                            LCG.PixelGlow_Stop(aura_env.region, "FWHUD_ROTCENTER_GLOW")
-                        end
-                    end""",
+                    "custom": """if aura_env then aura_env.lastQueuedState = nil end
+local LCG = LibStub and LibStub("LibCustomGlow-1.0", true)
+if LCG and aura_env and aura_env.region then
+    LCG.PixelGlow_Stop(aura_env.region, "FWHUD_ROTCENTER_GLOW")
+end""",
                 },
             },
             "subRegions": [

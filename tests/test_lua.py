@@ -49,13 +49,18 @@ def run_tests():
     all_items = [tree["d"]] + tree["c"]
     for child in all_items:
         cid = child.get("id", "Unknown")
-        # Check actions.init.custom
+        # Check actions (init, start, finish)
         actions = child.get("actions", {})
-        init_c = actions.get("init", {}).get("custom")
-        if init_c and isinstance(init_c, str):
-            count += 1
-            ok = verify_lua(init_c, f"{cid} -> actions.init.custom")
-            if not ok: all_passed = False
+        for act_name in ("init", "start", "finish"):
+            act_c = actions.get(act_name, {}).get("custom")
+            if act_c and isinstance(act_c, str):
+                count += 1
+                assert not act_c.strip().startswith("function"), (
+                    f"{cid} -> actions.{act_name}.custom cannot start with 'function' (WeakAuras wraps it automatically)"
+                )
+                wrapped_code = f"function()\n{act_c}\nend"
+                ok = verify_lua(wrapped_code, f"{cid} -> actions.{act_name}.custom")
+                if not ok: all_passed = False
 
         # Check triggers
         triggers = child.get("triggers", {})

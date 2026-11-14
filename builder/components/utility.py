@@ -751,6 +751,7 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
             [71541] = true, [71540] = true, -- Whispering Fanged Skull (Crit)
             [65024] = true, [65023] = true, -- Dark-Matter (Crit)
             [71484] = true, [71558] = true, -- DBW Speed of the Vrykul (Agilita/Crit, no AP per Guerriero)
+            [60233] = true,                 -- Darkmoon Card: Greatness Agility (+300 Agilita/Crit)
         }
         if spellId and critSpellIds[spellId] then return false end
 

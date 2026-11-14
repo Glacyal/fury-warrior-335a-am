@@ -49,6 +49,11 @@ def run_tests():
 
     auras_map = {a["id"]: a for a in auras[1:]}
 
+    # Verifica Execute Usable (color neutro [1, 1, 1, 1] senza filtro rosso vertex)
+    exec_aura = auras_map.get("Execute Usable")
+    assert exec_aura is not None, "Manca aura 'Execute Usable' in build_procs_auras"
+    assert exec_aura["color"] == [1, 1, 1, 1], f"Execute Usable deve avere color [1, 1, 1, 1], trovato: {exec_aura.get('color')}"
+
     # Verifica Weapon Desync Alert
     desync = auras_map.get("Weapon Desync Alert")
     assert desync is not None, "Manca aura 'Weapon Desync Alert' in build_procs_auras"

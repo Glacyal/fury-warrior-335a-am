@@ -284,7 +284,7 @@ end"""
             "height": 34,
             "displayIcon": "Interface\\Icons\\INV_Sword_48",
             "auto": False,
-            "color": [1, 0.2, 0.2, 1],
+            "color": [1, 1, 1, 1],
             "desaturate": False,
             "actions": {
                 "start": make_glow_action(),

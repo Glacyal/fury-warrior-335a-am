@@ -550,10 +550,10 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         _G.FWHUD_SlotCache = _G.FWHUD_SlotCache or {}
         if _G.FWHUD_SlotCache[slot] and _G.FWHUD_SlotCache[slot].time == now then
             local c = _G.FWHUD_SlotCache[slot]
-            return c.state, c.rem, c.dur, c.icon
+            return c.state, c.rem, c.dur, c.icon, c.spellId, c.buffName
         end
 
-        local function finish(st, r, d, ic)
+        local function finish(st, r, d, ic, spId, bNm)
             local c = _G.FWHUD_SlotCache[slot]
             if not c then
                 c = {}
@@ -564,7 +564,9 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
             c.rem = r
             c.dur = d
             c.icon = ic
-            return st, r, d, ic
+            c.spellId = spId
+            c.buffName = bNm
+            return st, r, d, ic, spId, bNm
         end
 
         local itemID = nil
@@ -649,6 +651,8 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         local remBuff = 0
         local durBuff = 0
         local buffIcon = nil
+        local matchedSpellId = nil
+        local matchedBuffName = nil
 
         local buffs = _G.FWHUD_GetPlayerBuffs and _G.FWHUD_GetPlayerBuffs()
         local buffList = buffs and buffs.list or {}
@@ -696,6 +700,8 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                 if remBuff > 0.05 then
                     foundBuff = true
                     buffIcon = b.icon
+                    matchedSpellId = b.spellId
+                    matchedBuffName = b.name
                     break
                 end
             end
@@ -707,7 +713,7 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
                 icdState.lastEnd = icdState.lastStart + targetICD
                 icdState.isProc = true
             end
-            return finish("ACTIVE", remBuff, durBuff, buffIcon or baseIcon)
+            return finish("ACTIVE", remBuff, durBuff, buffIcon or baseIcon, matchedSpellId, matchedBuffName)
         end
 
         if icdState.isProc then
@@ -730,6 +736,50 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         end
 
         return finish("READY", 0, 0, baseIcon)
+    end
+
+    -- =========================================================================
+    -- VERIFICA PROC AP / ARP PER SMART BURST ADVISOR (ESCLUSIONE CRITICO/HASTE)
+    -- =========================================================================
+    _G.FWHUD_IsSlotBurstProcActive = function(slot)
+        if not _G.FWHUD_CheckSlot then return false end
+        local state, rem, dur, icon, spellId, buffName = _G.FWHUD_CheckSlot(slot)
+        if state ~= "ACTIVE" then return false end
+
+        -- Esclusione proc di CRITICO (Recklessness garantisce gia 100% critico speciale, quindi proc crit non partecipano)
+        local critSpellIds = {
+            [71541] = true, [71540] = true, -- Whispering Fanged Skull (Crit)
+            [65024] = true, [65023] = true, -- Dark-Matter (Crit)
+            [71484] = true, [71558] = true, -- DBW Speed of the Vrykul (Agilita/Crit, no AP per Guerriero)
+        }
+        if spellId and critSpellIds[spellId] then return false end
+
+        -- Esclusione proc di HASTE (non forniscono AP ne ArP)
+        local hasteSpellIds = {
+            [64772] = true,                 -- Comet's Trail (Haste)
+            [60305] = true, [60304] = true, -- Meteorite Whetstone (Haste)
+            [67683] = true,                 -- Shard of the Crystal Heart (Haste)
+        }
+        if spellId and hasteSpellIds[spellId] then return false end
+
+        -- Esclusione monili Tank (stamina, armatura, assorbimento)
+        local tankSpellIds = {
+            [71586] = true, [67753] = true, [67752] = true,
+            [67631] = true, [67630] = true, [71569] = true, [71638] = true,
+        }
+        if spellId and tankSpellIds[spellId] then return false end
+
+        -- Filtro di sicurezza su parole chiave del nome del buff
+        if buffName then
+            local bClean = buffName:lower():gsub("[%s%p%c]", "")
+            if bClean:find("vrykul") or bClean:find("agilit") or bClean:find("skull") or bClean:find("teschio")
+               or bClean:find("darkmatter") or bClean:find("materiaoscura") or bClean:find("comet") or bClean:find("cometa")
+               or bClean:find("hardenedskin") or bClean:find("scarab") or bClean:find("juggernaut") then
+                return false
+            end
+        end
+
+        return true
     end
 
     -- =========================================================================
@@ -2197,13 +2247,12 @@ def make_recklessness_custom_text() -> str:
             end
 
             local procsCount = 0
-            if _G.FWHUD_CheckSlotState then
-                local t1State = _G.FWHUD_CheckSlotState(13)
-                if t1State == "ACTIVE" then procsCount = procsCount + 1 end
-                local t2State = _G.FWHUD_CheckSlotState(14)
-                if t2State == "ACTIVE" then procsCount = procsCount + 1 end
+            if _G.FWHUD_IsSlotBurstProcActive then
+                if _G.FWHUD_IsSlotBurstProcActive(13) then procsCount = procsCount + 1 end
+                if _G.FWHUD_IsSlotBurstProcActive(14) then procsCount = procsCount + 1 end
             end
-            if _G.FWHUD_CheckRing then
+            local isRingEquipped = _G.FWHUD_CheckRingEquipped and _G.FWHUD_CheckRingEquipped()
+            if isRingEquipped and _G.FWHUD_CheckRing then
                 local rState = _G.FWHUD_CheckRing()
                 if rState == "ACTIVE" then procsCount = procsCount + 1 end
             end

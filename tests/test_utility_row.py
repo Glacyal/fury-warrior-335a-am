@@ -167,6 +167,12 @@ def run_tests():
     assert "procsCount >= 2" in reck_txt, "Manca soglia procsCount >= 2 con Death Wish in customText di 12 - Recklessness"
     assert "procsCount >= 3" in reck_txt, "Manca soglia procsCount >= 3 senza Death Wish in customText di 12 - Recklessness"
     assert "1.0, 0.35, 0.0, 1.0" in reck_txt, "Manca colore arancione/fuoco per pixel glow burst advisor"
+    assert "_G.FWHUD_IsSlotBurstProcActive(13)" in reck_txt, "Manca chiamata FWHUD_IsSlotBurstProcActive(13) in reck_txt"
+    assert "_G.FWHUD_IsSlotBurstProcActive(14)" in reck_txt, "Manca chiamata FWHUD_IsSlotBurstProcActive(14) in reck_txt"
+    assert "isRingEquipped and _G.FWHUD_CheckRing" in reck_txt, "Manca verifica anello equipaggiato prima del proc in reck_txt"
+    assert "_G.FWHUD_IsSlotBurstProcActive" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca _G.FWHUD_IsSlotBurstProcActive nel bootstrap"
+    assert "71541" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca esclusione WFS 71541 (Crit)"
+    assert "71484" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca esclusione DBW Vrykul 71484 (Crit/Agilita)"
 
     reck_finish = reck_aura.get("actions", {}).get("finish", {}).get("custom", "")
     assert 'LCG.PixelGlow_Stop(aura_env.region, "FWHUD_RECK_GLOW")' in reck_finish, "Manca stop FWHUD_RECK_GLOW in actions.finish"

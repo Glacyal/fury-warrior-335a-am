@@ -112,18 +112,18 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         -- PHYSICAL / MELEE DPS TRINKETS (WotLK 3.3.5a)
         -- ====================================================================
         -- Deathbringer's Will (Normal 50362, Heroic 50363 - ICC 25 Saurfang)
-        [50362] = { keywords = { "taunka", "vrykul", "irondwarf", "deathbringer", "nanodiferro", "forzadel", "agilitadel", "miradel", "volonta" }, spellIds = { [71484] = true, [71485] = true, [71486] = true, [71491] = true, [71492] = true, [71487] = true, [71556] = true, [71557] = true, [71558] = true, [71559] = true, [71560] = true, [71561] = true }, icd = 105, dur = 30 },
-        [50363] = { keywords = { "taunka", "vrykul", "irondwarf", "deathbringer", "nanodiferro", "forzadel", "agilitadel", "miradel", "volonta" }, spellIds = { [71484] = true, [71485] = true, [71486] = true, [71491] = true, [71492] = true, [71487] = true, [71556] = true, [71557] = true, [71558] = true, [71559] = true, [71560] = true, [71561] = true }, icd = 105, dur = 30 },
+        [50362] = { keywords = { "taunka", "vrykul", "irondwarf", "deathbringer", "nanodiferro", "forzadel", "forzadei", "agilitadel", "miradel", "volonta" }, spellIds = { [71484] = true, [71485] = true, [71486] = true, [71491] = true, [71492] = true, [71487] = true, [71556] = true, [71557] = true, [71558] = true, [71559] = true, [71560] = true, [71561] = true }, icd = 105, dur = 30 },
+        [50363] = { keywords = { "taunka", "vrykul", "irondwarf", "deathbringer", "nanodiferro", "forzadel", "forzadei", "agilitadel", "miradel", "volonta" }, spellIds = { [71484] = true, [71485] = true, [71486] = true, [71491] = true, [71492] = true, [71487] = true, [71556] = true, [71557] = true, [71558] = true, [71559] = true, [71560] = true, [71561] = true }, icd = 105, dur = 30 },
 
         -- Sharpened Twilight Scale (Normal 54569, Heroic 54590 - RS 25 Halion)
         [54569] = { keywords = { "twilightprecision", "sharpenedtwilight", "twilight", "crepuscolare", "precisione" }, spellIds = { [75473] = true, [75474] = true, [75466] = true, [75456] = true }, icd = 45, dur = 15 },
         [54590] = { keywords = { "twilightprecision", "sharpenedtwilight", "twilight", "crepuscolare", "precisione" }, spellIds = { [75473] = true, [75474] = true, [75466] = true, [75456] = true }, icd = 45, dur = 15 },
 
         -- Death's Choice / Verdict (Normal Alliance 47115, Normal Horde 47131, Heroic Alliance 47303, Heroic Horde 47464 - ToC 25 Twins)
-        [47115] = { keywords = { "paragon", "choice", "verdict", "scelta", "verdetto" }, spellIds = { [67708] = true, [67703] = true, [67707] = true }, icd = 45, dur = 15 },
-        [47131] = { keywords = { "paragon", "choice", "verdict", "scelta", "verdetto" }, spellIds = { [67773] = true, [67772] = true, [67771] = true }, icd = 45, dur = 15 },
-        [47303] = { keywords = { "paragon", "choice", "verdict", "scelta", "verdetto" }, spellIds = { [67708] = true, [67703] = true, [67707] = true }, icd = 45, dur = 15 },
-        [47464] = { keywords = { "paragon", "choice", "verdict", "scelta", "verdetto" }, spellIds = { [67773] = true, [67772] = true, [67771] = true }, icd = 45, dur = 15 },
+        [47115] = { keywords = { "paragon", "choice", "verdict", "scelta", "verdetto", "esempio", "forza", "strength" }, spellIds = { [67708] = true, [67703] = true, [67707] = true }, icd = 45, dur = 15 },
+        [47131] = { keywords = { "paragon", "choice", "verdict", "scelta", "verdetto", "esempio", "forza", "strength" }, spellIds = { [67773] = true, [67772] = true, [67771] = true }, icd = 45, dur = 15 },
+        [47303] = { keywords = { "paragon", "choice", "verdict", "scelta", "verdetto", "esempio", "forza", "strength" }, spellIds = { [67708] = true, [67703] = true, [67707] = true }, icd = 45, dur = 15 },
+        [47464] = { keywords = { "paragon", "choice", "verdict", "scelta", "verdetto", "esempio", "forza", "strength" }, spellIds = { [67773] = true, [67772] = true, [67771] = true }, icd = 45, dur = 15 },
 
         -- Whispering Fanged Skull (Normal 50342, Heroic 50343 - ICC 10 Lady Deathwhisper)
         [50342] = { keywords = { "whisperingfangedskull", "fanged", "skull", "teschio", "sussurrante" }, spellIds = { [71541] = true, [71540] = true }, icd = 45, dur = 15 },
@@ -143,10 +143,10 @@ SHARED_WARRIOR_CORE_BOOTSTRAP_LUA = r"""function()
         [45609] = { keywords = { "cometstrail", "comet", "cometa" }, spellIds = { [64772] = true }, icd = 45, dur = 10 },
 
         -- Darkmoon Card: Greatness (44253, 44254, 44255, 42987)
-        [44253] = { keywords = { "greatness", "nobilt", "grandezza" }, spellIds = { [60229] = true, [60233] = true, [60234] = true, [60235] = true }, icd = 45, dur = 15 },
-        [44254] = { keywords = { "greatness", "nobilt", "grandezza" }, spellIds = { [60229] = true, [60233] = true, [60234] = true, [60235] = true }, icd = 45, dur = 15 },
-        [44255] = { keywords = { "greatness", "nobilt", "grandezza" }, spellIds = { [60229] = true, [60233] = true, [60234] = true, [60235] = true }, icd = 45, dur = 15 },
-        [42987] = { keywords = { "greatness", "nobilt", "grandezza" }, spellIds = { [60229] = true, [60233] = true, [60234] = true, [60235] = true }, icd = 45, dur = 15 },
+        [44253] = { keywords = { "greatness", "nobilt", "grandezza", "forza", "strength" }, spellIds = { [60229] = true, [60233] = true, [60234] = true, [60235] = true }, icd = 45, dur = 15 },
+        [44254] = { keywords = { "greatness", "nobilt", "grandezza", "forza", "strength" }, spellIds = { [60229] = true, [60233] = true, [60234] = true, [60235] = true }, icd = 45, dur = 15 },
+        [44255] = { keywords = { "greatness", "nobilt", "grandezza", "forza", "strength" }, spellIds = { [60229] = true, [60233] = true, [60234] = true, [60235] = true }, icd = 45, dur = 15 },
+        [42987] = { keywords = { "greatness", "nobilt", "grandezza", "forza", "strength" }, spellIds = { [60229] = true, [60233] = true, [60234] = true, [60235] = true }, icd = 45, dur = 15 },
 
         -- Grim Toll (40256 - Naxxramas 25)
         [40256] = { keywords = { "grimtoll", "toll", "rintocco" }, spellIds = { [60486] = true, [60485] = true }, icd = 45, dur = 10 },

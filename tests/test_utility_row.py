@@ -173,6 +173,10 @@ def run_tests():
     assert "_G.FWHUD_IsSlotBurstProcActive" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca _G.FWHUD_IsSlotBurstProcActive nel bootstrap"
     assert "71541" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca esclusione WFS 71541 (Crit)"
     assert "71484" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca esclusione DBW Vrykul 71484 (Crit/Agilita)"
+    assert "forza" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca keyword forza per monili di Forza (Death's Choice, Greatness, DBW)"
+    assert "67708" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca spellId 67708 (Paragon / Strength) per Death's Choice"
+    assert "71485" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca spellId 71485 (Strength of the Taunka) per DBW"
+    assert "60229" in SHARED_WARRIOR_CORE_BOOTSTRAP_LUA, "Manca spellId 60229 (Greatness Strength) per Darkmoon Card: Greatness"
 
     reck_finish = reck_aura.get("actions", {}).get("finish", {}).get("custom", "")
     assert 'LCG.PixelGlow_Stop(aura_env.region, "FWHUD_RECK_GLOW")' in reck_finish, "Manca stop FWHUD_RECK_GLOW in actions.finish"

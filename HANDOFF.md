@@ -140,10 +140,10 @@ Per apportare modifiche alla suite o estendere la logica:
 - **Smart Burst Advisor (`12 - Recklessness`)**:
   - Advisor reattivo per ottimizzare il lancio di Recklessness durante finestre di alto danno:
     - In combattimento contro un bersaglio vivente e attaccabile, con abilità pronta (`state == "READY"`).
-    - **Filtro selettivo AP/ArP esclusivo**: Riconosce solo proc che incrementano Attack Power o Armor Penetration (`_G.FWHUD_IsSlotBurstProcActive`). I monili con solo Critico (*Whispering Fanged Skull*, *Dark-Matter*, DBW *Speed of the Vrykul*) sono esclusi poiché ridondanti con il 100% critico di Recklessness.
+    - **Filtro selettivo AP/ArP esclusivo**: Riconosce solo proc che incrementano Forza (Strength), Attack Power o Armor Penetration (`_G.FWHUD_IsSlotBurstProcActive`). I monili con solo Critico (*Whispering Fanged Skull*, *Dark-Matter*, DBW *Speed of the Vrykul*) sono esclusi poiché ridondanti con il 100% critico di Recklessness.
     - **Rilevamento condizionale dell'anello**: L'anello (*Ashen Band*) partecipa al conteggio solo se effettivamente equipaggiato dal giocatore.
-    - Con Death Wish attivo: richiede almeno $\ge 2$ proc maggiori AP/ArP.
-    - Senza Death Wish: richiede almeno $\ge 3$ proc maggiori AP/ArP simultanei.
+    - Con Death Wish attivo: richiede almeno $\ge 2$ proc maggiori di Forza/AP/ArP.
+    - Senza Death Wish: richiede almeno $\ge 3$ proc maggiori di Forza/AP/ArP simultanei.
     - Notifica visiva: **Pixel Glow Fuoco** arancione caldo (`[1.0, 0.35, 0.0, 1.0]`) senza testo o clutter invasivo.
     - All'attivazione: transizione istantanea a Pixel Glow giallo con conteggio cariche (`x3`, `x2`, `x1`).
     - In ricarica o out-of-combat: spegnimento totale del glow.

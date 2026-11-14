@@ -2143,6 +2143,99 @@ def make_warrior_spell_custom_text(spell_id: int, buff_id: int, glow_key: str) -
 end"""
 
 
+def make_recklessness_custom_text() -> str:
+    """Testo descrittivo e smart burst advisor per Recklessness (%c), con pixel glow su proc attivo e advisor finestra di burst."""
+    return """function()
+    if (not _G.FWHUD_CoreInitDone or _G.FWHUD_BUILD_VER ~= 47) and _G.FWHUD_InitCore then _G.FWHUD_InitCore() end
+    if _G.FWHUD_UpdateUtilityRowPositions then
+        _G.FWHUD_UpdateUtilityRowPositions()
+    end
+    if not _G.FWHUD_CheckWarriorSpell then return "" end
+    local state, rem, dur, count, icon = _G.FWHUD_CheckWarriorSpell(1719, 1719)
+    local LCG = LibStub and LibStub("LibCustomGlow-1.0", true)
+    local reg = aura_env and aura_env.region
+
+    if state == "ACTIVE" then
+        if LCG and reg then
+            LCG.PixelGlow_Stop(reg, "FWHUD_RECK_BURST_GLOW")
+            LCG.PixelGlow_Start(reg, {1, 0.85, 0.1, 1}, 8, 0.25, 10, 2, 0, 0, false, "FWHUD_RECK_GLOW")
+        end
+        if count and count > 1 then
+            return string.format("|cFFFFFF00x%d|r", count)
+        elseif rem > 0 then
+            return string.format("|cFFFFFF00%.1fs|r", rem)
+        end
+        return "|cFFFFFF00ON|r"
+    else
+        if LCG and reg then
+            LCG.PixelGlow_Stop(reg, "FWHUD_RECK_GLOW")
+        end
+
+        if state == "COOLDOWN" and rem > 0.1 then
+            if LCG and reg then
+                LCG.PixelGlow_Stop(reg, "FWHUD_RECK_BURST_GLOW")
+            end
+            if rem >= 60 then
+                local m = math.floor(rem / 60)
+                local s = math.floor(rem % 60)
+                return string.format("%d:%02d", m, s)
+            else
+                return string.format("%.0f", rem)
+            end
+        end
+
+        -- state == "READY"
+        local inCombat = UnitAffectingCombat and UnitAffectingCombat("player")
+        local hasTarget = UnitExists("target") and not UnitIsDeadOrGhost("target") and UnitCanAttack("player", "target")
+        local burstWindow = false
+
+        if inCombat and hasTarget then
+            local isDW = false
+            if _G.FWHUD_CheckWarriorSpell then
+                local dwState = _G.FWHUD_CheckWarriorSpell(12292, 12292)
+                isDW = (dwState == "ACTIVE")
+            end
+
+            local procsCount = 0
+            if _G.FWHUD_CheckSlotState then
+                local t1State = _G.FWHUD_CheckSlotState(13)
+                if t1State == "ACTIVE" then procsCount = procsCount + 1 end
+                local t2State = _G.FWHUD_CheckSlotState(14)
+                if t2State == "ACTIVE" then procsCount = procsCount + 1 end
+            end
+            if _G.FWHUD_CheckRing then
+                local rState = _G.FWHUD_CheckRing()
+                if rState == "ACTIVE" then procsCount = procsCount + 1 end
+            end
+            if _G.FWHUD_CheckEnchants then
+                local eState, _, _, eCount = _G.FWHUD_CheckEnchants()
+                if eState == "ACTIVE" then
+                    procsCount = procsCount + (eCount or 1)
+                end
+            end
+
+            if isDW and procsCount >= 2 then
+                burstWindow = true
+            elseif procsCount >= 3 then
+                burstWindow = true
+            end
+        end
+
+        if burstWindow then
+            if LCG and reg then
+                LCG.PixelGlow_Start(reg, {1.0, 0.35, 0.0, 1.0}, 8, 0.25, 10, 2, 0, 0, false, "FWHUD_RECK_BURST_GLOW")
+            end
+        else
+            if LCG and reg then
+                LCG.PixelGlow_Stop(reg, "FWHUD_RECK_BURST_GLOW")
+            end
+        end
+
+        return ""
+    end
+end"""
+
+
 def make_warrior_spell_custom_duration(spell_id: int, buff_id: int) -> str:
     """Durata e scadenza dello swipe per il cooldown/buff del guerriero."""
     return f"""function()
@@ -2549,7 +2642,18 @@ end"""
             "cooldownTextDisabled": True,
             "inverse": False,
             "customTextUpdate": "update",
-            "customText": make_warrior_spell_custom_text(1719, 1719, "FWHUD_RECK_GLOW"),
+            "customText": make_recklessness_custom_text(),
+            "actions": {
+                "start": {},
+                "finish": {
+                    "do_custom": True,
+                    "custom": """local LCG = LibStub and LibStub("LibCustomGlow-1.0", true)
+if LCG and aura_env and aura_env.region then
+    LCG.PixelGlow_Stop(aura_env.region, "FWHUD_RECK_GLOW")
+    LCG.PixelGlow_Stop(aura_env.region, "FWHUD_RECK_BURST_GLOW")
+end""",
+                },
+            },
             "triggers": {
                 1: {
                     "trigger": {

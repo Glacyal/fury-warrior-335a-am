@@ -67,7 +67,7 @@ La riga inferiore si adatta in tempo reale con centratura automatica in base all
 - **09 - Enchants warDPS**: Monitoraggio unificato degli incanti arma (Mano Primaria e Secondaria), presente esclusivamente se almeno un'arma possiede un incanto con proc (*Berserking*, *Mongoose*, *Executioner*, *Crusader*, *Blade Ward*, *Blood Draining*, *Black Magic*). Mostra il badge `x2` in alto in caso di doppio proc simultaneo (+800 AP con doppio Berserking) e timer FIFO alla base con durata residua del primo incanto in scadenza.
 - **10 - Gloves warDPS**: Compare solo se i guanti possiedono gli *Acceleratori Ipersonici* di Ingegneria (+340 Haste per 12s, 60s CD).
 - **11 - Death Wish**: Monitora durata attiva (+20% danno) e tempo di recupero.
-- **12 - Recklessness**: Tracciamento delle cariche di critico garantito e tempo di recupero.
+- **12 - Recklessness**: Tracciamento delle cariche di critico garantito, tempo di recupero e **Smart Burst Advisor** (Pixel Glow ad alta visibilità colore fuoco `[1.0, 0.35, 0.0, 1.0]` che consiglia il momento ottimale per scatenare il burst in combattimento quando si aprono finestre di procs multipli pesanti tra monili, anello del Verdetto ed incanti Berserking con o senza Death Wish).
 - **13 - Boots warDPS**: Compare solo se gli stivali possiedono gli *Acceleratori a Nitro* di Ingegneria (5s sprint, 180s CD), nascondendosi automaticamente in presenza di incanti con statistiche passive.
 - **Centratura Automatica Dinamica**: Qualsiasi combinazione di icone attive (fino a 10 icone con passo adattivo) viene allineata in modo perfettamente simmetrico ed equilibrato sotto la barra della rabbia senza alcun disallineamento.
 

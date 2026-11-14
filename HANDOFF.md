@@ -137,6 +137,14 @@ Per apportare modifiche alla suite o estendere la logica:
 ### 4.4 Centratura Dinamica Riga Utility (`05` - `13`, da 3 a 10 Icone)
 - **Ordine rigoroso da sinistra a destra**:
   `[05 - Trinket 1] -> [06 - Trinket 2] -> [06b - Ring] -> [07 - Cloak] -> [08 - Tier Set] -> [09 - Enchants] -> [10 - Gloves] -> [11 - Death Wish] -> [12 - Recklessness] -> [13 - Boots]`
+- **Smart Burst Advisor (`12 - Recklessness`)**:
+  - Advisor reattivo per ottimizzare il lancio di Recklessness durante finestre di alto danno:
+    - In combattimento contro un bersaglio vivente e attaccabile, con abilità pronta (`state == "READY"`).
+    - Con Death Wish attivo: richiede almeno $\ge 2$ proc maggiori (Trinket 1, Trinket 2, Ashen Band, Berserking armi).
+    - Senza Death Wish: richiede almeno $\ge 3$ proc maggiori simultanei.
+    - Notifica visiva: **Pixel Glow Fuoco** arancione caldo (`[1.0, 0.35, 0.0, 1.0]`) senza testo o clutter invasivo.
+    - All'attivazione: transizione istantanea a Pixel Glow giallo con conteggio cariche (`x3`, `x2`, `x1`).
+    - In ricarica o out-of-combat: spegnimento totale del glow.
 - **Safe Region Accessor (`getRegion`)**:
   - Sostituito l'accesso diretto a `WeakAuras.regions` con il safe accessor:
     ```lua

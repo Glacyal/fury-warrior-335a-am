@@ -13,6 +13,7 @@ def run_tests():
         make_ring_custom_text,
         make_enchants_custom_text,
         make_enchants_custom_duration,
+        make_recklessness_custom_text,
     )
 
     auras = build_utility_auras()
@@ -158,6 +159,19 @@ def run_tests():
     print("[OK] Tutti i 10 elementi della riga utility verificati con 'check': 'update'.")
     print("[OK] Catalogo monili WotLK 3.3.5a completo con ICD e spell ID corretti (DBW, STS, Choice, Skull, ecc.).")
     print("[OK] Gestione proc attivo (Pixel Glow giallo) e conteggio ICD rimanente (rosso) verificati.")
+    # Verify 12 - Recklessness Smart Burst Advisor
+    reck_aura = [a for a in auras if a["id"] == "12 - Recklessness"][0]
+    reck_txt = reck_aura["customText"]
+    assert "FWHUD_RECK_BURST_GLOW" in reck_txt, "Manca FWHUD_RECK_BURST_GLOW in customText di 12 - Recklessness"
+    assert "FWHUD_RECK_GLOW" in reck_txt, "Manca FWHUD_RECK_GLOW in customText di 12 - Recklessness"
+    assert "procsCount >= 2" in reck_txt, "Manca soglia procsCount >= 2 con Death Wish in customText di 12 - Recklessness"
+    assert "procsCount >= 3" in reck_txt, "Manca soglia procsCount >= 3 senza Death Wish in customText di 12 - Recklessness"
+    assert "1.0, 0.35, 0.0, 1.0" in reck_txt, "Manca colore arancione/fuoco per pixel glow burst advisor"
+
+    reck_finish = reck_aura.get("actions", {}).get("finish", {}).get("custom", "")
+    assert 'LCG.PixelGlow_Stop(aura_env.region, "FWHUD_RECK_GLOW")' in reck_finish, "Manca stop FWHUD_RECK_GLOW in actions.finish"
+    assert 'LCG.PixelGlow_Stop(aura_env.region, "FWHUD_RECK_BURST_GLOW")' in reck_finish, "Manca stop FWHUD_RECK_BURST_GLOW in actions.finish"
+    print("[OK] 12 - Recklessness Smart Burst Advisor (FWHUD_RECK_BURST_GLOW, soglie proc e actions.finish) verificato.")
     print("[OK] Incanti arma unificati in '09 - Enchants warDPS' con timer FIFO in basso e stack x2 in alto verificati.")
     print("[PASS] test_utility_row.py superato con successo!")
 

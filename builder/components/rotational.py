@@ -3,8 +3,8 @@ Modulo Componente: 15 - Rotational Bar (Dual Swing Timer & Heroic Strike Queued)
 ===============================================================================
 Gestisce la barra orizzontale centrale composita a y = -7 (278x7px):
 1. Background Frame (278x7px, scuro semitrasparente).
-2. Mezza Barra Sinistra (137x5px a x = -70.5): Swing Timer Mano Primaria (MH) con timing %c (es. 1.8s).
-3. Mezza Barra Destra (137x5px a x = +70.5): Swing Timer Mano Secondaria (OH) con timing %c (es. 1.2s).
+2. Mezza Barra Sinistra (137x5px a x = -70.5): Swing Timer Mano Secondaria (OH) con timing %c (es. 1.2s).
+3. Mezza Barra Destra (137x5px a x = +70.5): Swing Timer Mano Primaria (MH) con timing %c (es. 1.8s).
 4. Indicatore Heroic Strike / Cleave Queued:
    - Rileva in tempo reale se Heroic Strike (47450) o Cleave (47520) è accodato tramite IsCurrentSpell().
    - Illuminazione cromatica dinamica su tutta la barra (278x7px) e Pixel Glow dedicato (Oro per Heroic Strike, Verde Smeraldo per Cleave), senza testi sovrapposti ai timer di swing.
@@ -137,8 +137,8 @@ def build_rotational_auras() -> list[dict]:
             "selfPoint": "CENTER",
             "controlledChildren": [
                 "Rotational Bar - Background",
-                "Rotational Bar - MH Swing",
                 "Rotational Bar - OH Swing",
+                "Rotational Bar - MH Swing",
                 "Rotational Bar - HS Queued",
             ],
             "actions": {
@@ -181,89 +181,7 @@ def build_rotational_auras() -> list[dict]:
                 "activeTriggerMode": -10,
             },
         },
-        # MH Swing (Mezza barra sinistra: 137x5px a x = -70.5) con etichetta MH e timing %c
-        {
-            "id": "Rotational Bar - MH Swing",
-            "uid": "FWHUD_ROTCENTER_MH",
-            "parent": "15 - Rotational Bar",
-            "regionType": "aurabar",
-            "internalVersion": 52,
-            "width": 137,
-            "height": 5,
-            "xOffset": -70.5,
-            "yOffset": 0,
-            "barColor": [0.85, 0.45, 0.15, 1.0],
-            "backgroundColor": [0.12, 0.06, 0.04, 0.6],
-            "texture": TEXTURE_STATUSBAR,
-            "inverse": False,
-            "customTextUpdate": "update",
-            "customText": """function()
-                if _G.FWHUD_GetSwing then _G.FWHUD_GetSwing() end
-                local now = GetTime()
-                local sw = _G.FWHUD_Swing
-                if sw and sw.mhStart and sw.mhStart > 0 then
-                    local rem = (sw.mhStart + (sw.mhDur or 3.0)) - now
-                    if rem > 0 then
-                        return string.format("%.1fs", rem)
-                    end
-                end
-                local spd = select(1, UnitAttackSpeed("player")) or 3.0
-                return string.format("%.1fs", spd)
-            end""",
-            "actions": {
-                "init": {
-                    "do_custom": True,
-                    "custom": SHARED_SWING_TIMER_LUA,
-                },
-                "start": {},
-                "finish": {},
-            },
-            "triggers": {
-                1: {
-                    "trigger": {
-                        "type": "custom",
-                        "custom_type": "status",
-                        "check": "update",
-                        "custom": "function() return true end",
-                        "customDuration": """function()
-                            if _G.FWHUD_GetSwing then _G.FWHUD_GetSwing() end
-                            local sw = _G.FWHUD_Swing
-                            local now = GetTime()
-                            local start = sw and sw.mhStart or 0
-                            local dur = sw and sw.mhDur or select(1, UnitAttackSpeed("player")) or 3.0
-                            local exp = start + dur
-                            if exp > now and start > 0 then
-                                return dur, exp
-                            end
-                            return dur, now + dur
-                        end""",
-                        "customText": """function()
-                            if _G.FWHUD_GetSwing then _G.FWHUD_GetSwing() end
-                            local now = GetTime()
-                            local sw = _G.FWHUD_Swing
-                            if sw and sw.mhStart and sw.mhStart > 0 then
-                                local rem = (sw.mhStart + (sw.mhDur or 3.0)) - now
-                                if rem > 0 then
-                                    return string.format("%.1fs", rem)
-                                end
-                            end
-                            local spd = select(1, UnitAttackSpeed("player")) or 3.0
-                            return string.format("%.1fs", spd)
-                        end""",
-                        "customTextUpdate": "update",
-                    },
-                    "untrigger": {
-                        "custom": "function() return false end",
-                    }
-                },
-                "activeTriggerMode": -10,
-            },
-            "subRegions": [
-                make_subtext("MH", justify="LEFT", anchor_point="INNER_LEFT", font_size=9, y_offset=0, extra_props={"text_xOffset": 3, "text_color": [1.0, 0.75, 0.2, 1.0]}),
-                make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=9, y_offset=0, extra_props={"text_color": [1.0, 1.0, 1.0, 1.0]}),
-            ],
-        },
-        # OH Swing (Mezza barra destra: 137x5px a x = +70.5) con etichetta OH e timing %c
+        # OH Swing (Mezza barra sinistra: 137x5px a x = -70.5) con etichetta OH e timing %c
         {
             "id": "Rotational Bar - OH Swing",
             "uid": "FWHUD_ROTCENTER_OH",
@@ -272,9 +190,9 @@ def build_rotational_auras() -> list[dict]:
             "internalVersion": 52,
             "width": 137,
             "height": 5,
-            "xOffset": 70.5,
+            "xOffset": -70.5,
             "yOffset": 0,
-            "barColor": [0.75, 0.35, 0.10, 1.0],
+            "barColor": [0.85, 0.45, 0.15, 1.0],
             "backgroundColor": [0.12, 0.06, 0.04, 0.6],
             "texture": TEXTURE_STATUSBAR,
             "inverse": False,
@@ -349,8 +267,90 @@ def build_rotational_auras() -> list[dict]:
                 "activeTriggerMode": -10,
             },
             "subRegions": [
+                make_subtext("OH", justify="LEFT", anchor_point="INNER_LEFT", font_size=9, y_offset=0, extra_props={"text_xOffset": 3, "text_color": [1.0, 0.75, 0.2, 1.0]}),
                 make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=9, y_offset=0, extra_props={"text_color": [1.0, 1.0, 1.0, 1.0]}),
-                make_subtext("OH", justify="RIGHT", anchor_point="INNER_RIGHT", font_size=9, y_offset=0, extra_props={"text_xOffset": -3, "text_color": [1.0, 0.65, 0.2, 1.0]}),
+            ],
+        },
+        # MH Swing (Mezza barra destra: 137x5px a x = +70.5) con etichetta MH e timing %c
+        {
+            "id": "Rotational Bar - MH Swing",
+            "uid": "FWHUD_ROTCENTER_MH",
+            "parent": "15 - Rotational Bar",
+            "regionType": "aurabar",
+            "internalVersion": 52,
+            "width": 137,
+            "height": 5,
+            "xOffset": 70.5,
+            "yOffset": 0,
+            "barColor": [0.85, 0.45, 0.15, 1.0],
+            "backgroundColor": [0.12, 0.06, 0.04, 0.6],
+            "texture": TEXTURE_STATUSBAR,
+            "inverse": False,
+            "customTextUpdate": "update",
+            "customText": """function()
+                if _G.FWHUD_GetSwing then _G.FWHUD_GetSwing() end
+                local now = GetTime()
+                local sw = _G.FWHUD_Swing
+                if sw and sw.mhStart and sw.mhStart > 0 then
+                    local rem = (sw.mhStart + (sw.mhDur or 3.0)) - now
+                    if rem > 0 then
+                        return string.format("%.1fs", rem)
+                    end
+                end
+                local spd = select(1, UnitAttackSpeed("player")) or 3.0
+                return string.format("%.1fs", spd)
+            end""",
+            "actions": {
+                "init": {
+                    "do_custom": True,
+                    "custom": SHARED_SWING_TIMER_LUA,
+                },
+                "start": {},
+                "finish": {},
+            },
+            "triggers": {
+                1: {
+                    "trigger": {
+                        "type": "custom",
+                        "custom_type": "status",
+                        "check": "update",
+                        "custom": "function() return true end",
+                        "customDuration": """function()
+                            if _G.FWHUD_GetSwing then _G.FWHUD_GetSwing() end
+                            local sw = _G.FWHUD_Swing
+                            local now = GetTime()
+                            local start = sw and sw.mhStart or 0
+                            local dur = sw and sw.mhDur or select(1, UnitAttackSpeed("player")) or 3.0
+                            local exp = start + dur
+                            if exp > now and start > 0 then
+                                return dur, exp
+                            end
+                            return dur, now + dur
+                        end""",
+                        "customText": """function()
+                            if _G.FWHUD_GetSwing then _G.FWHUD_GetSwing() end
+                            local now = GetTime()
+                            local sw = _G.FWHUD_Swing
+                            if sw and sw.mhStart and sw.mhStart > 0 then
+                                local rem = (sw.mhStart + (sw.mhDur or 3.0)) - now
+                                if rem > 0 then
+                                    return string.format("%.1fs", rem)
+                                end
+                            end
+                            local spd = select(1, UnitAttackSpeed("player")) or 3.0
+                            return string.format("%.1fs", spd)
+                        end""",
+                        "customTextUpdate": "update",
+                    },
+                    "untrigger": {
+                        "custom": "function() return false end",
+                    }
+                },
+                "activeTriggerMode": -10,
+            },
+            "subRegions": [
+                make_subtext("%c", justify="CENTER", anchor_point="CENTER", font_size=9, y_offset=0, extra_props={"text_color": [1.0, 1.0, 1.0, 1.0]}),
+                make_subtext("MH", justify="RIGHT", anchor_point="INNER_RIGHT", font_size=9, y_offset=0, extra_props={"text_xOffset": -3, "text_color": [1.0, 0.75, 0.2, 1.0]}),
             ],
         },
         # HS Queued Indicator (Dynamic Chromatic Illumination - Gold for HS, Emerald Green for Cleave)

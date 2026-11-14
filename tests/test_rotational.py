@@ -17,15 +17,17 @@ def run_tests():
     bg = auras[1]
     assert bg["width"] == 278 and bg["height"] == 7
 
-    mh = auras[2]
-    assert mh["id"] == "Rotational Bar - MH Swing"
-    assert mh["width"] == 137 and mh["height"] == 5
-    assert mh["xOffset"] == -70.5
-
-    oh = auras[3]
-    assert oh["id"] == "Rotational Bar - OH Swing"
+    auras_map = {a["id"]: a for a in auras}
+    oh = auras_map["Rotational Bar - OH Swing"]
     assert oh["width"] == 137 and oh["height"] == 5
-    assert oh["xOffset"] == 70.5
+    assert oh["xOffset"] == -70.5
+
+    mh = auras_map["Rotational Bar - MH Swing"]
+    assert mh["width"] == 137 and mh["height"] == 5
+    assert mh["xOffset"] == 70.5
+
+    assert mh["barColor"] == oh["barColor"], f"I colori delle barre non coincidono: {mh['barColor']} vs {oh['barColor']}"
+    assert mh["barColor"] == [0.85, 0.45, 0.15, 1.0], f"Colore inatteso: {mh['barColor']}"
 
     hsq = auras[4]
     assert hsq["id"] == "Rotational Bar - HS Queued"

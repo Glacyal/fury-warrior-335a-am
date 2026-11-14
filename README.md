@@ -28,8 +28,9 @@ Tutti i componenti del pacchetto sono organizzati con una numerazione sequenzial
 ### 1. Barra Rotazionale & Dual Swing Timer (`15 - Rotational Bar`)
 Posizionata visivamente a centro schermo subito sopra la barra della rabbia, gestisce il monitoraggio del ritmo di attacco e della priorità in combattimento:
 - **Doppio Swing Timer Speculare con Timing Numerico Live**:
-  - **Mezza Barra Sinistra (MH)**: Avanzamento dello swing per la Mano Primaria con etichetta MH e conto alla rovescia numerico live al decimo di secondo.
-  - **Mezza Barra Destra (OH)**: Avanzamento dello swing per la Mano Secondaria con etichetta OH e conto alla rovescia numerico live al decimo di secondo.
+  - **Mezza Barra Sinistra (OH)**: Avanzamento dello swing per la Mano Secondaria con etichetta OH e conto alla rovescia numerico live al decimo di secondo.
+  - **Mezza Barra Destra (MH)**: Avanzamento dello swing per la Mano Primaria con etichetta MH e conto alla rovescia numerico live al decimo di secondo.
+  - **Colorazione Unificata**: Entrambe le metà condividono la medesima tonalità cromatica calda e coerente per massima pulizia visiva.
 - **Illuminazione Cromatica Additiva Dinamica ("Glow" ADD) per HS e Cleave**:
   - Quando **Heroic Strike** è in coda: L'intera barra rotazionale (278x7px) si retroillumina in oro caldo con Pixel Glow dorato (`[1.0, 0.84, 0.0, 1.0]`).
   - Quando **Cleave** è in coda: L'intera barra si retroillumina in verde smeraldo con Pixel Glow smeraldo (`[0.1, 0.95, 0.2, 1.0]`).

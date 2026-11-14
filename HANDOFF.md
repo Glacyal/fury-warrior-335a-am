@@ -105,8 +105,9 @@ Per apportare modifiche alla suite o estendere la logica:
 
 ### 4.1 Barra Rotazionale Dual Swing & HS/Cleave Queued (`15 - Rotational Bar`)
 - **Doppio Swing Timer Speculare**:
-  1. **MH Swing (Mezza Sinistra)**: Avanzamento dello swing per Mano Primaria con etichetta `MH` e timing `%c` (es. `1.8s`).
-  2. **OH Swing (Mezza Destra)**: Avanzamento dello swing per Mano Secondaria con etichetta `OH` e timing `%c` (es. `1.2s`).
+  1. **OH Swing (Mezza Sinistra)**: Avanzamento dello swing per Mano Secondaria con etichetta `OH` e timing `%c` (es. `1.2s`).
+  2. **MH Swing (Mezza Destra)**: Avanzamento dello swing per Mano Primaria con etichetta `MH` e timing `%c` (es. `1.8s`).
+  3. **Colorazione Unificata**: Entrambe le barre condividono la medesima tonalità cromatica (`[0.85, 0.45, 0.15, 1.0]`) per massima armonia visiva.
 - **Retroilluminazione Cromatica Additiva Dinamica**:
   - Quando **Heroic Strike** è accodato: retroilluminazione oro caldo (`[1.0, 0.84, 0.0, 0.40]`) con Pixel Glow dorato.
   - Quando **Cleave** è accodato: retroilluminazione verde smeraldo (`[0.1, 0.95, 0.2, 0.40]`) con Pixel Glow smeraldo.
